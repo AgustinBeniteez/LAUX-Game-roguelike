@@ -132,6 +132,13 @@
 
     continueBtn.addEventListener('click', () => {
       if (selectedClass) {
+        // Guardar el idioma actual
+        const currentLanguage = localStorage.getItem('language');
+        // Limpiar todo el localStorage
+        localStorage.clear();
+        // Restaurar el idioma
+        if (currentLanguage) localStorage.setItem('language', currentLanguage);
+
         const weaponStats = {
           basic_wand: { name: 'Varita Básica', damage: 15, speed: 0.3 },
           staff: { name: 'Bastón Mágico', damage: 30, speed: 0.8 },

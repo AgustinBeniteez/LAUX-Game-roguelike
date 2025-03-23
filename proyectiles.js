@@ -13,15 +13,15 @@ class Projectile extends Entity {
         // Configurar daño y sprite según el tipo de varita
         switch(weaponType) {
             case 'crystal':
-                this.damage = damage * 0.2;
+                this.damage = damage * 1.5;
                 this.loadSprite('sprites/proyectil_sprite_3.png', 32, 32, 1);
                 break;
             case 'nature':
-                this.damage = damage * 0.2;
+                this.damage = damage * 1.7;
                 this.loadSprite('sprites/proyectil_sprite_2.png', 32, 32, 1);
                 break;
             default:
-                this.damage = damage * 0.2;
+                this.damage = damage * 1.5;
                 this.loadSprite('sprites/proyectil_sprite_1.png', 32, 32, 1);
         }
         

@@ -43,7 +43,7 @@ class Entity {
             this.damageRate = 30;
             this.width = 130;
             this.height = 130;
-            this.spritePath = 'sprites/plant_enemy_boss_sprite.png'; // Misma ruta temporal
+            this.spritePath = 'sprites/plant_enemy_4_sprite.png'; // Misma ruta temporal
             break;
         }
         if (spriteSrc === null) {
