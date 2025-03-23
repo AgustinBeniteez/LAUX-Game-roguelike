@@ -256,33 +256,37 @@ class Entity {
         const enemyX = nearestEnemy.x + nearestEnemy.width / 2;
         const enemyY = nearestEnemy.y + nearestEnemy.height / 2;
         
-        // Crear 3 proyectiles en patrón triangular
-        const angles = [-15, 0, 15]; // Ángulos de dispersión en grados
-        angles.forEach(angle => {
-          const radians = angle * (Math.PI / 180);
-          const dx = enemyX - (this.x + this.width / 2);
-          const dy = enemyY - (this.y + this.height / 2);
-          const distance = Math.sqrt(dx * dx + dy * dy);
-          
-          // Rotar el vector de dirección
-          const rotatedX = (dx * Math.cos(radians) - dy * Math.sin(radians)) / distance;
-          const rotatedY = (dx * Math.sin(radians) + dy * Math.cos(radians)) / distance;
-          
-          const targetPosX = this.x + this.width / 2 + rotatedX * distance;
-          const targetPosY = this.y + this.height / 2 + rotatedY * distance;
-          
-          let projectile;
-          if (this.equippedWeapon.name === 'Varita de Cristal') {
-            projectile = new Projectile(this.x + this.width / 2, this.y + this.height / 2, targetPosX, targetPosY, this.equippedWeapon.damage, 300, 2);
-            projectile.areaRadius = 100;
-            projectile.damageTimer = 0;
-            projectile.damageInterval = 0.9;
-          } else {
-            projectile = new Projectile(this.x + this.width / 2, this.y + this.height / 2, targetPosX, targetPosY, this.equippedWeapon.damage, this.equippedWeapon.name === 'Bastón Mágico' ? 200 : 400);
-          }
+        let projectile;
+        if (this.equippedWeapon.name === 'Varita de Cristal') {
+          // Varita de Cristal: 3 proyectiles en abanico
+          const angles = [-15, 0, 15];
+          angles.forEach(angle => {
+            const radians = angle * (Math.PI / 180);
+            const dx = enemyX - (this.x + this.width / 2);
+            const dy = enemyY - (this.y + this.height / 2);
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            const rotatedX = (dx * Math.cos(radians) - dy * Math.sin(radians)) / distance;
+            const rotatedY = (dx * Math.sin(radians) + dy * Math.cos(radians)) / distance;
+            
+            const targetPosX = this.x + this.width / 2 + rotatedX * distance;
+            const targetPosY = this.y + this.height / 2 + rotatedY * distance;
+            
+            projectile = new Projectile(this.x + this.width / 2, this.y + this.height / 2, targetPosX, targetPosY, 'crystal', this.equippedWeapon.damage, 200);
+            engine.addEntity(projectile);
+          });
+        } else if (this.equippedWeapon.name === 'Varita de Naturaleza') {
+          // Varita de Naturaleza: proyectil que se divide al impactar
+          projectile = new Projectile(this.x + this.width / 2, this.y + this.height / 2, enemyX, enemyY, 'nature', this.equippedWeapon.damage, 200);
+          engine.addEntity(projectile);
+        } else {
+          // Varita básica: un proyectil directo
+          projectile = new Projectile(this.x + this.width / 2, this.y + this.height / 2, enemyX, enemyY, 'crystal', this.equippedWeapon.damage, 200);
+          engine.addEntity(projectile);
+        }
           
           engine.addEntity(projectile);
-        });
+        
         
         // Auto-shoot
         setTimeout(() => {
@@ -398,4 +402,3 @@ class Entity {
       }
     }
   }
-  

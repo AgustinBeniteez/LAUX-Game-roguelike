@@ -13,15 +13,18 @@ class Projectile extends Entity {
         // Configurar daño y sprite según el tipo de varita
         switch(weaponType) {
             case 'crystal':
-                this.damage = damage * 1.5;
+                this.damage = damage * 1.2;
                 this.loadSprite('sprites/proyectil_sprite_3.png', 32, 32, 1);
+                this.areaEffect = true;
+                this.areaRadius = 80;
                 break;
             case 'nature':
-                this.damage = damage * 1.7;
+                this.damage = damage * 1.4;
                 this.loadSprite('sprites/proyectil_sprite_2.png', 32, 32, 1);
+                this.splitOnImpact = true;
                 break;
             default:
-                this.damage = damage * 1.5;
+                this.damage = damage;
                 this.loadSprite('sprites/proyectil_sprite_1.png', 32, 32, 1);
         }
         
@@ -61,6 +64,42 @@ class Projectile extends Entity {
                 if (this.checkCollision(entity)) {
                     // Aplicar daño al enemigo
                     entity.health -= this.damage;
+                    
+                    // Comportamiento especial para cada tipo de varita
+                    if (this.weaponType === 'crystal') {
+                        // Efecto de área para la varita de cristal
+                        engine.entities.forEach(nearbyEntity => {
+                            if (nearbyEntity.isEnemy && !nearbyEntity.isDead && nearbyEntity !== entity) {
+                                const dx = nearbyEntity.x - this.x;
+                                const dy = nearbyEntity.y - this.y;
+                                const distance = Math.sqrt(dx * dx + dy * dy);
+                                
+                                if (distance <= this.areaRadius) {
+                                    // El daño disminuye con la distancia
+                                    const damageMultiplier = 1 - (distance / this.areaRadius);
+                                    nearbyEntity.health -= this.damage * damageMultiplier;
+                                }
+                            }
+                        });
+                    } else if (this.weaponType === 'nature') {
+                        // Crear proyectiles adicionales al impactar
+                        const angles = [-45, 45];
+                        angles.forEach(angle => {
+                            const radians = angle * (Math.PI / 180);
+                            const newVelX = this.velocityX * Math.cos(radians) - this.velocityY * Math.sin(radians);
+                            const newVelY = this.velocityX * Math.sin(radians) + this.velocityY * Math.cos(radians);
+                            const newProjectile = new Projectile(
+                                this.x,
+                                this.y,
+                                this.x + newVelX,
+                                this.y + newVelY,
+                                'nature',
+                                this.damage * 0.5,
+                                this.speed * 0.8
+                            );
+                            engine.addEntity(newProjectile);
+                        });
+                    }
                     
                     // Eliminar el proyectil al impactar
                     const index = engine.entities.indexOf(this);
