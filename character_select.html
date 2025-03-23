@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>LAUX GAME - Selección de Personaje</title>
+  <link rel="shortcut icon" href="sprites/laux_logo.webp" type="image/x-icon">
+  <style>
+    body { 
+      margin: 0; 
+      background: #222; 
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      font-family: 'Arial', sans-serif;
+    }
+    .title {
+      color: white;
+      font-size: 48px;
+      margin-bottom: 40px;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    }
+    .class-selection {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    .class-card {
+        border-radius: 10px;
+        padding: 20px;
+        width: 200px;
+        height: 350px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+    }
+    .class-card:hover {
+      transform: scale(1.1);
+    }
+    .class-card.selected {
+      background-image: url('sprites/card_selected_sprite.png') !important;
+      transition: all 0.3s ease;
+    }
+    .class-icon {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 10px;
+    }
+    .class-name {
+      color: white;
+      font-size: 24px;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      z-index: 1;
+    }
+    .class-desc {
+      color: #fff;
+      font-size: 14px;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+      z-index: 1;
+    }
+    .continue-btn {
+      background: #4CAF50;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      padding: 15px 30px;
+      font-size: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: none;
+    }
+    .continue-btn:hover {
+      background: #45a049;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <h1 class="title">Elige una clase</h1>
+  <div class="class-selection">
+    <div class="class-card" data-weapon="basic_wand" style="background-image: url('sprites/card_sprite.png');">
+      <svg class="class-icon" viewBox="0 0 32 32">
+        <path fill="#8B5CF6" d="M16 2L4 30h24L16 2zm0 8l8 18H8l8-18z"/>
+        <path fill="#C4B5FD" d="M16 10l-8 18h16l-8-18z"/>
+      </svg>
+      <div class="class-name">Varita Básica</div>
+      <div class="class-desc">Disparo rápido y preciso</div>
+    </div>
+    <div class="class-card" data-weapon="staff" style="background-image: url('sprites/card_sprite.png');">
+      <svg class="class-icon" viewBox="0 0 32 32">
+        <path fill="#4B5563" d="M16 2L4 30h24L16 2zm0 8l8 18H8l8-18z"/>
+        <path fill="#9CA3AF" d="M16 10l-8 18h16l-8-18z"/>
+      </svg>
+      <div class="class-name">Bastón Mágico</div>
+      <div class="class-desc">Mayor daño pero más lento</div>
+    </div>
+    <div class="class-card" data-weapon="crystal_wand" style="background-image: url('sprites/card_sprite.png');">
+      <svg class="class-icon" viewBox="0 0 32 32">
+        <path fill="#EC4899" d="M16 2L4 30h24L16 2zm0 8l8 18H8l8-18z"/>
+        <path fill="#F9A8D4" d="M16 10l-8 18h16l-8-18z"/>
+      </svg>
+      <div class="class-name">Varita de Cristal</div>
+      <div class="class-desc">Disparo explosivo con área de efecto</div>
+    </div>
+  </div>
+  <button id="continue" class="continue-btn">Continuar</button>
+
+  <script>
+    let selectedClass = null;
+    const cards = document.querySelectorAll('.class-card');
+    const continueBtn = document.getElementById('continue');
+
+    cards.forEach(card => {
+      card.addEventListener('click', () => {
+        cards.forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        selectedClass = card.dataset.weapon;
+        continueBtn.style.display = 'block';
+      });
+    });
+
+    continueBtn.addEventListener('click', () => {
+      if (selectedClass) {
+        const weaponStats = {
+          basic_wand: { name: 'Varita Básica', damage: 15, speed: 0.3 },
+          staff: { name: 'Bastón Mágico', damage: 30, speed: 0.8 },
+          crystal_wand: { name: 'Varita de Cristal', damage: 20, speed: 0.5 }
+        };
+        const playerData = {
+          class: 'wizard',
+          health: 100,
+          speed: 250,
+          level: 1,
+          experience: 0,
+          mana: 100,
+          maxMana: 100,
+          stamina: 0,
+          maxStamina: 0,
+          inventory: [],
+          equippedWeapon: weaponStats[selectedClass]
+        };
+        localStorage.setItem('playerData', JSON.stringify(playerData));
+        window.location.href = 'game.html';
+      }
+    });
+  </script>
+</body>
+</html>

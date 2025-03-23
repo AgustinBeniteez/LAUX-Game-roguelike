@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>LAUX GAME</title>
+  <link rel="shortcut icon" href="sprites/laux_logo.webp" type="image/x-icon">
+  <style>
+    body { 
+      margin: 0; 
+      background: #222; 
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      font-family: 'Arial', sans-serif;
+    }
+    .config-title {
+      color: rgb(206, 111, 206);
+      font-size: 48px;
+      margin-bottom: 40px;
+      text-shadow: 0 0 10px rgba(253, 78, 201, 0.5);
+    }
+    .config-container {
+      background: rgba(0, 0, 0, 0.7);
+      padding: 30px;
+      border-radius: 10px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      min-width: 300px;
+    }
+    .config-item {
+      margin-bottom: 20px;
+      color: white;
+    }
+    .config-label {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 18px;
+      color: #ffd700;
+    }
+    select {
+      width: 100%;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    select:hover {
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+    .button-container {
+      display: flex;
+      gap: 10px;
+      margin-top: 30px;
+    }
+    .config-button {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      padding: 15px 30px;
+      border-radius: 5px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .config-button:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: scale(1.05);
+    }
+    .save-button {
+      background: rgba(76, 175, 80, 0.3);
+    }
+    .back-button {
+      background: rgba(244, 67, 54, 0.3);
+    }
+  </style>
+</head>
+<body>
+  <h1 class="config-title" data-translate="settings">Configuración</h1>
+  <div class="config-container">
+    <div class="config-item">
+      <label class="config-label" data-translate="language">Idioma</label>
+      <select id="languageSelect">
+        <option value="es">Español</option>
+        <option value="en">English</option>
+      </select>
+    </div>
+    <div class="button-container">
+      <button class="config-button save-button" data-translate="save" onclick="saveConfig()">Guardar</button>
+      <button class="config-button back-button" data-translate="back" onclick="handleBack()">Volver</button>
+    </div>
+  </div>
+
+  <script>
+    let translations = {};
+    let currentLang = localStorage.getItem('language') || 'es';
+
+    async function loadTranslations() {
+      try {
+        const response = await fetch('translations.json');
+        translations = await response.json();
+        document.documentElement.lang = currentLang;
+        updateLanguage();
+      } catch (error) {
+        console.error('Error loading translations:', error);
+      }
+    }
+
+    function updateLanguage() {
+      const elements = document.querySelectorAll('[data-translate]');
+      elements.forEach(element => {
+        const key = element.getAttribute('data-translate');
+        if (translations[currentLang] && translations[currentLang][key]) {
+          element.textContent = translations[currentLang][key];
+        }
+      });
+      document.getElementById('languageSelect').value = currentLang;
+    }
+
+    function saveConfig() {
+      const langSelect = document.getElementById('languageSelect');
+      currentLang = langSelect.value;
+      localStorage.setItem('language', currentLang);
+      updateLanguage();
+      handleBack();
+    }
+
+    function handleBack() {
+      if (window.parent === window) {
+        window.location.href = 'index.html';
+      } else {
+        window.parent.postMessage('closeSettings', '*');
+      }
+    }
+
+    // Initialize
+    document.getElementById('languageSelect').value = currentLang;
+    loadTranslations();
+  </script>
+</body>
+</html>

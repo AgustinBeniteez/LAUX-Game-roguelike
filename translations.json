@@ -1,0 +1,34 @@
+{
+  "es": {
+    "title": "LAUX GAME",
+    "play": "Jugar",
+    "options": "Opciones",
+    "resume": "Reanudar",
+    "settings": "Configuración",
+    "mainMenu": "Menú Principal",
+    "health": "Vida",
+    "speed": "Velocidad",
+    "position": "Posición",
+    "language": "Idioma",
+    "save": "Guardar",
+    "youDied": "Has muerto",
+    "playAgain": "Volver a jugar",
+    "exit": "Salir"
+  },
+  "en": {
+    "title": "LAUX GAME",
+    "play": "Play",
+    "options": "Options",
+    "resume": "Resume",
+    "settings": "Settings",
+    "mainMenu": "Main Menu",
+    "health": "Health",
+    "speed": "Speed",
+    "position": "Position",
+    "language": "Language",
+    "save": "Save",
+    "youDied": "You Died",
+    "playAgain": "Play Again",
+    "exit": "Exit"
+  }
+}

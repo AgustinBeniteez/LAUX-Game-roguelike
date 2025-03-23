@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>LAUX GAME</title>
+  <link rel="shortcut icon" href="sprites/laux_logo.webp" type="image/x-icon">
+  <script>
+    // Load saved language
+    const currentLang = localStorage.getItem('language') || 'es';
+    document.documentElement.lang = currentLang;
+  </script>
+  <style>
+    body { 
+      margin: 0; 
+      background: #222; 
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      font-family: 'Arial', sans-serif;
+    }
+    .game-title {
+      color: rgb(206, 111, 206);
+      font-size: 48px;
+      margin-bottom: 40px;
+      text-shadow: 0 0 10px rgba(253, 78, 201, 0.5);
+    }
+    .menu-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+    .menu-button {
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      padding: 20px 40px;
+      border-radius: 5px;
+      font-size: 24px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      min-width: 200px;
+      text-align: center;
+      text-decoration: none;
+    }
+    .menu-button:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: scale(1.05);
+      text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+    }
+  </style>
+</head>
+<body>
+  <h1 class="game-title" data-translate="title">LAUX GAME</h1>
+  <div class="menu-container">
+    <a href="character_select.html" class="menu-button" data-translate="newGame">Nueva Partida</a>
+    <button id="loadGame" class="menu-button" data-translate="loadGame">Cargar Partida</button>
+    <a href="config.html" class="menu-button" data-translate="options">Opciones</a>
+  </div>
+
+  <script>
+    document.getElementById('loadGame').addEventListener('click', () => {
+      const savedData = localStorage.getItem('playerData');
+      if (savedData) {
+        window.location.href = 'game.html';
+      } else {
+        alert('No hay partida guardada');
+      }
+    });
+  </script>
+
+  <script>
+    async function loadTranslations() {
+      try {
+        const response = await fetch('translations.json');
+        const translations = await response.json();
+        const currentLang = localStorage.getItem('language') || 'es';
+        
+        const elements = document.querySelectorAll('[data-translate]');
+        elements.forEach(element => {
+          const key = element.getAttribute('data-translate');
+          if (translations[currentLang] && translations[currentLang][key]) {
+            element.textContent = translations[currentLang][key];
+          }
+        });
+      } catch (error) {
+        console.error('Error loading translations:', error);
+      }
+    }
+
+    loadTranslations();
+  </script>
+</body>
+</html>

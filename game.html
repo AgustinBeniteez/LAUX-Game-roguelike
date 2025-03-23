@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>LAUX GAME</title>
+  <link rel="shortcut icon" href="sprites/laux_logo.webp" type="image/x-icon">
+  <script>
+    // Load saved language
+    const currentLang = localStorage.getItem('language') || 'es';
+    document.documentElement.lang = currentLang;
+  </script>
+  <style>
+    body { 
+      margin: 0; 
+      background: #222; 
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    canvas {
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+        width: 100vw;
+        height: 100vh;
+        object-fit: cover;
+        position: absolute;
+        z-index: 1;
+    }
+    #hud {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      z-index: 2;
+      color: white;
+      font-family: 'Arial', sans-serif;
+      font-size: 18px;
+    }
+    .stat-container {
+      margin-bottom: 10px;
+    }
+    .stat-label {
+      font-weight: bold;
+      color: #ffd700;
+      margin-right: 10px;
+    }
+    .stat-value {
+      color: #fff;
+    }
+    .coordinates {
+      font-size: 14px;
+      color: #aaa;
+    }
+    #pauseMenu {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 3;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+    #pauseMenu h1 {
+      color: white;
+      font-family: 'Arial', sans-serif;
+      font-size: 48px;
+      margin-bottom: 10px;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    }
+    #pauseMenu h2 {
+      color: white;
+      font-size: 36px;
+      font-family: 'Arial', sans-serif;
+      margin-bottom: 30px;
+      text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+    }
+    #settingsFrame {
+        display: none;
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        border: none;
+        border-radius: 10px;
+        z-index: 4;
+        background: #222;
+    }
+    .weapon-card:hover {
+      transform: scale(1.1);
+    }
+    .weapon-card.selected {
+      background: url('sprites/card_selected_sprite.png') no-repeat center !important;
+      background-size: contain !important;
+    }
+    .menu-button {
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      padding: 15px 30px;
+      margin: 10px;
+      border-radius: 5px;
+      font-family: 'Arial', sans-serif;
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .menu-button:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas"></canvas>
+  <div id="hud">
+    <div id="wave-info" style="position: absolute; top: 20px; right: 20px; background: rgba(0, 0, 0, 0.7); padding: 15px; border-radius: 10px; color: white;">
+      <div class="stat-container">
+        <span class="stat-label" data-translate="wave">Oleada:</span>
+        <span class="stat-value" id="wave-value">1</span>
+      </div>
+      <div class="stat-container">
+        <span class="stat-label" data-translate="enemies">Enemigos Eliminados:</span>
+        <span class="stat-value" id="enemies-value">0</span>
+      </div>
+      <div class="stat-container">
+        <span class="stat-label" data-translate="nextWave">Siguiente oleada:</span>
+        <span class="stat-value" id="next-wave-timer">30s</span>
+      </div>
+    </div>
+    <div id="weapon-selection" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 5; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8);">
+      <div style="display: flex; justify-content: center; align-items: center; height: 100%; gap: 20px;">
+        <div class="weapon-card" data-weapon="0" style="width: 200px; height: 300px; background: url('sprites/card_sprite.png') no-repeat center; background-size: contain; cursor: pointer; transition: transform 0.3s;">
+          <div style="height: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding: 20px; color: white; text-align: center;">
+            <h3 id="weapon-name-0" style="margin: 0;">Arma 1</h3>
+            <p id="weapon-desc-0" style="margin: 5px 0;">Descripción del arma 1</p>
+          </div>
+        </div>
+        <div class="weapon-card" data-weapon="1" style="width: 200px; height: 300px; background: url('sprites/card_sprite.png') no-repeat center; background-size: contain; cursor: pointer; transition: transform 0.3s;">
+          <div style="height: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding: 20px; color: white; text-align: center;">
+            <h3 id="weapon-name-1" style="margin: 0;">Arma 2</h3>
+            <p id="weapon-desc-1" style="margin: 5px 0;">Descripción del arma 2</p>
+          </div>
+        </div>
+        <div class="weapon-card" data-weapon="2" style="width: 200px; height: 300px; background: url('sprites/card_sprite.png') no-repeat center; background-size: contain; cursor: pointer; transition: transform 0.3s;">
+          <div style="height: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding: 20px; color: white; text-align: center;">
+            <h3 id="weapon-name-2" style="margin: 0;">Arma 3</h3>
+            <p id="weapon-desc-2" style="margin: 5px 0;">Descripción del arma 3</p>
+          </div>
+        </div>
+      </div>
+      <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); color: white; font-size: 24px;">
+        Tiempo restante: <span id="weapon-selection-timer">30</span>s
+      </div>
+    </div>
+    <div class="stat-container">
+      <span class="stat-label" data-translate="health">Vida:</span>
+      <span class="stat-value" id="health-value">100</span>
+    </div>
+    <div class="stat-container">
+      <span class="stat-label" data-translate="speed">Velocidad:</span>
+      <span class="stat-value" id="speed-value">200</span>
+    </div>
+    <div class="stat-container" id="mana-container">
+      <span class="stat-label" data-translate="mana">Mana:</span>
+      <span class="stat-value" id="mana-value">0</span>
+    </div>
+    <div class="stat-container" id="stamina-container">
+      <span class="stat-label" data-translate="stamina">Stamina:</span>
+      <span class="stat-value" id="stamina-value">0</span>
+    </div>
+    <div class="stat-container">
+      <span class="stat-label" data-translate="weapon">Arma:</span>
+      <span class="stat-value" id="weapon-value">-</span>
+    </div>
+    <div class="stat-container coordinates">
+      <span class="stat-label" data-translate="position">Posición:</span>
+      <span class="stat-value" id="position-value">X: 0, Y: 0</span>
+    </div>
+  </div>
+  <div id="pauseMenu">
+    <h1>LAUX GAME</h1>
+    <h2 data-translate="pause">Pause</h2>
+    <button id="resumeButton" class="menu-button" data-translate="resume">Reanudar</button>
+    <button id="settingsButton" class="menu-button" data-translate="settings">Configuración</button>
+    <button id="mainMenuButton" class="menu-button" data-translate="mainMenu" onclick="window.location.href='index.html'">Menú Principal</button>
+  </div>
+  <iframe id="settingsFrame" src="config.html"></iframe>
+  <script>
+    async function loadTranslations() {
+      try {
+        const response = await fetch('translations.json');
+        const translations = await response.json();
+        const currentLang = localStorage.getItem('language') || 'es';
+        
+        const elements = document.querySelectorAll('[data-translate]');
+        elements.forEach(element => {
+          const key = element.getAttribute('data-translate');
+          if (translations[currentLang] && translations[currentLang][key]) {
+            element.textContent = translations[currentLang][key];
+          }
+        });
+      } catch (error) {
+        console.error('Error loading translations:', error);
+      }
+    }
+
+    // Settings frame handling
+    const settingsFrame = document.getElementById('settingsFrame');
+    const pauseMenu = document.getElementById('pauseMenu');
+    const settingsButton = document.getElementById('settingsButton');
+
+    settingsButton.addEventListener('click', () => {
+      settingsFrame.style.display = 'block';
+      pauseMenu.style.display = 'none';
+    });
+
+    window.addEventListener('message', (event) => {
+      if (event.data === 'closeSettings') {
+        settingsFrame.style.display = 'none';
+        pauseMenu.style.display = 'flex';
+      }
+    });
+
+    loadTranslations();
+  </script>
+  <script src="assetManager.js"></script>
+  <script src="map.js"></script>
+  <script src="entity.js"></script>
+  <script src="minimap.js"></script>
+  <script src="engine.js"></script>
+  <script src="proyectiles.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
