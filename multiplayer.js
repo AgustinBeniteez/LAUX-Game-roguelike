@@ -1,5 +1,8 @@
 // Multiplayer game management
 import { createGameRoom, joinGameRoom, updateGameState, listenToGameState, updatePlayerState, listenToPlayerChanges } from './firebase-config.js';
+import { initWaitingPhase } from './game-state.js';
+
+let gameStarted = false;
 
 // Store current room and player information
 let currentRoomId = null;
@@ -13,6 +16,8 @@ export async function hostGame(name) {
         currentPlayerType = 'host';
         currentRoomId = await createGameRoom(name);
         setupGameListeners();
+        showRoomCode(currentRoomId);
+        initWaitingPhase();
         return currentRoomId;
     } catch (error) {
         console.error('Error creating game room:', error);
@@ -28,6 +33,8 @@ export async function joinGame(roomId, name) {
         await joinGameRoom(roomId, name);
         currentRoomId = roomId;
         setupGameListeners();
+        showRoomCode(roomId);
+        initWaitingPhase();
         return true;
     } catch (error) {
         console.error('Error joining game room:', error);
@@ -39,6 +46,11 @@ export async function joinGame(roomId, name) {
 function setupGameListeners() {
     listenToGameState(currentRoomId, (gameState) => {
         if (gameState) {
+            if (gameState.gamePhase === 'playing' && !gameStarted) {
+                gameStarted = true;
+                document.getElementById('hud').style.display = 'block';
+                document.getElementById('gameCanvas').style.visibility = 'visible';
+            }
             updateLocalGameState(gameState);
         }
     });
@@ -49,6 +61,21 @@ function setupGameListeners() {
             checkGameStart(players);
         }
     });
+}
+
+// Show room code in multiplayer mode
+function showRoomCode(roomId) {
+    const roomCodeElement = document.getElementById('roomCode');
+    const pauseRoomCodeElement = document.getElementById('pauseRoomCode');
+    
+    if (roomCodeElement) {
+        roomCodeElement.style.display = 'block';
+        roomCodeElement.textContent = `Código de sala: ${roomId}`;
+    }
+    
+    if (pauseRoomCodeElement) {
+        pauseRoomCodeElement.textContent = `Código de sala: ${roomId}`;
+    }
 }
 
 // Update the local game state based on Firebase data
@@ -68,7 +95,39 @@ function updateLocalGameState(gameState) {
         window.enemies = gameState.enemies;
     }
 
-    // Update other game state variables as needed
+    // Update remote player state
+    if (gameState.players) {
+        const playerRole = isHost ? 'guest' : 'host';
+        const remotePlayer = gameState.players[playerRole];
+        
+        if (remotePlayer) {
+            let existingPlayer = engine.entities.find(
+                e => !e.isEnemy && e !== engine.entities.find(e => !e.isEnemy && !e.isDead)
+            );
+
+            if (!existingPlayer) {
+                existingPlayer = new Entity(remotePlayer.x, remotePlayer.y);
+                existingPlayer.class = remotePlayer.class;
+                existingPlayer.isRemotePlayer = true;
+                existingPlayer.loadSprite(
+                    remotePlayer.class === 'warrior' ? 'sprites/player_espada_sprite.png' : 'sprites/player_barita_sprite.png',
+                    32, 32, 4
+                );
+                engine.addEntity(existingPlayer);
+            }
+
+            existingPlayer.x = remotePlayer.x;
+            existingPlayer.y = remotePlayer.y;
+            existingPlayer.health = remotePlayer.health;
+            existingPlayer.currentFrame = remotePlayer.currentFrame;
+            existingPlayer.direction = remotePlayer.direction;
+            existingPlayer.isMoving = remotePlayer.isMoving;
+
+            if (existingPlayer.isMoving) {
+                existingPlayer.animate();
+            }
+        }
+    }
 }
 
 // Update the UI to show connected players
