@@ -4,9 +4,11 @@
   <meta charset="UTF-8">
   <title>LAUX GAME</title>
   <link rel="shortcut icon" href="sprites/laux_logo.webp" type="image/x-icon">
+  <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-database.js"></script>
+  <script type="module" src="firebase-config.js"></script>
+  <script type="module" src="multiplayer.js"></script>
   <script>
-    //BETA MULTIPLAYER
-    // Load saved language
     const currentLang = localStorage.getItem('language') || 'es';
     document.documentElement.lang = currentLang;
   </script>
@@ -61,10 +63,13 @@
   <div class="menu-container">
     <a href="character_select.html" class="menu-button" data-translate="newGame">Nueva Partida</a>
     <button id="loadGame" class="menu-button" data-translate="loadGame">Cargar Partida</button>
+    <button id="multiplayerButton" class="menu-button" data-translate="multiplayer">Multijugador</button>
     <a href="config.html" class="menu-button" data-translate="options">Opciones</a>
   </div>
 
-  <script>
+  <script type="module">
+    import { createMultiplayerMenu } from './multiplayer.js';
+
     document.getElementById('loadGame').addEventListener('click', () => {
       const savedData = localStorage.getItem('playerData');
       if (savedData) {
@@ -72,6 +77,10 @@
       } else {
         alert('No hay partida guardada');
       }
+    });
+
+    document.getElementById('multiplayerButton').addEventListener('click', () => {
+      createMultiplayerMenu();
     });
   </script>
 
