@@ -1,7 +1,7 @@
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js';
-import { getDatabase, ref, set, get, update, remove, onValue } from 'https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js';
-
 // Firebase configuration
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getDatabase, ref, set, onValue, push, child, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
 const firebaseConfig = {
   apiKey: "AIzaSyBdQ8Vw702Qy4_s3FmZ5oJ78oKAfWJMLuc",
   authDomain: "lauxgame.firebaseapp.com",
@@ -17,65 +17,70 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 
-// Room management functions
-const createRoom = async () => {
-  const roomId = Math.random().toString(36).substring(2, 8);
-  await database.ref(`rooms/${roomId}`).set({
-    players: 1,
-    status: 'waiting',
-    gameState: null
+// Game room management
+export async function createGameRoom(hostName) {
+  const roomsRef = ref(database, 'rooms');
+  const newRoomRef = push(roomsRef);
+  const roomId = newRoomRef.key;
+
+  await set(newRoomRef, {
+    host: {
+      name: hostName,
+      isReady: false
+    },
+    gameState: {
+      phase: 1,
+      roundTime: 0,
+      enemies: [],
+      started: false
+    }
   });
+
   return roomId;
-};
+}
 
-const joinRoom = async (roomId) => {
-  const roomRef = database.ref(`rooms/${roomId}`);
-  const snapshot = await roomRef.once('value');
-  const room = snapshot.val();
-  
-  if (!room || room.players >= 2) {
-    throw new Error('Room is full or does not exist');
+export async function joinGameRoom(roomId, playerName) {
+  const roomRef = ref(database, `rooms/${roomId}`);
+  const snapshot = await get(roomRef);
+
+  if (!snapshot.exists()) {
+    throw new Error('Room not found');
   }
-  
-  await roomRef.update({
-    players: room.players + 1,
-    status: room.players + 1 === 2 ? 'ready' : 'waiting'
+
+  await set(ref(database, `rooms/${roomId}/guest`), {
+    name: playerName,
+    isReady: false
   });
-  
-  return room;
-};
 
-const leaveRoom = async (roomId) => {
-  const roomRef = database.ref(`rooms/${roomId}`);
-  const snapshot = await roomRef.once('value');
-  const room = snapshot.val();
-  
-  if (!room) return;
-  
-  if (room.players <= 1) {
-    await roomRef.remove();
-  } else {
-    await roomRef.update({
-      players: room.players - 1,
-      status: 'waiting'
-    });
-  }
-};
+  return true;
+}
 
-const updateGameState = (roomId, gameState) => {
-  return database.ref(`rooms/${roomId}/gameState`).set(gameState);
-};
+export function updateGameState(roomId, gameState) {
+  const gameStateRef = ref(database, `rooms/${roomId}/gameState`);
+  set(gameStateRef, gameState);
+}
 
-const listenToGameState = (roomId, callback) => {
-  database.ref(`rooms/${roomId}/gameState`).on('value', (snapshot) => {
+export function listenToGameState(roomId, callback) {
+  const gameStateRef = ref(database, `rooms/${roomId}/gameState`);
+  onValue(gameStateRef, (snapshot) => {
     callback(snapshot.val());
   });
-};
+}
 
-export {
-  createRoom,
-  joinRoom,
-  leaveRoom,
-  updateGameState,
-  listenToGameState
-};
+export function updatePlayerState(roomId, playerType, state) {
+  const playerRef = ref(database, `rooms/${roomId}/${playerType}`);
+  set(playerRef, state);
+}
+
+export function listenToPlayerChanges(roomId, callback) {
+  const roomRef = ref(database, `rooms/${roomId}`);
+  onValue(roomRef, (snapshot) => {
+    const room = snapshot.val();
+    if (room) {
+      callback({
+        host: room.host,
+        guest: room.guest
+      });
+    }
+  });
+}

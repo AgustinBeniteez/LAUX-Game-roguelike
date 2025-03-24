@@ -1,155 +1,118 @@
-// Multiplayer interface management
+// Multiplayer game management
+import { createGameRoom, joinGameRoom, updateGameState, listenToGameState, updatePlayerState, listenToPlayerChanges } from './firebase-config.js';
+
+// Store current room and player information
 let currentRoomId = null;
-let isHost = false;
-
-// Create the multiplayer menu interface
-function createMultiplayerMenu() {
-    const multiplayerMenu = document.createElement('div');
-    multiplayerMenu.id = 'multiplayer-menu';
-    multiplayerMenu.style.cssText = `
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: rgba(0, 0, 0, 0.9);
-        padding: 20px;
-        border-radius: 10px;
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-        z-index: 1000;
-    `;
-
-    const title = document.createElement('h2');
-    title.textContent = 'Multijugador';
-    title.style.color = 'white';
-    title.style.textAlign = 'center';
-
-    const createRoomButton = document.createElement('button');
-    createRoomButton.textContent = 'Crear Sala';
-    createRoomButton.className = 'menu-button';
-    createRoomButton.onclick = createGameRoom;
-
-    const joinRoomContainer = document.createElement('div');
-    joinRoomContainer.style.display = 'flex';
-    joinRoomContainer.style.gap = '10px';
-
-    const roomCodeInput = document.createElement('input');
-    roomCodeInput.type = 'text';
-    roomCodeInput.placeholder = 'Código de sala';
-    roomCodeInput.style.cssText = `
-        padding: 10px;
-        border-radius: 5px;
-        border: none;
-        background: rgba(255, 255, 255, 0.1);
-        color: white;
-    `;
-
-    const joinRoomButton = document.createElement('button');
-    joinRoomButton.textContent = 'Unirse';
-    joinRoomButton.className = 'menu-button';
-    joinRoomButton.onclick = () => joinGameRoom(roomCodeInput.value);
-
-    const backButton = document.createElement('button');
-    backButton.textContent = 'Volver';
-    backButton.className = 'menu-button';
-    backButton.onclick = () => multiplayerMenu.remove();
-
-    joinRoomContainer.appendChild(roomCodeInput);
-    joinRoomContainer.appendChild(joinRoomButton);
-
-    multiplayerMenu.appendChild(title);
-    multiplayerMenu.appendChild(createRoomButton);
-    multiplayerMenu.appendChild(joinRoomContainer);
-    multiplayerMenu.appendChild(backButton);
-
-    document.body.appendChild(multiplayerMenu);
-}
+let currentPlayerType = null; // 'host' or 'guest'
+let playerName = null;
 
 // Create a new game room
-async function createGameRoom() {
+export async function hostGame(name) {
     try {
-        const roomId = await createRoom();
-        currentRoomId = roomId;
-        isHost = true;
-        
-        // Show room code to share
-        const roomInfo = document.createElement('div');
-        roomInfo.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.9);
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            color: white;
-            z-index: 1001;
-        `;
-        
-        roomInfo.innerHTML = `
-            <h3>Código de sala: ${roomId}</h3>
-            <p>Esperando a otro jugador...</p>
-            <button class="menu-button" onclick="this.parentElement.remove()">Cerrar</button>
-        `;
-        
-        document.body.appendChild(roomInfo);
-
-        // Listen for second player
-        listenToGameState(roomId, (gameState) => {
-            if (gameState && gameState.status === 'ready') {
-                window.location.href = 'game.html?mode=multiplayer&room=' + roomId;
-            }
-        });
+        playerName = name;
+        currentPlayerType = 'host';
+        currentRoomId = await createGameRoom(name);
+        setupGameListeners();
+        return currentRoomId;
     } catch (error) {
-        console.error('Error creating room:', error);
-        alert('Error al crear la sala');
+        console.error('Error creating game room:', error);
+        throw error;
     }
 }
 
 // Join an existing game room
-async function joinGameRoom(roomId) {
-    if (!roomId) {
-        alert('Por favor ingresa un código de sala');
-        return;
-    }
-
+export async function joinGame(roomId, name) {
     try {
-        const room = await joinRoom(roomId);
+        playerName = name;
+        currentPlayerType = 'guest';
+        await joinGameRoom(roomId, name);
         currentRoomId = roomId;
-        isHost = false;
-        window.location.href = 'game.html?mode=multiplayer&room=' + roomId;
+        setupGameListeners();
+        return true;
     } catch (error) {
-        console.error('Error joining room:', error);
-        alert('Error al unirse a la sala');
+        console.error('Error joining game room:', error);
+        throw error;
     }
 }
 
-// Leave the current room
-async function leaveGameRoom() {
-    if (currentRoomId) {
-        await leaveRoom(currentRoomId);
-        currentRoomId = null;
-        isHost = false;
-        window.location.href = 'index.html';
+// Set up listeners for game state changes
+function setupGameListeners() {
+    listenToGameState(currentRoomId, (gameState) => {
+        if (gameState) {
+            updateLocalGameState(gameState);
+        }
+    });
+
+    listenToPlayerChanges(currentRoomId, (players) => {
+        if (players) {
+            updatePlayersUI(players);
+            checkGameStart(players);
+        }
+    });
+}
+
+// Update the local game state based on Firebase data
+function updateLocalGameState(gameState) {
+    // Update game phase
+    if (window.gamePhase !== gameState.phase) {
+        window.gamePhase = gameState.phase;
+    }
+
+    // Update round time
+    if (window.roundTime !== gameState.roundTime) {
+        window.roundTime = gameState.roundTime;
+    }
+
+    // Update enemies
+    if (gameState.enemies) {
+        window.enemies = gameState.enemies;
+    }
+
+    // Update other game state variables as needed
+}
+
+// Update the UI to show connected players
+function updatePlayersUI(players) {
+    const hostInfo = document.getElementById('hostInfo');
+    const guestInfo = document.getElementById('guestInfo');
+
+    if (hostInfo && players.host) {
+        hostInfo.textContent = `Host: ${players.host.name} ${players.host.isReady ? '(Ready)' : ''}`;
+    }
+
+    if (guestInfo && players.guest) {
+        guestInfo.textContent = `Guest: ${players.guest.name} ${players.guest.isReady ? '(Ready)' : ''}`;
     }
 }
 
-// Update game state in multiplayer mode
-function updateMultiplayerState(gameState) {
-    if (currentRoomId) {
+// Check if both players are ready to start
+function checkGameStart(players) {
+    if (players.host?.isReady && players.guest?.isReady) {
+        startGame();
+    }
+}
+
+// Start the multiplayer game
+function startGame() {
+    updateGameState(currentRoomId, {
+        phase: 1,
+        roundTime: 0,
+        enemies: [],
+        started: true
+    });
+}
+
+// Update player ready status
+export function setPlayerReady(isReady) {
+    updatePlayerState(currentRoomId, currentPlayerType, {
+        name: playerName,
+        isReady: isReady
+    });
+}
+
+// Sync game state to Firebase
+export function syncGameState(gameState) {
+    if (currentRoomId && currentPlayerType === 'host') {
         updateGameState(currentRoomId, gameState);
     }
 }
-
-// Export functions and variables
-export {
-    createMultiplayerMenu,
-    createGameRoom,
-    joinGameRoom,
-    leaveGameRoom,
-    updateMultiplayerState,
-    currentRoomId,
-    isHost
-};
