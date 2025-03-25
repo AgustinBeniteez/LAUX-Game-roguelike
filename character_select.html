@@ -88,37 +88,38 @@
   </style>
 </head>
 <body>
-  <h1 class="title">Elige una clase</h1>
+  <h1 class="title">Elige tu habilidad</h1>
   <div class="class-selection">
-    <div class="class-card" data-weapon="basic_wand" style="background-image: url('sprites/card_sprite.png');">
-      <svg class="class-icon" viewBox="0 0 32 32">
-        <path fill="#8B5CF6" d="M16 2L4 30h24L16 2zm0 8l8 18H8l8-18z"/>
-        <path fill="#C4B5FD" d="M16 10l-8 18h16l-8-18z"/>
-      </svg>
-      <div class="class-name">Varita Básica</div>
-      <div class="class-desc">Disparo rápido y preciso</div>
+    <div class="class-card" data-skill="fire" style="background-image: url('sprites/card_sprite.png');">
+      <img class="class-icon" src="sprites/proyectil_sprite_1.png" style="width: 64px; height: 64px;">
+      <div class="class-name">Fuego</div>
+      <div class="class-desc">Daño básico y rápido</div>
     </div>
-    <div class="class-card" data-weapon="staff" style="background-image: url('sprites/card_sprite.png');">
-      <svg class="class-icon" viewBox="0 0 32 32">
-        <path fill="#4B5563" d="M16 2L4 30h24L16 2zm0 8l8 18H8l8-18z"/>
-        <path fill="#9CA3AF" d="M16 10l-8 18h16l-8-18z"/>
-      </svg>
-      <div class="class-name">Bastón Mágico</div>
-      <div class="class-desc">Mayor daño pero más lento</div>
+    <div class="class-card" data-skill="ice" style="background-image: url('sprites/card_sprite.png');">
+      <img class="class-icon" src="sprites/proyectil_sprite_2.png" style="width: 64px; height: 64px;">
+      <div class="class-name">Hielo</div>
+      <div class="class-desc">Ralentiza a los enemigos</div>
     </div>
-    <div class="class-card" data-weapon="crystal_wand" style="background-image: url('sprites/card_sprite.png');">
-      <svg class="class-icon" viewBox="0 0 32 32">
-        <path fill="#EC4899" d="M16 2L4 30h24L16 2zm0 8l8 18H8l8-18z"/>
-        <path fill="#F9A8D4" d="M16 10l-8 18h16l-8-18z"/>
-      </svg>
-      <div class="class-name">Varita de Cristal</div>
-      <div class="class-desc">Disparo explosivo con área de efecto</div>
+    <div class="class-card" data-skill="energy" style="background-image: url('sprites/card_sprite.png');">
+      <img class="class-icon" src="sprites/proyectil_sprite_3.png" style="width: 64px; height: 64px;">
+      <div class="class-name">Energía</div>
+      <div class="class-desc">Daño en área</div>
+    </div>
+    <div class="class-card" data-skill="shock" style="background-image: url('sprites/card_sprite.png');">
+      <img class="class-icon" src="sprites/proyectil_sprite_4.png" style="width: 64px; height: 64px;">
+      <div class="class-name">Choque</div>
+      <div class="class-desc">Daño en cadena</div>
+    </div>
+    <div class="class-card" data-skill="dark" style="background-image: url('sprites/card_sprite.png');">
+      <img class="class-icon" src="sprites/proyectil_sprite_5.png" style="width: 64px; height: 64px;">
+      <div class="class-name">Oscuridad</div>
+      <div class="class-desc">Crea un vórtice dañino</div>
     </div>
   </div>
   <button id="continue" class="continue-btn">Continuar</button>
 
   <script>
-    let selectedClass = null;
+    let selectedSkill = null;
     const cards = document.querySelectorAll('.class-card');
     const continueBtn = document.getElementById('continue');
 
@@ -126,13 +127,13 @@
       card.addEventListener('click', () => {
         cards.forEach(c => c.classList.remove('selected'));
         card.classList.add('selected');
-        selectedClass = card.dataset.weapon;
+        selectedSkill = card.dataset.skill;
         continueBtn.style.display = 'block';
       });
     });
 
     continueBtn.addEventListener('click', () => {
-      if (selectedClass) {
+      if (selectedSkill) {
         // Guardar el idioma actual
         const currentLanguage = localStorage.getItem('language');
         // Limpiar todo el localStorage
@@ -140,10 +141,12 @@
         // Restaurar el idioma
         if (currentLanguage) localStorage.setItem('language', currentLanguage);
 
-        const weaponStats = {
-          basic_wand: { name: 'Varita Básica', damage: 15, speed: 0.3 },
-          staff: { name: 'Bastón Mágico', damage: 30, speed: 0.8 },
-          crystal_wand: { name: 'Varita de Cristal', damage: 20, speed: 0.5 }
+        const skillStats = {
+          fire: { name: 'Fuego', damage: 20, speed: 400, icon: 'sprites/proyectil_sprite_1.png' },
+          ice: { name: 'Hielo', damage: 24, speed: 400, icon: 'sprites/proyectil_sprite_2.png' },
+          energy: { name: 'Energía', damage: 28, speed: 400, icon: 'sprites/proyectil_sprite_3.png' },
+          shock: { name: 'Choque', damage: 32, speed: 400, icon: 'sprites/proyectil_sprite_4.png' },
+          dark: { name: 'Oscuridad', damage: 36, speed: 400, icon: 'sprites/proyectil_sprite_5.png' }
         };
         const playerData = {
           class: 'wizard',
@@ -156,7 +159,8 @@
           stamina: 0,
           maxStamina: 0,
           inventory: [],
-          equippedWeapon: weaponStats[selectedClass]
+          selectedSkill: selectedSkill,
+          skillStats: skillStats[selectedSkill]
         };
         localStorage.setItem('playerData', JSON.stringify(playerData));
         window.location.href = 'game.html';

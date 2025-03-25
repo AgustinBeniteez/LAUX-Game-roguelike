@@ -122,6 +122,12 @@
 <body>
   <canvas id="gameCanvas"></canvas>
   <div id="hud">
+    <div id="skills-bar" style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; background: rgba(0, 0, 0, 0.7); padding: 10px; border-radius: 10px;">
+      <div class="skill-box" style="width: 50px; height: 50px; border: 2px solid #fff; border-radius: 5px; position: relative; overflow: hidden;">
+        <div class="skill-icon" id="selected-skill-icon" style="width: 100%; height: 100%; background-size: contain; background-repeat: no-repeat; background-position: center;"></div>
+        <div class="cooldown-overlay" style="position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(0, 0, 0, 0.7); transform-origin: bottom; transform: scaleY(0); transition: transform 0.1s linear;"></div>
+      </div>
+    </div>
     <div id="wave-info" style="position: absolute; top: 20px; right: 20px; background: rgba(0, 0, 0, 0.7); padding: 15px; border-radius: 10px; color: white;">
       <div class="stat-container">
         <span class="stat-label" data-translate="wave">Oleada:</span>
@@ -238,6 +244,44 @@
   <script src="minimap.js"></script>
   <script src="engine.js"></script>
   <script src="proyectiles.js"></script>
+  <script src="skills.js"></script>
   <script src="main.js"></script>
+  <script>
+    // Función para actualizar el cooldown de una habilidad
+    function updateSkillCooldown(skillIndex, progress) {
+      const cooldownOverlay = document.querySelectorAll('.cooldown-overlay')[skillIndex];
+      cooldownOverlay.style.transform = `scaleY(${progress})`;
+    }
+
+    // Función para actualizar el ícono de una habilidad
+    function updateSkillIcon(skillIndex, iconUrl) {
+      const skillIcon = document.querySelectorAll('.skill-icon')[skillIndex];
+      skillIcon.style.backgroundImage = `url('${iconUrl})`;
+    }
+
+    // Ejemplo de uso cuando se selecciona una nueva habilidad
+    document.addEventListener('weaponSelected', (event) => {
+      const { weaponIndex, iconUrl } = event.detail;
+      updateSkillIcon(weaponIndex, iconUrl);
+    });
+
+    // Ejemplo de uso cuando se usa una habilidad
+    document.addEventListener('skillUsed', (event) => {
+      const { skillIndex, cooldownTime } = event.detail;
+      updateSkillCooldown(skillIndex, 1);
+      
+      // Animación de cooldown
+      let progress = 1;
+      const interval = setInterval(() => {
+        progress -= 0.01;
+        updateSkillCooldown(skillIndex, progress);
+        
+        if (progress <= 0) {
+          clearInterval(interval);
+          updateSkillCooldown(skillIndex, 0);
+        }
+      }, cooldownTime / 100);
+    });
+  </script>
 </body>
 </html>

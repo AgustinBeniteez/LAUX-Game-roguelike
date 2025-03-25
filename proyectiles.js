@@ -1,7 +1,8 @@
 class Projectile extends Entity {
-    constructor(x, y, targetX, targetY, weaponType = 'basic', damage = 20, speed = 400) {
+    constructor(x, y, targetX, targetY, skillType = 'fire', damage = 20, speed = 400, secondarySkillType = null) {
         super(x, y);
-        this.weaponType = weaponType;
+        this.skillType = skillType;
+        this.secondarySkillType = secondarySkillType;
         this.speed = speed;
         this.lifetime = 2; // Tiempo de vida en segundos
         this.timeAlive = 0;
@@ -10,18 +11,32 @@ class Projectile extends Entity {
         this.maxRange = 400; // Rango máximo del proyectil
         this.opacity = 1.0; // Opacidad para el efecto de desvanecimiento
         
-        // Configurar daño y sprite según el tipo de varita
-        switch(weaponType) {
-            case 'crystal':
+        // Configurar daño y sprite según el tipo de habilidad
+        switch(skillType) {
+            case 'fire':
+                this.damage = damage;
+                this.loadSprite('sprites/proyectil_sprite_1.png', 32, 32, 1);
+                break;
+            case 'ice':
                 this.damage = damage * 1.2;
+                this.loadSprite('sprites/proyectil_sprite_2.png', 32, 32, 1);
+                this.slowEffect = true;
+                break;
+            case 'energy':
+                this.damage = damage * 1.4;
                 this.loadSprite('sprites/proyectil_sprite_3.png', 32, 32, 1);
                 this.areaEffect = true;
                 this.areaRadius = 80;
                 break;
-            case 'nature':
-                this.damage = damage * 1.4;
-                this.loadSprite('sprites/proyectil_sprite_2.png', 32, 32, 1);
-                this.splitOnImpact = true;
+            case 'shock':
+                this.damage = damage * 1.6;
+                this.loadSprite('sprites/proyectil_sprite_4.png', 32, 32, 1);
+                this.chainEffect = true;
+                break;
+            case 'dark':
+                this.damage = damage * 1.8;
+                this.loadSprite('sprites/proyectil_sprite_5.png', 32, 32, 1);
+                this.vortexEffect = true;
                 break;
             default:
                 this.damage = damage;
@@ -57,6 +72,28 @@ class Projectile extends Entity {
             return;
         }
 
+        // Efectos especiales según la combinación de habilidades
+        if (this.secondarySkillType) {
+            switch(this.skillType + '_' + this.secondarySkillType) {
+                case 'fire_ice':
+                    // Efecto de vapor que daña y ralentiza
+                    this.damage *= 1.5;
+                    this.slowEffect = true;
+                    break;
+                case 'energy_shock':
+                    // Efecto de tormenta eléctrica con mayor área
+                    this.areaRadius *= 1.5;
+                    this.chainEffect = true;
+                    break;
+                case 'dark_ice':
+                    // Efecto de congelación oscura
+                    this.vortexEffect = true;
+                    this.slowEffect = true;
+                    this.damage *= 1.3;
+                    break;
+            }
+        }
+
         // Detectar colisiones con enemigos
         engine.entities.forEach(entity => {
             if (entity.isEnemy && !entity.isDead) {
@@ -65,9 +102,9 @@ class Projectile extends Entity {
                     // Aplicar daño al enemigo
                     entity.health -= this.damage;
                     
-                    // Comportamiento especial para cada tipo de varita
-                    if (this.weaponType === 'crystal') {
-                        // Efecto de área para la varita de cristal
+                    // Comportamiento especial para cada tipo de habilidad
+                    if (this.skillType === 'energy') {
+                        // Efecto de área para la explosión de energía
                         engine.entities.forEach(nearbyEntity => {
                             if (nearbyEntity.isEnemy && !nearbyEntity.isDead && nearbyEntity !== entity) {
                                 const dx = nearbyEntity.x - this.x;
@@ -81,26 +118,57 @@ class Projectile extends Entity {
                                 }
                             }
                         });
-                    } else if (this.weaponType === 'nature') {
-                        // Crear proyectiles adicionales al impactar
-                        const angles = [-45, 45];
-                        angles.forEach(angle => {
-                            const radians = angle * (Math.PI / 180);
-                            const newVelX = this.velocityX * Math.cos(radians) - this.velocityY * Math.sin(radians);
-                            const newVelY = this.velocityX * Math.sin(radians) + this.velocityY * Math.cos(radians);
-                            const newProjectile = new Projectile(
-                                this.x,
-                                this.y,
-                                this.x + newVelX,
-                                this.y + newVelY,
-                                'nature',
-                                this.damage * 0.5,
-                                this.speed * 0.8
-                            );
-                            engine.addEntity(newProjectile);
+                    } else if (this.skillType === 'shock') {
+                        // Efecto de cadena para la onda de choque
+                        let chainedEnemies = 0;
+                        const maxChains = 3;
+                        const chainRange = 120;
+                        
+                        const chainLightning = (sourceEntity) => {
+                            if (chainedEnemies >= maxChains) return;
+                            
+                            engine.entities.forEach(nearbyEntity => {
+                                if (nearbyEntity.isEnemy && !nearbyEntity.isDead && nearbyEntity !== sourceEntity) {
+                                    const dx = nearbyEntity.x - sourceEntity.x;
+                                    const dy = nearbyEntity.y - sourceEntity.y;
+                                    const distance = Math.sqrt(dx * dx + dy * dy);
+                                    
+                                    if (distance <= chainRange) {
+                                        nearbyEntity.health -= this.damage * 0.7;
+                                        chainedEnemies++;
+                                        chainLightning(nearbyEntity);
+                                    }
+                                }
+                            });
+                        };
+                        
+                        chainLightning(entity);
+                    } else if (this.skillType === 'ice') {
+                        // Efecto de ralentización
+                        entity.speed *= 0.7;
+                        setTimeout(() => {
+                            if (entity && !entity.isDead) {
+                                entity.speed /= 0.7;
+                            }
+                        }, 3000);
+                    } else if (this.skillType === 'dark') {
+                        // Efecto de vórtice
+                        const vortexRadius = 100;
+                        engine.entities.forEach(nearbyEntity => {
+                            if (nearbyEntity.isEnemy && !nearbyEntity.isDead) {
+                                const dx = nearbyEntity.x - this.x;
+                                const dy = nearbyEntity.y - this.y;
+                                const distance = Math.sqrt(dx * dx + dy * dy);
+                                
+                                if (distance <= vortexRadius) {
+                                    const angle = Math.atan2(dy, dx);
+                                    nearbyEntity.x -= Math.cos(angle) * 50 * engine.deltaTime;
+                                    nearbyEntity.y -= Math.sin(angle) * 50 * engine.deltaTime;
+                                    nearbyEntity.health -= this.damage * 0.2;
+                                }
+                            }
                         });
                     }
-                    
                     // Eliminar el proyectil al impactar
                     const index = engine.entities.indexOf(this);
                     if (index > -1) {
@@ -166,6 +234,6 @@ class Projectile extends Entity {
                 this.height
             );
             ctx.globalAlpha = 1.0;
+        }
     }
-}
 }
