@@ -14,7 +14,6 @@ class Entity {
       this.isEnemy = isEnemy;
       this.isBoss = bossType !== null;
       this.bossType = bossType;
-      this.playerName = '';
       
       // Configuración de jefes
       if (this.isBoss) {
@@ -331,14 +330,6 @@ class Entity {
           this.width, this.height
         );
         return;
-      }
-
-      // Render player name if it exists and not an enemy
-      if (this.playerName && !this.isEnemy && !this.isDead) {
-        ctx.font = '14px Arial';
-        ctx.fillStyle = 'white';
-        ctx.textAlign = 'center';
-        ctx.fillText(this.playerName, this.x + this.width / 2, this.y - 10);
       }
 
       // Render health bar for enemies

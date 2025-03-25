@@ -41,35 +41,6 @@
       font-family: 'Arial', sans-serif;
       font-size: 18px;
     }
-    .room-code {
-      position: absolute;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0, 0, 0, 0.7);
-      padding: 8px 16px;
-      border-radius: 4px;
-      cursor: pointer;
-      user-select: all;
-      transition: background 0.2s;
-      display: none; /* Hidden by default */
-    }
-    .room-code:hover {
-      background: rgba(0, 0, 0, 0.9);
-    }
-    .room-code::after {
-      content: 'Click to copy';
-      position: absolute;
-      bottom: -25px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 12px;
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-    .room-code:hover::after {
-      opacity: 1;
-    }
     .stat-container {
       margin-bottom: 10px;
     }
@@ -151,7 +122,6 @@
 <body>
   <canvas id="gameCanvas"></canvas>
   <div id="hud">
-    <div id="roomCode" class="room-code" onclick="copyRoomCode()"></div>
     <div id="wave-info" style="position: absolute; top: 20px; right: 20px; background: rgba(0, 0, 0, 0.7); padding: 15px; border-radius: 10px; color: white;">
       <div class="stat-container">
         <span class="stat-label" data-translate="wave">Oleada:</span>
@@ -219,7 +189,6 @@
   <div id="pauseMenu">
     <h1>LAUX GAME</h1>
     <h2 data-translate="pause">Pause</h2>
-    <div id="pauseRoomCode" style="color: white; margin-bottom: 20px; font-size: 18px;">CODE: </div>
     <button id="resumeButton" class="menu-button" data-translate="resume">Reanudar</button>
     <button id="settingsButton" class="menu-button" data-translate="settings">Configuración</button>
     <button id="mainMenuButton" class="menu-button" data-translate="mainMenu" onclick="window.location.href='index.html'">Menú Principal</button>
@@ -272,24 +241,3 @@
   <script src="main.js"></script>
 </body>
 </html>
-<script>
-function copyRoomCode() {
-  const roomCode = document.getElementById('roomCode').textContent;
-  navigator.clipboard.writeText(roomCode).then(() => {
-    const roomCodeEl = document.getElementById('roomCode');
-    roomCodeEl.style.background = 'rgba(0, 255, 0, 0.3)';
-    setTimeout(() => {
-      roomCodeEl.style.background = 'rgba(0, 0, 0, 0.7)';
-    }, 500);
-  });
-}
-
-window.addEventListener('message', (event) => {
-  if (event.data === 'closeSettings') {
-    settingsFrame.style.display = 'none';
-    pauseMenu.style.display = 'flex';
-  }
-});
-
-loadTranslations();
-</script>
