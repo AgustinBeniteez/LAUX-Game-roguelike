@@ -63,10 +63,9 @@ class Entity {
       this.stamina = 0;
       this.maxStamina = 0;
       this.inventory = [];
-      this.equippedWeapon = null;
-      this.weaponSprite = null;
-      this.weaponFrameWidth = 0;
-      this.weaponFrameHeight = 0;
+      this.selectedProjectile = null;
+      this.projectileType = null;
+      this.projectileDamage = 20;
       this.lastShotTime = 0;
       this.shootCooldown = 2.0; // Time between shots in seconds
       this.manaCost = 10; // Mana cost per shot
@@ -89,14 +88,58 @@ class Entity {
     }
   
     update(dt) {
-      // Auto-shooting for wizard
-      if (this.class === 'wizard' && !this.isDead && !engine.isPaused) {
+      // Auto-shooting for all equipped skills
+      if (!this.isDead && !engine.isPaused) {
         const currentTime = Date.now() / 1000;
-        if (currentTime - this.lastShotTime >= this.shootCooldown) {
-          const rect = engine.canvas.getBoundingClientRect();
-          const mouseX = (event?.clientX || rect.right) - rect.left;
-          const mouseY = (event?.clientY || rect.bottom) - rect.top;
-          this.shoot(mouseX, mouseY);
+        
+        // Encontrar el enemigo más cercano una sola vez
+        let closestEnemy = null;
+        let minDistance = Infinity;
+        
+        engine.entities.forEach(entity => {
+          if (entity.isEnemy && !entity.isDead) {
+            const dx = entity.x - this.x;
+            const dy = entity.y - this.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance < minDistance) {
+              minDistance = distance;
+              closestEnemy = entity;
+            }
+          }
+        });
+        
+        if (closestEnemy) {
+          // Iterar sobre todas las habilidades equipadas
+          skillSystem.equippedSkills.forEach((skill, index) => {
+            if (skill && index < skillSystem.maxEquippedSkills) {
+              if (currentTime - (this.lastShotTimes?.[index] || 0) >= skill.cooldown) {
+                const projectile = new Projectile(
+                  this.x,
+                  this.y,
+                  closestEnemy.x,
+                  closestEnemy.y,
+                  skill.projectileType,
+                  skill.damage
+                );
+                engine.addEntity(projectile);
+                
+                // Actualizar el tiempo del último disparo para esta habilidad
+                if (!this.lastShotTimes) this.lastShotTimes = {};
+                this.lastShotTimes[index] = currentTime;
+                
+                // Disparar evento para actualizar el cooldown visual
+                const event = new CustomEvent('skillCooldown', {
+                  detail: {
+                    skillIndex: index,
+                    progress: 1,
+                    duration: skill.cooldown * 1000
+                  }
+                });
+                document.dispatchEvent(event);
+              }
+            }
+          });
         }
       }
 
@@ -196,11 +239,30 @@ class Entity {
         const distance = Math.sqrt(dx * dx + dy * dy);
         const followDistance = 20; // Distancia a la que el enemigo seguirá al jugador
         const damageRange = 80; // Rango en el que el enemigo puede hacer daño
+        const minEnemyDistance = 60; // Distancia mínima entre enemigos
+        
+        // Calcular fuerzas de separación entre enemigos
+        let separationX = 0;
+        let separationY = 0;
+        
+        engine.entities.forEach(entity => {
+          if (entity !== this && entity.isEnemy && !entity.isDead) {
+            const enemyDx = this.x - entity.x;
+            const enemyDy = this.y - entity.y;
+            const enemyDistance = Math.sqrt(enemyDx * enemyDx + enemyDy * enemyDy);
+            
+            if (enemyDistance < minEnemyDistance) {
+              const separationForce = (minEnemyDistance - enemyDistance) / minEnemyDistance;
+              separationX += (enemyDx / enemyDistance) * separationForce;
+              separationY += (enemyDy / enemyDistance) * separationForce;
+            }
+          }
+        });
         
         if (distance > followDistance) {
-          // El enemigo se mueve hacia el jugador
-          const vx = (dx / distance) * this.speed * dt;
-          const vy = (dy / distance) * this.speed * dt;
+          // El enemigo se mueve hacia el jugador con separación
+          const vx = ((dx / distance) * this.speed + separationX * this.speed * 0.5) * dt;
+          const vy = ((dy / distance) * this.speed + separationY * this.speed * 0.5) * dt;
           this.x += vx;
           this.y += vy;
         } else if (distance <= damageRange && this.damageRate > 0 && this.target.health > 0) {
@@ -217,13 +279,9 @@ class Entity {
       }
     }
   
-    loadWeaponSprite(src, frameWidth = null, frameHeight = null, totalFrames = 1) {
-      this.weaponSprite = new Image();
-      this.weaponSprite.src = src;
-      this.weaponSprite.onload = () => {
-        this.weaponFrameWidth = frameWidth || this.weaponSprite.width;
-        this.weaponFrameHeight = frameHeight || this.weaponSprite.height;
-      };
+    setProjectileType(type, damage = 20) {
+      this.projectileType = type;
+      this.projectileDamage = damage;
     }
 
     shoot(targetX, targetY) {
@@ -257,31 +315,16 @@ class Entity {
         const enemyY = nearestEnemy.y + nearestEnemy.height / 2;
         
         let projectile;
-        if (this.equippedWeapon.name === 'Varita de Cristal') {
-          // Varita de Cristal: 3 proyectiles en abanico
-          const angles = [-15, 0, 15];
-          angles.forEach(angle => {
-            const radians = angle * (Math.PI / 180);
-            const dx = enemyX - (this.x + this.width / 2);
-            const dy = enemyY - (this.y + this.height / 2);
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            
-            const rotatedX = (dx * Math.cos(radians) - dy * Math.sin(radians)) / distance;
-            const rotatedY = (dx * Math.sin(radians) + dy * Math.cos(radians)) / distance;
-            
-            const targetPosX = this.x + this.width / 2 + rotatedX * distance;
-            const targetPosY = this.y + this.height / 2 + rotatedY * distance;
-            
-            projectile = new Projectile(this.x + this.width / 2, this.y + this.height / 2, targetPosX, targetPosY, 'crystal', this.equippedWeapon.damage, 200);
-            engine.addEntity(projectile);
-          });
-        } else if (this.equippedWeapon.name === 'Varita de Naturaleza') {
-          // Varita de Naturaleza: proyectil que se divide al impactar
-          projectile = new Projectile(this.x + this.width / 2, this.y + this.height / 2, enemyX, enemyY, 'nature', this.equippedWeapon.damage, 200);
-          engine.addEntity(projectile);
-        } else {
-          // Varita básica: un proyectil directo
-          projectile = new Projectile(this.x + this.width / 2, this.y + this.height / 2, enemyX, enemyY, 'crystal', this.equippedWeapon.damage, 200);
+        if (this.selectedProjectile) {
+          projectile = new Projectile(
+            this.x + this.width / 2,
+            this.y + this.height / 2,
+            enemyX,
+            enemyY,
+            this.selectedProjectile.type,
+            this.selectedProjectile.damage,
+            200
+          );
           engine.addEntity(projectile);
         }
           

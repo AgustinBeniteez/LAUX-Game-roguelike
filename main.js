@@ -4,8 +4,6 @@ const engine = new Engine('gameCanvas', 800, 600);
 // Load game state and player data
 const gameState = JSON.parse(localStorage.getItem('gameState')) || {
   currentWave: 1,
-  enemiesKilled: 0,
-  totalEnemiesKilled: 0,
   waveTimer: 120,
   nextWaveTimer: 30,
   isWaveActive: true,
@@ -39,8 +37,6 @@ player.equippedWeapon = playerData.equippedWeapon;
 // Update HUD values
 document.getElementById('mana-value').textContent = player.mana;
 document.getElementById('stamina-value').textContent = player.stamina;
-document.getElementById('weapon-value').textContent = player.equippedWeapon ? player.equippedWeapon.name : '-';
-
 // Show/hide mana and stamina based on class
 document.getElementById('mana-container').style.display = player.class === 'wizard' ? 'block' : 'none';
 document.getElementById('stamina-container').style.display = player.class === 'warrior' ? 'block' : 'none';
@@ -65,8 +61,6 @@ function saveGame() {
 
   const currentGameState = {
     currentWave,
-    enemiesKilled: gameState.enemiesKilled,
-    totalEnemiesKilled: gameState.totalEnemiesKilled,
     waveTimer,
     nextWaveTimer,
     isWaveActive,
@@ -181,7 +175,6 @@ function spawnEnemy(isBoss = false) {
 // Función para actualizar los contadores del HUD
 function updateWaveHUD() {
   document.getElementById('wave-value').textContent = currentWave;
-  document.getElementById('enemies-value').textContent = enemiesInWave;
   document.getElementById('next-wave-timer').textContent = 
     isWaveActive ? `${Math.ceil(waveTimer)}s` : `${Math.ceil(nextWaveTimer)}s`;
 }
@@ -206,6 +199,7 @@ function waveManager(dt) {
     if (waveTimer <= 0 || (enemiesInWave === 0 && isBossSpawned)) {
       isWaveActive = false;
       nextWaveTimer = 30;
+      engine.isPaused = true; // Pausar el juego durante la selección de cartas
       
       // Eliminar todos los enemigos restantes con una animación suave
       engine.entities.forEach(entity => {
@@ -224,62 +218,101 @@ function waveManager(dt) {
       });
       enemiesInWave = 0;
       
-      // Mostrar menú de selección de armas
-      const weaponSelection = document.getElementById('weapon-selection');
-      weaponSelection.style.display = 'block';
+      // Mostrar menú de selección de cartas
+      const skillSelection = document.getElementById('skill-selection');
+      skillSelection.style.display = 'block';
       
-      // Configurar las armas disponibles
-      const weapons = [
-        { name: 'Espada de Fuego', description: 'Daño aumentado y efecto de quemadura', sprite: 'sprites/player_espada_sprite.png', cooldown: 2.0 },
-        { name: 'Varita de Hielo', description: 'Ralentiza enemigos y daño mágico', sprite: 'sprites/player_barita_sprite.png', cooldown: 2.0 },
-        { name: 'Hacha de Tormenta', description: 'Daño en área y efecto de aturdimiento', sprite: 'sprites/player_espada_sprite.png', cooldown: 2.0 }
-      ];
+      // Generar cartas de mejora aleatorias
+      const generateUpgradeCards = () => {
+        const availableUpgrades = [
+          { type: 'new_skill', name: 'Nueva Habilidad', description: 'Desbloquea una nueva habilidad' },
+          { type: 'multi_projectile', name: 'Proyectil Múltiple', description: 'Dispara 2 proyectiles a la vez' },
+          { type: 'damage_boost', name: 'Aumento de Daño', description: 'Aumenta el daño de tus habilidades en 25%' },
+          { type: 'cooldown_reduction', name: 'Reducción de Enfriamiento', description: 'Reduce el tiempo de enfriamiento en 20%' },
+          { type: 'area_increase', name: 'Aumento de Área', description: 'Aumenta el área de efecto de las habilidades' }
+        ];
+        
+        // Seleccionar 3 mejoras aleatorias sin repetir
+        const selectedUpgrades = [];
+        while (selectedUpgrades.length < 3) {
+          const randomIndex = Math.floor(Math.random() * availableUpgrades.length);
+          const upgrade = availableUpgrades[randomIndex];
+          if (!selectedUpgrades.find(u => u.type === upgrade.type)) {
+            selectedUpgrades.push(upgrade);
+          }
+        }
+        
+        return selectedUpgrades;
+      };
+      
+      const upgrades = generateUpgradeCards();
       
       // Actualizar información de las cartas
-      weapons.forEach((weapon, index) => {
-        document.getElementById(`weapon-name-${index}`).textContent = weapon.name;
-        document.getElementById(`weapon-desc-${index}`).textContent = 
-          player.equippedWeapon && player.equippedWeapon.name === weapon.name
-            ? 'Mejora: Reduce tiempo entre disparos a 1.5s'
-            : weapon.description;
+      upgrades.forEach((upgrade, index) => {
+        document.getElementById(`skill-name-${index}`).textContent = upgrade.name;
+        document.getElementById(`skill-desc-${index}`).textContent = upgrade.description;
       });
       
-      // Manejar selección de arma
-      const selectWeapon = (index) => {
-        const selectedWeapon = weapons[index];
-        if (player.equippedWeapon && player.equippedWeapon.name === selectedWeapon.name) {
-          player.shootCooldown = 1.5; // Mejora el tiempo de disparo
-        } else {
-          player.shootCooldown = selectedWeapon.cooldown;
+      // Manejar selección de mejora
+      const selectUpgrade = (index) => {
+        const selectedUpgrade = upgrades[index];
+        switch(selectedUpgrade.type) {
+          case 'new_skill':
+            skillSystem.unlockSkillSlot();
+            break;
+          case 'multi_projectile':
+            player.projectileCount = (player.projectileCount || 1) + 1;
+            break;
+          case 'damage_boost':
+            player.damageMultiplier = (player.damageMultiplier || 1) * 1.25;
+            break;
+          case 'cooldown_reduction':
+            skillSystem.skills.forEach(skill => {
+              skill.cooldown *= 0.8;
+            });
+            break;
+          case 'area_increase':
+            player.areaMultiplier = (player.areaMultiplier || 1) * 1.3;
+            break;
         }
-        player.loadWeaponSprite(selectedWeapon.sprite, 32, 32, 4);
-        player.equippedWeapon = selectedWeapon;
-        document.getElementById('weapon-value').textContent = selectedWeapon.name;
-        weaponSelection.style.display = 'none';
-        clearInterval(timer);
+        
+        skillSelection.style.display = 'none';
+        if (timer) clearInterval(timer);
+        isWaveActive = false;
+        nextWaveTimer = 30;
       };
       
       // Iniciar temporizador de selección
       let timeLeft = 30;
       const timerElement = document.getElementById('weapon-selection-timer');
-      const timer = setInterval(() => {
-        timeLeft--;
+      let timer = null;
+      
+      const startTimer = () => {
+        if (timer) clearInterval(timer);
+        timeLeft = 30;
         timerElement.textContent = timeLeft;
         
-        if (timeLeft <= 0) {
-          clearInterval(timer);
-          // Seleccionar arma aleatoria si no se eligió ninguna
-          const randomWeapon = Math.floor(Math.random() * weapons.length);
-          selectWeapon(randomWeapon);
-        }
-      }, 1000);
+        timer = setInterval(() => {
+          timeLeft--;
+          timerElement.textContent = timeLeft;
+          
+          if (timeLeft <= 0) {
+            clearInterval(timer);
+            // Seleccionar mejora aleatoria si no se eligió ninguna
+            const randomUpgrade = Math.floor(Math.random() * upgrades.length);
+            selectUpgrade(randomUpgrade);
+          }
+        }, 1000);
+      };
+      
+      startTimer();
       
       // Agregar eventos de clic a las cartas
       document.querySelectorAll('.weapon-card').forEach((card, index) => {
         card.onclick = () => {
           document.querySelectorAll('.weapon-card').forEach(c => c.classList.remove('selected'));
           card.classList.add('selected');
-          selectWeapon(index);
+          selectUpgrade(index);
         };
       });
     }
@@ -308,32 +341,33 @@ let keys = {};
 window.addEventListener('keydown', e => keys[e.key] = true);
 window.addEventListener('keyup', e => keys[e.key] = false);
 
-// Mouse click event for shooting
+// Mouse click event disabled for shooting - only automatic shooting is enabled
 window.addEventListener('click', (e) => {
-  if (!engine.isPaused && !player.isDead && player.class === 'wizard') {
-    const rect = engine.canvas.getBoundingClientRect();
-    const scaleX = engine.gameWidth / engine.canvas.width;
-    const scaleY = engine.gameHeight / engine.canvas.height;
-    
-    const targetX = (e.clientX - rect.left) * scaleX;
-    const targetY = (e.clientY - rect.top) * scaleY;
-    
-    player.shoot(targetX, targetY);
-  }
+  // Click event listener kept for other potential future interactions
 });
 
-// Load weapon sprite for wizard
+// Inicializar stats del jugador según su clase
 if (player.class === 'wizard') {
-  player.loadWeaponSprite('sprites/player_barita_sprite.png', 32, 32, 4);
-  player.equippedWeapon = 'wand';
   player.mana = 100;
   player.maxMana = 100;
+  skillSystem.primarySkill = skillSystem.skills[0];
 }
 
-// Load weapon sprite for warrior
-if (player.class === 'Warrior') {
-  player.loadWeaponSprite('sprites/player_espada_sprite.png', 32, 32, 4);
+if (player.class === 'warrior') {
+  player.stamina = 100;
+  player.maxStamina = 100;
+  skillSystem.primarySkill = skillSystem.skills[0];
 }
+
+// Inicializar el icono de habilidad
+document.addEventListener('DOMContentLoaded', () => {
+  if (skillSystem.primarySkill) {
+    const skillIcon = document.getElementById('selected-skill-icon');
+    if (skillIcon) {
+      skillIcon.style.backgroundImage = `url('${skillSystem.primarySkill.icon}')`;
+    }
+  }
+});
 
 // Game loop
 let lastTime = 0;

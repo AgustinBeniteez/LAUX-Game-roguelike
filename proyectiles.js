@@ -30,12 +30,12 @@ class Projectile extends Entity {
                 break;
             case 'shock':
                 this.damage = damage * 1.6;
-                this.loadSprite('sprites/proyectil_sprite_4.png', 32, 32, 1);
+                this.loadSprite('sprites/proyectil_sprite_1.png', 32, 32, 1); // Fallback to basic projectile
                 this.chainEffect = true;
                 break;
             case 'dark':
                 this.damage = damage * 1.8;
-                this.loadSprite('sprites/proyectil_sprite_5.png', 32, 32, 1);
+                this.loadSprite('sprites/proyectil_sprite_1.png', 32, 32, 1); // Fallback to basic projectile
                 this.vortexEffect = true;
                 break;
             default:
@@ -181,9 +181,6 @@ class Projectile extends Entity {
                         const index = engine.entities.indexOf(entity);
                         if (index > -1) {
                             engine.entities.splice(index, 1);
-                            gameState.enemiesKilled++;
-                            gameState.totalEnemiesKilled++;
-                            document.getElementById('enemies-value').textContent = gameState.totalEnemiesKilled;
                             enemiesInWave--;
                             saveGame();
                         }

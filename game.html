@@ -125,7 +125,7 @@
     <div id="skills-bar" style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; background: rgba(0, 0, 0, 0.7); padding: 10px; border-radius: 10px;">
       <div class="skill-box" style="width: 50px; height: 50px; border: 2px solid #fff; border-radius: 5px; position: relative; overflow: hidden;">
         <div class="skill-icon" id="selected-skill-icon" style="width: 100%; height: 100%; background-size: contain; background-repeat: no-repeat; background-position: center;"></div>
-        <div class="cooldown-overlay" style="position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(0, 0, 0, 0.7); transform-origin: bottom; transform: scaleY(0); transition: transform 0.1s linear;"></div>
+        <div class="cooldown-overlay" style="position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); transform-origin: bottom; transform: scaleY(0); transition: transform 0.1s linear;"></div>
       </div>
     </div>
     <div id="wave-info" style="position: absolute; top: 20px; right: 20px; background: rgba(0, 0, 0, 0.7); padding: 15px; border-radius: 10px; color: white;">
@@ -134,33 +134,27 @@
         <span class="stat-value" id="wave-value">1</span>
       </div>
       <div class="stat-container">
-        <span class="stat-label" data-translate="enemies">Enemigos Eliminados:</span>
-        <span class="stat-value" id="enemies-value">0</span>
-      </div>
-      <div class="stat-container">
         <span class="stat-label" data-translate="nextWave">Siguiente oleada:</span>
         <span class="stat-value" id="next-wave-timer">30s</span>
       </div>
     </div>
-    <div id="weapon-selection" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 5; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8);">
-      <div style="display: flex; justify-content: center; align-items: center; height: 100%; gap: 20px;">
-        <div class="weapon-card" data-weapon="0" style="image-rendering: pixelated; width: 200px; height: 300px; background: url('sprites/card_sprite.png') no-repeat center; background-size: contain; cursor: pointer; transition: transform 0.3s;">
-          <div style="height: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding: 20px; color: white; text-align: center;">
-            <h3 id="weapon-name-0" style="margin: 0;">Arma 1</h3>
-            <p id="weapon-desc-0" style="margin: 5px 0;">Descripción del arma 1</p>
-          </div>
+    <div id="skill-selection" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 5; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8);">
+      <h1 class="title" style="color: white; font-size: 48px; margin-bottom: 40px; text-shadow: 0 0 10px rgba(255, 255, 255, 0.5); text-align: center;">Elige tu habilidad</h1>
+      <div style="display: flex; justify-content: center; align-items: center; height: calc(100% - 120px); gap: 20px;">
+        <div class="skill-card" data-skill="0" style="image-rendering: pixelated; width: 200px; height: 350px; background: url('sprites/card_sprite.png') no-repeat center; background-size: contain; cursor: pointer; transition: transform 0.3s; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
+          <img class="skill-icon" src="sprites/proyectil_sprite_1.png" style="width: 64px; height: 64px; margin-bottom: 10px;">
+          <div class="class-name" style="color: white; font-size: 24px; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); z-index: 1;">Fuego</div>
+          <div class="class-desc" style="color: #fff; font-size: 14px; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); z-index: 1;">Daño básico y rápido</div>
         </div>
-        <div class="weapon-card" data-weapon="1" style="image-rendering: pixelated; width: 200px; height: 300px; background: url('sprites/card_sprite.png') no-repeat center; background-size: contain; cursor: pointer; transition: transform 0.3s;">
-          <div style="height: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding: 20px; color: white; text-align: center;">
-            <h3 id="weapon-name-1" style="margin: 0;">Arma 2</h3>
-            <p id="weapon-desc-1" style="margin: 5px 0;">Descripción del arma 2</p>
-          </div>
+        <div class="skill-card" data-skill="1" style="image-rendering: pixelated; width: 200px; height: 350px; background: url('sprites/card_sprite.png') no-repeat center; background-size: contain; cursor: pointer; transition: transform 0.3s; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
+          <img class="skill-icon" src="sprites/proyectil_sprite_2.png" style="width: 64px; height: 64px; margin-bottom: 10px;">
+          <div class="class-name" style="color: white; font-size: 24px; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); z-index: 1;">Hielo</div>
+          <div class="class-desc" style="color: #fff; font-size: 14px; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); z-index: 1;">Ralentiza a los enemigos</div>
         </div>
-        <div class="weapon-card" data-weapon="2" style="image-rendering: pixelated; width: 200px; height: 300px; background: url('sprites/card_sprite.png') no-repeat center; background-size: contain; cursor: pointer; transition: transform 0.3s;">
-          <div style="height: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding: 20px; color: white; text-align: center;">
-            <h3 id="weapon-name-2" style="margin: 0;">Arma 3</h3>
-            <p id="weapon-desc-2" style="margin: 5px 0;">Descripción del arma 3</p>
-          </div>
+        <div class="skill-card" data-skill="2" style="image-rendering: pixelated; width: 200px; height: 350px; background: url('sprites/card_sprite.png') no-repeat center; background-size: contain; cursor: pointer; transition: transform 0.3s; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
+          <img class="skill-icon" src="sprites/proyectil_sprite_3.png" style="width: 64px; height: 64px; margin-bottom: 10px;">
+          <div class="class-name" style="color: white; font-size: 24px; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); z-index: 1;">Energía</div>
+          <div class="class-desc" style="color: #fff; font-size: 14px; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); z-index: 1;">Daño en área</div>
         </div>
       </div>
       <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); color: white; font-size: 24px;">
@@ -184,8 +178,8 @@
       <span class="stat-value" id="stamina-value">0</span>
     </div>
     <div class="stat-container">
-      <span class="stat-label" data-translate="weapon">Arma:</span>
-      <span class="stat-value" id="weapon-value">-</span>
+      <span class="stat-label" data-translate="skill">Habilidad:</span>
+      <span class="stat-value" id="skill-value">-</span>
     </div>
     <div class="stat-container coordinates">
       <span class="stat-label" data-translate="position">Posición:</span>
@@ -247,40 +241,72 @@
   <script src="skills.js"></script>
   <script src="main.js"></script>
   <script>
-    // Función para actualizar el cooldown de una habilidad
-    function updateSkillCooldown(skillIndex, progress) {
-      const cooldownOverlay = document.querySelectorAll('.cooldown-overlay')[skillIndex];
-      cooldownOverlay.style.transform = `scaleY(${progress})`;
-    }
-
-    // Función para actualizar el ícono de una habilidad
-    function updateSkillIcon(skillIndex, iconUrl) {
-      const skillIcon = document.querySelectorAll('.skill-icon')[skillIndex];
-      skillIcon.style.backgroundImage = `url('${iconUrl})`;
-    }
-
-    // Ejemplo de uso cuando se selecciona una nueva habilidad
-    document.addEventListener('weaponSelected', (event) => {
-      const { weaponIndex, iconUrl } = event.detail;
-      updateSkillIcon(weaponIndex, iconUrl);
-    });
-
-    // Ejemplo de uso cuando se usa una habilidad
-    document.addEventListener('skillUsed', (event) => {
-      const { skillIndex, cooldownTime } = event.detail;
-      updateSkillCooldown(skillIndex, 1);
+    document.addEventListener('DOMContentLoaded', () => {
+      const skillSelectionContainer = document.querySelector('#skill-selection div[style*="display: flex"]');
+      const skillSelectionTimer = document.getElementById('weapon-selection-timer');
+      let timeLeft = 30;
+      let currentSkill = null;
       
-      // Animación de cooldown
-      let progress = 1;
-      const interval = setInterval(() => {
-        progress -= 0.01;
-        updateSkillCooldown(skillIndex, progress);
+      // Limpiar el contenedor de cartas
+      skillSelectionContainer.innerHTML = '';
+      
+      // Obtener habilidades aleatorias del sistema de habilidades
+      const availableSkills = skillSystem.skills;
+      const numSkillsToShow = 3;
+      const selectedSkills = [];
+      
+      while (selectedSkills.length < numSkillsToShow && availableSkills.length > 0) {
+        const randomIndex = Math.floor(Math.random() * availableSkills.length);
+        selectedSkills.push(availableSkills[randomIndex]);
+        availableSkills.splice(randomIndex, 1);
+      }
+      
+      // Crear cartas para las habilidades seleccionadas
+      selectedSkills.forEach((skill, index) => {
+        const card = document.createElement('div');
+        card.className = 'skill-card';
+        card.setAttribute('data-skill', index);
+        card.style.cssText = 'image-rendering: pixelated; width: 200px; height: 350px; background: url(\'sprites/card_sprite.png\') no-repeat center; background-size: contain; cursor: pointer; transition: transform 0.3s; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;';
         
-        if (progress <= 0) {
-          clearInterval(interval);
-          updateSkillCooldown(skillIndex, 0);
+        card.innerHTML = `
+          <img class="skill-icon" src="${skill.icon}" style="width: 64px; height: 64px; margin-bottom: 10px;">
+          <div class="class-name" style="color: white; font-size: 24px; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); z-index: 1;">${skill.name}</div>
+          <div class="class-desc" style="color: #fff; font-size: 14px; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); z-index: 1;">Daño: ${skill.damage}</div>
+        `;
+        
+        card.addEventListener('click', () => {
+          const event = new CustomEvent('weaponSelected', {
+            detail: { weaponIndex: index }
+          });
+          document.dispatchEvent(event);
+          document.getElementById('skill-selection').style.display = 'none';
+        });
+        
+        card.addEventListener('mouseover', () => {
+          card.style.transform = 'scale(1.1)';
+        });
+        
+        card.addEventListener('mouseout', () => {
+          card.style.transform = 'scale(1)';
+        });
+        
+        skillSelectionContainer.appendChild(card);
+      });
+      
+      const updateTimer = () => {
+        if (timeLeft > 0) {
+          timeLeft--;
+          skillSelectionTimer.textContent = timeLeft;
+          setTimeout(updateTimer, 1000);
+        } else {
+          // Si se acaba el tiempo, seleccionar una habilidad aleatoria
+          const skillCards = document.querySelectorAll('.skill-card');
+          const randomSkill = Math.floor(Math.random() * skillCards.length);
+          skillCards[randomSkill].click();
         }
-      }, cooldownTime / 100);
+      };
+
+      updateTimer();
     });
   </script>
 </body>
