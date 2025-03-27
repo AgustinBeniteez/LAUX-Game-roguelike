@@ -5,6 +5,7 @@
   <title>LAUX GAME</title>
   <link rel="shortcut icon" href="sprites/laux_logo.webp" type="image/x-icon">
   <link rel="stylesheet" href="custom_cursor.css">
+  <link rel="stylesheet" href="src/fonts.css">
   <style>
     body { 
       margin: 0; 
@@ -16,7 +17,7 @@
       align-items: center;
       justify-content: center;
       flex-direction: column;
-      font-family: 'Arial', sans-serif;
+      font-family: 'Mineglyph', sans-serif;
     }
     .config-title {
       color: rgb(206, 111, 206);
@@ -39,7 +40,7 @@
       display: block;
       margin-bottom: 10px;
       font-size: 18px;
-      color: #ffd700;
+      color: #b847b2;
     }
     select {
       width: 100%;
@@ -50,10 +51,16 @@
       border-radius: 5px;
       font-size: 16px;
       cursor: pointer;
+      font-family: 'Mineglyph', sans-serif !important;
     }
     select:hover {
-      border-color: rgba(255, 255, 255, 0.5);
+      border-color: rgba(43, 39, 39, 0.5);
     }
+    select:focus {
+      outline: none;
+      border-color: rgba(85, 83, 83, 0.5);
+    }
+
     .button-container {
       display: flex;
       gap: 10px;
@@ -64,6 +71,7 @@
       background: rgba(255, 255, 255, 0.1);
       border: 2px solid rgba(255, 255, 255, 0.3);
       color: white;
+      font-family: 'Mineglyph', sans-serif !important;
       padding: 15px 30px;
       border-radius: 5px;
       font-size: 18px;

@@ -17,6 +17,17 @@ class Entity {
       this.experience = 0;
       this.statusEffects = {}; // Almacena efectos de estado activos
       
+      // Cargar el sprite seleccionado por el usuario
+      if (!isEnemy && !bossType) {
+        const selectedSkin = localStorage.getItem('selectedSkin') || 'default';
+        const skinSprites = {
+          default: 'sprites/player_sprite.png',
+          barita: 'sprites/player_sprite_skin1.png',
+          espada: 'sprites/player_sprite_skin3.png'
+        };
+        spriteSrc = skinSprites[selectedSkin];
+      }
+      
       // Configuración de jefes
       if (this.isBoss) {
         switch(bossType) {
