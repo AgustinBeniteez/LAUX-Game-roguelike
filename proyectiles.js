@@ -152,6 +152,7 @@ class Projectile extends Entity {
                     } else if (this.skillType === 'ice') {
                         // Efecto de ralentización
                         entity.speed *= 0.7;
+                        entity.applyStatusEffect('slow', 3000, { speedMultiplier: 0.7 });
                         setTimeout(() => {
                             if (entity && !entity.isDead) {
                                 entity.speed /= 0.7;
@@ -184,6 +185,10 @@ class Projectile extends Entity {
                     // Verificar si el enemigo murió
                     if (entity.health <= 0) {
                         entity.isDead = true;
+                        // Crear orbe de experiencia en la posición del enemigo
+                        const expOrb = new ExperienceOrb(entity.x, entity.y);
+                        engine.addEntity(expOrb);
+                        
                         const index = engine.entities.indexOf(entity);
                         if (index > -1) {
                             engine.entities.splice(index, 1);

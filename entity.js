@@ -15,6 +15,7 @@ class Entity {
       this.isBoss = bossType !== null;
       this.bossType = bossType;
       this.experience = 0;
+      this.statusEffects = {}; // Almacena efectos de estado activos
       
       // Configuración de jefes
       if (this.isBoss) {
@@ -88,7 +89,56 @@ class Entity {
       };
     }
   
+    applyStatusEffect(effectType, duration, params = {}) {
+      this.statusEffects[effectType] = {
+        duration,
+        params,
+        startTime: Date.now(),
+        visualElement: null
+      };
+
+      // Crear elemento visual para el efecto de congelación
+      if (effectType === 'slow') {
+        const visualElement = document.createElement('div');
+        visualElement.style.cssText = `
+          position: absolute;
+          width: ${this.width}px;
+          height: ${this.height}px;
+          background: url('sprites/frezee.png') no-repeat center center;
+          background-size: contain;
+          pointer-events: none;
+          z-index: 2;
+        `;
+        document.body.appendChild(visualElement);
+        this.statusEffects[effectType].visualElement = visualElement;
+      }
+    }
+
+    updateStatusEffects() {
+      const currentTime = Date.now();
+      Object.entries(this.statusEffects).forEach(([effectType, effect]) => {
+        if (currentTime - effect.startTime >= effect.duration) {
+          // Eliminar el elemento visual si existe
+          if (effect.visualElement) {
+            effect.visualElement.remove();
+          }
+          // Restaurar el sprite original cuando termina el efecto
+          if (this.sprite && effectType === 'slow') {
+            this.sprite.style.filter = '';
+          }
+          delete this.statusEffects[effectType];
+        } else if (effect.visualElement) {
+          // Actualizar posición del elemento visual y seguir al enemigo
+          effect.visualElement.style.left = `${this.x}px`;
+          effect.visualElement.style.top = `${this.y}px`;
+        }
+      });
+    }
+
     update(dt) {
+      // Actualizar efectos de estado
+      this.updateStatusEffects();
+      
       // Auto-shooting for all equipped skills
       if (!this.isDead && !engine.isPaused) {
         const currentTime = Date.now() / 1000;
@@ -153,25 +203,10 @@ class Entity {
       if (this.health <= 0 && !this.isDead) {
         if (this.isEnemy) {
           // Crear orbe de experiencia cuando muere un enemigo
-          const expOrb = new ExperienceOrb(this.x + this.width/2, this.y + this.height/2);
+          const expOrb = new ExperienceOrb(this.x, this.y);
           engine.addEntity(expOrb);
           
-          // Subir de nivel automáticamente al matar al último enemigo de la fase
-          const remainingEnemies = engine.entities.filter(e => e.isEnemy && !e.isDead).length;
-          if (remainingEnemies === 0) {
-            const player = engine.entities.find(e => !e.isEnemy && !e.isDead);
-            if (player) {
-              if (typeof player.experience === 'undefined') {
-                player.experience = 0;
-              }
-              player.experience = 100; // Forzar subida de nivel
-              const expBar = document.getElementById('exp-bar');
-              if (expBar) {
-                expBar.style.width = '100%';
-              }
-            }
-          }
-          
+          // Marcar como muerto y eliminar el enemigo
           this.isDead = true;
           const index = engine.entities.indexOf(this);
           if (index > -1) {

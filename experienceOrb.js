@@ -4,9 +4,13 @@ class ExperienceOrb extends Entity {
         this.width = 32;
         this.height = 32;
         this.loadSprite('sprites/orbe_exp.png');
-        this.expValue = 10;
+        this.expValue = 25;
         this.isCollected = false;
         this.experience = 0;
+        this.baseSpeed = 200;
+        this.maxSpeed = 500;
+        this.attractionRange = 200;
+        this.collectionRange = 40;
     }
 
     update(dt) {
@@ -21,19 +25,19 @@ class ExperienceOrb extends Entity {
         const dy = player.y - this.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
-        // Si el jugador está cerca, mover el orbe hacia él
-        const collectionRange = 150;
-        const collectionDistance = 50;
-
-        if (distance < collectionRange) {
-            const speed = 300;
-            const vx = (dx / distance) * speed * dt;
-            const vy = (dy / distance) * speed * dt;
+        // Si el jugador está cerca, mover el orbe hacia él con velocidad variable
+        if (distance < this.attractionRange) {
+            // Calcular velocidad basada en la distancia
+            const speedMultiplier = 1 - (distance / this.attractionRange);
+            const currentSpeed = this.baseSpeed + (this.maxSpeed - this.baseSpeed) * speedMultiplier;
+            
+            const vx = (dx / distance) * currentSpeed * dt;
+            const vy = (dy / distance) * currentSpeed * dt;
             this.x += vx;
             this.y += vy;
 
             // Recolectar el orbe si está muy cerca del jugador
-            if (distance < collectionDistance) {
+            if (distance < this.collectionRange) {
                 this.isCollected = true;
                 
                 // Inicializar experiencia si no existe
