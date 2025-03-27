@@ -8,7 +8,9 @@ upgrade-button:hover { cursor: url('sprites/mouse_game_hover.png'), pointer; }
 upgrade-button { cursor: url('sprites/mouse_game.png'), auto; }
 .menu-button:hover { cursor: url('sprites/mouse_game_hover.png'), pointer; }
 .menu-button { cursor: url('sprites/mouse_game.png'), auto; }
+
 .skill-icon:hover { cursor: url('sprites/mouse_game_hover.png'), pointer; }
+
 .skill-icon { cursor: url('sprites/mouse_game.png'), auto; }
 /*Cuando se hace click en un botón*/
 button:active { cursor: url('sprites/mouse_game.png'), auto; }
@@ -22,3 +24,14 @@ upgrade-button:active { cursor: url('sprites/mouse_game.png'), auto; }
 .menu-button:active { cursor: url('sprites/mouse_game.png'), auto; }
 /*Cuando se hace click en una imagen de habilidad*/
 .skill-icon:active { cursor: url('sprites/mouse_game.png'), auto; }
+
+select {
+  cursor: url('sprites/mouse_game_hover.png'), pointer;
+}
+select:hover {
+  cursor: url('sprites/mouse_game_hover.png'), pointer;
+}
+
+select:active {
+  cursor: url('sprites/mouse_game.png'), auto;
+}
