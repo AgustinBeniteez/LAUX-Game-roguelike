@@ -20,7 +20,7 @@ class Projectile extends Entity {
             },
             'ice': {
                 damage: damage * 1.2,
-                sprite: 'sprites/proyectil_sprite_2.png',
+                sprite: 'sprites/frezee.png',
                 effects: { slowEffect: true, slowDuration: 3, slowAmount: 0.7 }
             },
             'energy': {

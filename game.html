@@ -151,7 +151,7 @@
           <div class="class-desc" style="color: #fff; font-size: 14px; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); z-index: 1;">Daño básico y rápido</div>
         </div>
         <div class="skill-card" data-skill="1" style="image-rendering: pixelated; width: 200px; height: 350px; background: url('sprites/card_sprite.png') no-repeat center; background-size: contain; cursor: pointer; transition: transform 0.3s; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
-          <img class="skill-icon" src="sprites/proyectil_sprite_2.png" style="width: 64px; height: 64px; margin-bottom: 10px;">
+          <img class="skill-icon" src="sprites/frezee.png" style="width: 64px; height: 64px; margin-bottom: 10px;">
           <div class="class-name" style="color: white; font-size: 24px; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); z-index: 1;">Hielo</div>
           <div class="class-desc" style="color: #fff; font-size: 14px; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); z-index: 1;">Ralentiza a los enemigos</div>
         </div>
@@ -190,7 +190,7 @@
       <span class="stat-value" id="position-value">X: 0, Y: 0</span>
     </div>
     <div class="exp-bar-container" style="position: absolute; bottom: 95px; left: 50%; transform: translateX(-50%); width: 300px; height: 10px; background: rgba(0, 0, 0, 0.7); border-radius: 5px; overflow: visible;">
-      <div style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); color: white; font-size: 14px; text-shadow: 1px 1px 2px black;" id="level-display">Nivel 1</div>
+      <div style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); color: white; font-size: 14px; text-shadow: 1px 1px 2px black;" id="level-display">Level 1</div>
       <div id="exp-bar" style="width: 0%; height: 100%; background: #4CAF50; transition: width 0.3s ease;"></div>
     </div>
   </div>
@@ -356,6 +356,15 @@
       timeLeft = 30;
       skillSelectionTimer.textContent = timeLeft;
       updateTimer();
+
+      const levelDisplay = document.getElementById('level-display');
+      const updateLevelDisplay = () => {
+        const playerLevel = player.level; // Retrieve player's level from the player object
+        levelDisplay.textContent = `Level ${playerLevel}`;
+      };
+
+      // Example: Update level display when player's level changes
+      updateLevelDisplay();
     });
   </script>
 </body>

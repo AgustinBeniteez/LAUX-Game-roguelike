@@ -16,11 +16,11 @@ class SkillSystem {
             },
             {
                 name: 'Rayo de Hielo',
-                icon: 'sprites/proyectil_sprite_2.png',
+                icon: 'sprites/frezee.png',
                 cooldown: 3.0,
                 damage: 35,
                 projectileType: 'ice',
-                projectileSprite: 'sprites/proyectil_sprite_2.png'
+                projectileSprite: 'sprites/frezee.png'
             },
             {
                 name: 'Explosión de Energía',
@@ -64,20 +64,29 @@ class SkillSystem {
             const { weaponIndex } = event.detail;
             if (weaponIndex >= 0 && weaponIndex < this.skills.length) {
                 const selectedSkill = this.skills[weaponIndex];
-                
-                // Buscar el primer slot vacío disponible
-                let slotIndex = this.equippedSkills.findIndex(slot => slot === null);
-                
-                // Si no hay slots vacíos, no hacer nada
-                if (slotIndex === -1) return;
-                
-                // Equipar la habilidad en el slot
-                this.equippedSkills[slotIndex] = selectedSkill;
-                this.skillLevels[slotIndex] = 1;
-                this.updateSkillIcon(slotIndex);
-                this.updateHUDSlots();
-                
-                // Reanudar el juego después de seleccionar
+                const existingSkillIndex = this.equippedSkills.findIndex(skill => skill && skill.name === selectedSkill.name);
+
+                if (existingSkillIndex !== -1) {
+                    // Upgrade skill level if already equipped
+                    this.upgradeSkill(existingSkillIndex);
+                } else {
+                    // Find the first empty slot
+                    let slotIndex = this.equippedSkills.findIndex(slot => slot === null);
+
+                    if (slotIndex === -1) {
+                        // Prompt to replace an existing skill
+                        slotIndex = prompt('No hay huecos disponibles. Elige una habilidad para reemplazar:', this.equippedSkills.map(skill => skill.name).join(', '));
+                        if (slotIndex === null || slotIndex < 0 || slotIndex >= this.equippedSkills.length) return;
+                    }
+
+                    // Equip the new skill
+                    this.equippedSkills[slotIndex] = selectedSkill;
+                    this.skillLevels[slotIndex] = 1;
+                    this.updateSkillIcon(slotIndex);
+                    this.updateHUDSlots();
+                }
+
+                // Resume the game after selection
                 engine.isPaused = false;
                 document.getElementById('skill-selection').style.display = 'none';
             }
@@ -123,7 +132,6 @@ class SkillSystem {
             skillBox.className = 'skill-box';
             skillBox.style.cssText = 'width: 50px; height: 50px; border: 2px solid #fff; border-radius: 5px; position: relative; overflow: hidden;';
             
-            // Agregar estilo para slots bloqueados
             if (i >= this.maxEquippedSkills) {
                 skillBox.style.opacity = '0.5';
                 skillBox.style.border = '2px solid #666';
@@ -137,20 +145,16 @@ class SkillSystem {
             cooldownOverlay.className = 'cooldown-overlay';
             cooldownOverlay.style.cssText = 'position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; background: rgb(45 45 45 / 69%); transform-origin: bottom; transform: scaleY(0); transition: transform 0.1s linear;';
             
-            // Agregar indicador de nivel
-            if (this.equippedSkills[i]) {
-                const levelIndicator = document.createElement('div');
-                levelIndicator.className = 'level-indicator';
-                levelIndicator.style.cssText = 'position: absolute; top: 2px; right: 2px; background: rgba(255, 255, 255, 0.9); color: #000; font-size: 10px; padding: 1px 3px; border-radius: 3px;';
-                levelIndicator.textContent = `Lv${this.skillLevels[i]}`;
-                skillBox.appendChild(levelIndicator);
-            }
+            const levelIndicator = document.createElement('div');
+            levelIndicator.className = 'level-indicator';
+            levelIndicator.style.cssText = 'position: absolute; top: 2px; right: 2px; background: rgba(255, 255, 255, 0.9); color: #000; font-size: 10px; padding: 1px 3px; border-radius: 3px;';
+            levelIndicator.textContent = `Lv${this.skillLevels[i]}`;
+            skillBox.appendChild(levelIndicator);
             
             skillBox.appendChild(skillIcon);
             skillBox.appendChild(cooldownOverlay);
             skillsBar.appendChild(skillBox);
             
-            // Actualizar icono si hay una habilidad equipada
             if (this.equippedSkills[i]) {
                 this.updateSkillIcon(i);
             }

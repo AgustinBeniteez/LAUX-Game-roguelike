@@ -49,11 +49,23 @@ class ExperienceOrb extends Entity {
                 // Añadir experiencia
                 player.experience += this.expValue;
                 
+                // Actualizar el nivel del jugador
+                if (typeof player.level === 'undefined') {
+                    player.level = 1;
+                }
+                
                 // Verificar niveles de experiencia
-                const expForNextLevel = 100;
+                const expForNextLevel = 100 * player.level; // Incrementa el requisito de experiencia con el nivel
                 if (player.experience >= expForNextLevel) {
                     player.experience -= expForNextLevel;
+                    player.level += 1;
                     engine.isPaused = true;
+                    
+                    // Actualizar la visualización del nivel
+                    const levelDisplay = document.getElementById('level-display');
+                    if (levelDisplay) {
+                        levelDisplay.textContent = `Nivel: ${player.level}`;
+                    }
                     
                     // Mostrar botones de mejora de habilidades
                     const skillsBar = document.getElementById('skills-bar');
