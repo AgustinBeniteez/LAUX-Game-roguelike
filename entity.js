@@ -238,7 +238,8 @@ class Entity {
           
           const deathText = document.createElement('div');
           deathText.setAttribute('data-translate', 'youDied');
-          deathText.style.fontSize = '48px';
+          deathText.style.fontSize = '7rem';
+          deathText.style.fontFamily  = 'Mineglyph';
           deathText.style.marginBottom = '30px';
           deathPanel.appendChild(deathText);
 
@@ -251,14 +252,22 @@ class Entity {
           const playAgainButton = document.createElement('button');
           playAgainButton.setAttribute('data-translate', 'playAgain');
           playAgainButton.style.cssText = `
-            padding: 10px 20px;
-            font-size: 18px;
+            padding: 15px 30px;
+            font-size: 20px;
             cursor: pointer;
-            background: #4CAF50;
+            background: #4caf4f2c;
             border: none;
             border-radius: 5px;
             color: white;
+            font-family: 'Mineglyph', sans-serif;
+            transition: background 0.3s;
           `;
+          playAgainButton.onmouseover = () => {
+            playAgainButton.style.background = '#4caf50';
+          };
+          playAgainButton.onmouseout = () => {
+            playAgainButton.style.background = '#4caf4f2c';
+          };
           playAgainButton.onclick = () => {
             location.reload();
           };
@@ -266,14 +275,22 @@ class Entity {
           const exitButton = document.createElement('button');
           exitButton.setAttribute('data-translate', 'exit');
           exitButton.style.cssText = `
-            padding: 10px 20px;
-            font-size: 18px;
+            padding: 15px 30px;
+            font-size: 20px;
             cursor: pointer;
-            background: #f44336;
+            background: #f4433627;
             border: none;
             border-radius: 5px;
             color: white;
+            font-family: 'Mineglyph', sans-serif;
+            transition: background 0.3s;
           `;
+          exitButton.onmouseover = () => {
+            exitButton.style.background = '#f44336';
+          };
+          exitButton.onmouseout = () => {
+            exitButton.style.background = '#f4433627';
+          };
           exitButton.onclick = () => {
             window.location.href = 'index.html';
           };

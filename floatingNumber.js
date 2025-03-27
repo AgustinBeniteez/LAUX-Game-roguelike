@@ -38,10 +38,11 @@ class FloatingNumber {
         ctx.save();
         ctx.globalAlpha = this.alpha;
         ctx.fillStyle = this.color;
-        ctx.font = `${Math.floor(20 * this.scale)}px Arial`;
+        ctx.font = `${Math.floor(20 * this.scale)}px 'Mineglyph', sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(Math.round(this.value), this.x, this.y);
         ctx.restore();
     }
 }
+
