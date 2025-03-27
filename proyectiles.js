@@ -104,6 +104,10 @@ class Projectile extends Entity {
                     // Aplicar daño al enemigo
                     entity.health -= this.damage;
                     
+                    // Crear número flotante de daño
+                    const damageNumber = new FloatingNumber(entity.x + entity.width / 2, entity.y, this.damage);
+                    engine.addEntity(damageNumber);
+                    
                     // Comportamiento especial para cada tipo de habilidad
                     if (this.skillType === 'energy') {
                         // Efecto de área para la explosión de energía

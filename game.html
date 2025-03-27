@@ -246,10 +246,10 @@
   <script src="entity.js"></script>
   <script src="minimap.js"></script>
   <script src="engine.js"></script>
+  <script src="floatingNumber.js"></script>
   <script src="proyectiles.js"></script>
   <script src="skills.js"></script>
   <script src="main.js"></script>
-
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const skillSelectionContainer = document.querySelector('#skill-selection div[style*="display: flex"]');
@@ -261,6 +261,12 @@
       // Asegurarse de que el sistema de habilidades esté inicializado
       if (!window.skillSystem) {
         window.skillSystem = new SkillSystem();
+      }
+
+      // Verificar si el jugador ya tiene una habilidad
+      if (window.skillSystem.equippedSkills[0]) {
+        document.getElementById('skill-selection').style.display = 'none';
+        return;
       }
 
       // Cargar la habilidad guardada del localStorage
