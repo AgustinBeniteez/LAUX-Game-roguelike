@@ -14,6 +14,7 @@ class Entity {
       this.isEnemy = isEnemy;
       this.isBoss = bossType !== null;
       this.bossType = bossType;
+      this.experience = 0;
       
       // Configuración de jefes
       if (this.isBoss) {
@@ -152,8 +153,25 @@ class Entity {
       if (this.health <= 0 && !this.isDead) {
         if (this.isEnemy) {
           // Crear orbe de experiencia cuando muere un enemigo
-          const expOrb = new ExperienceOrb(this.x, this.y);
+          const expOrb = new ExperienceOrb(this.x + this.width/2, this.y + this.height/2);
           engine.addEntity(expOrb);
+          
+          // Subir de nivel automáticamente al matar al último enemigo de la fase
+          const remainingEnemies = engine.entities.filter(e => e.isEnemy && !e.isDead).length;
+          if (remainingEnemies === 0) {
+            const player = engine.entities.find(e => !e.isEnemy && !e.isDead);
+            if (player) {
+              if (typeof player.experience === 'undefined') {
+                player.experience = 0;
+              }
+              player.experience = 100; // Forzar subida de nivel
+              const expBar = document.getElementById('exp-bar');
+              if (expBar) {
+                expBar.style.width = '100%';
+              }
+            }
+          }
+          
           this.isDead = true;
           const index = engine.entities.indexOf(this);
           if (index > -1) {

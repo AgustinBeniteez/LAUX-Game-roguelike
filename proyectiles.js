@@ -30,12 +30,12 @@ class Projectile extends Entity {
             },
             'shock': {
                 damage: damage * 1.6,
-                sprite: 'sprites/proyectil_sprite_1.png',
-                effects: { chainEffect: true, chainRange: 120, chainCount: 3, chainDamageMultiplier: 0.7 }
+                sprite: 'sprites/proyectil_sprite_4.png',
+                effects: { chainEffect: true, chainRange: 100, chainCount: 3, chainDamageMultiplier: 0.7 }
             },
             'dark': {
                 damage: damage * 1.8,
-                sprite: 'sprites/proyectil_sprite_1.png',
+                sprite: 'sprites/proyectil_sprite_leaves.png',
                 effects: { vortexEffect: true, vortexRadius: 100, vortexPull: 50, vortexDamageMultiplier: 0.2 }
             }
         };

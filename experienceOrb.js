@@ -1,13 +1,12 @@
-class ExperienceOrb {
+class ExperienceOrb extends Entity {
     constructor(x, y) {
-        this.x = x;
-        this.y = y;
-        this.width = 20;
-        this.height = 20;
-        this.sprite = new Image();
-        this.sprite.src = 'sprites/orbe_exp.png';
+        super(x, y);
+        this.width = 32;
+        this.height = 32;
+        this.loadSprite('sprites/orbe_exp.png');
         this.expValue = 10;
         this.isCollected = false;
+        this.experience = 0;
     }
 
     update(dt) {
@@ -23,8 +22,8 @@ class ExperienceOrb {
         const distance = Math.sqrt(dx * dx + dy * dy);
 
         // Si el jugador está cerca, mover el orbe hacia él
-        const collectionRange = 100;
-        const collectionDistance = 30;
+        const collectionRange = 150;
+        const collectionDistance = 50;
 
         if (distance < collectionRange) {
             const speed = 300;
@@ -36,7 +35,14 @@ class ExperienceOrb {
             // Recolectar el orbe si está muy cerca del jugador
             if (distance < collectionDistance) {
                 this.isCollected = true;
-                player.experience = (player.experience || 0) + this.expValue;
+                
+                // Inicializar experiencia si no existe
+                if (typeof player.experience === 'undefined') {
+                    player.experience = 0;
+                }
+                
+                // Añadir experiencia
+                player.experience += this.expValue;
                 
                 // Verificar niveles de experiencia
                 const expForNextLevel = 100;
@@ -44,9 +50,38 @@ class ExperienceOrb {
                     player.experience -= expForNextLevel;
                     engine.isPaused = true;
                     
-                    // Mostrar selección de habilidades
-                    const skillSelection = document.getElementById('skill-selection');
-                    skillSelection.style.display = 'block';
+                    // Mostrar botones de mejora de habilidades
+                    const skillsBar = document.getElementById('skills-bar');
+                    const skillBoxes = skillsBar.getElementsByClassName('skill-box');
+                    
+                    for (let i = 0; i < skillBoxes.length; i++) {
+                        const skill = window.skillSystem.equippedSkills[i];
+                        if (skill) {
+                            const upgradeButton = document.createElement('button');
+                            upgradeButton.className = 'upgrade-button';
+                            upgradeButton.style.cssText = 'position: absolute; top: -25px; left: 50%; transform: translateX(-50%); background: #4CAF50; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px;';
+                            upgradeButton.textContent = '¡Subes de nivel! +1';
+                            
+                            upgradeButton.addEventListener('click', () => {
+                                window.skillSystem.upgradeSkill(i);
+                                upgradeButton.remove();
+                                engine.isPaused = false;
+                            });
+                            
+                            skillBoxes[i].appendChild(upgradeButton);
+                        }
+                    }
+                }
+                
+                // Verificar si es el último enemigo de la fase
+                const remainingEnemies = engine.entities.filter(e => e.isEnemy && !e.isDead).length;
+                if (remainingEnemies === 0) {
+                    // Forzar subida de nivel al completar la fase
+                    player.experience = expForNextLevel;
+                    const expBar = document.getElementById('exp-bar');
+                    if (expBar) {
+                        expBar.style.width = '100%';
+                    }
                 }
 
                 // Actualizar HUD de experiencia

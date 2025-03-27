@@ -129,7 +129,7 @@
     <div id="skills-bar" style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; background: rgba(0, 0, 0, 0.7); padding: 10px; border-radius: 10px;">
       <div class="skill-box" style="width: 50px; height: 50px; border: 2px solid #fff; border-radius: 5px; position: relative; overflow: hidden;">
         <div class="skill-icon" id="selected-skill-icon" style="width: 100%; height: 100%; background-size: contain; background-repeat: no-repeat; background-position: center;"></div>
-        <div class="cooldown-overlay" style="position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); transform-origin: bottom; transform: scaleY(0); transition: transform 0.1s linear;"></div>
+        <div class="cooldown-overlay" style="position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; background: rgb(45 45 45 / 69%); transform-origin: bottom; transform: scaleY(0); transition: transform 0.1s linear;"></div>
       </div>
     </div>
     <div id="wave-info" style="position: absolute; top: 20px; right: 20px; background: rgba(0, 0, 0, 0.7); padding: 15px; border-radius: 10px; color: white;">
@@ -189,7 +189,8 @@
       <span class="stat-label" data-translate="position">Posición:</span>
       <span class="stat-value" id="position-value">X: 0, Y: 0</span>
     </div>
-    <div class="exp-bar-container" style="position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%); width: 300px; height: 10px; background: rgba(0, 0, 0, 0.7); border-radius: 5px; overflow: hidden;">
+    <div class="exp-bar-container" style="position: absolute; bottom: 95px; left: 50%; transform: translateX(-50%); width: 300px; height: 10px; background: rgba(0, 0, 0, 0.7); border-radius: 5px; overflow: visible;">
+      <div style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); color: white; font-size: 14px; text-shadow: 1px 1px 2px black;" id="level-display">Nivel 1</div>
       <div id="exp-bar" style="width: 0%; height: 100%; background: #4CAF50; transition: width 0.3s ease;"></div>
     </div>
   </div>
@@ -241,12 +242,14 @@
   </script>
   <script src="assetManager.js"></script>
   <script src="map.js"></script>
+  <script src="experienceOrb.js"></script>
   <script src="entity.js"></script>
   <script src="minimap.js"></script>
   <script src="engine.js"></script>
   <script src="proyectiles.js"></script>
   <script src="skills.js"></script>
   <script src="main.js"></script>
+
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const skillSelectionContainer = document.querySelector('#skill-selection div[style*="display: flex"]');

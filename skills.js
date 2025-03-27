@@ -4,6 +4,7 @@ class SkillSystem {
         this.skillLevels = new Array(5).fill(1); // Nivel de cada habilidad equipada
         this.maxEquippedSkills = 1; // Inicialmente solo 1 slot disponible
         this.lastAutoFireTime = new Array(5).fill(0); // Tiempo del último disparo automático
+        this.maxSkillLevel = 5; // Nivel máximo de cada habilidad
         this.skills = [
             {
                 name: 'Proyectil de Fuego',
@@ -39,11 +40,11 @@ class SkillSystem {
             },
             {
                 name: 'Vórtice Oscuro',
-                icon: 'sprites/proyectil_sprite_5.png',
-                cooldown: 6.0,
+                icon: 'sprites/proyectil_sprite_leaves.png',
+                cooldown: 5.0,
                 damage: 65,
                 projectileType: 'dark',
-                projectileSprite: 'sprites/proyectil_sprite_5.png'
+                projectileSprite: 'sprites/proyectil_sprite_leaves.png'
             }
         ];
 
@@ -134,7 +135,7 @@ class SkillSystem {
             
             const cooldownOverlay = document.createElement('div');
             cooldownOverlay.className = 'cooldown-overlay';
-            cooldownOverlay.style.cssText = 'position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); transform-origin: bottom; transform: scaleY(0); transition: transform 0.1s linear;';
+            cooldownOverlay.style.cssText = 'position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; background: rgb(45 45 45 / 69%); transform-origin: bottom; transform: scaleY(0); transition: transform 0.1s linear;';
             
             // Agregar indicador de nivel
             if (this.equippedSkills[i]) {
@@ -155,6 +156,26 @@ class SkillSystem {
             }
         }
         
+    }
+
+    upgradeSkill(index) {
+        if (!this.equippedSkills[index] || this.skillLevels[index] >= this.maxSkillLevel) return;
+        
+        const skill = this.equippedSkills[index];
+        this.skillLevels[index]++;
+        
+        // Mejorar estadísticas de la habilidad
+        skill.damage = Math.floor(skill.damage * 1.2); // Aumentar daño en 20%
+        skill.cooldown = Math.max(0.5, skill.cooldown * 0.9); // Reducir cooldown en 10% con mínimo de 0.5s
+        
+        // Actualizar el indicador de nivel
+        const skillBox = document.querySelector(`#skill-slot-${index}`);
+        if (skillBox) {
+            const levelIndicator = skillBox.querySelector('.level-indicator');
+            if (levelIndicator) {
+                levelIndicator.textContent = `Lv${this.skillLevels[index]}`;
+            }
+        }
     }
 
     useSkill(index, targetX, targetY) {
