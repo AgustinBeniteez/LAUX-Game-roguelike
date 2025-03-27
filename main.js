@@ -21,6 +21,26 @@ const playerData = JSON.parse(localStorage.getItem('playerData')) || {
   y: 100
 };
 
+let skillSelectionActive = false;
+
+function showSkillSelection() {
+  skillSelectionActive = true;
+  engine.isPaused = true;
+  document.getElementById('skill-selection').style.display = 'block';
+
+  // Manejar la selección de habilidades
+  const skillCards = document.querySelectorAll('.skill-card');
+  skillCards.forEach(card => {
+    card.onclick = () => {
+      const skillIndex = parseInt(card.dataset.skill);
+      document.dispatchEvent(new CustomEvent('weaponSelected', { detail: { weaponIndex: skillIndex } }));
+      document.getElementById('skill-selection').style.display = 'none';
+      engine.isPaused = false;
+      skillSelectionActive = false;
+    };
+  });
+}
+
 const player = new Entity(100, 100);
 player.loadSprite(playerData.class === 'wizard' ? 'sprites/player_sprite.png' : 'sprites/player_sprite.png', 32, 32, 4);
 player.health = playerData.health;
@@ -31,6 +51,28 @@ player.mana = playerData.mana;
 player.maxMana = playerData.maxMana;
 player.stamina = playerData.stamina;
 player.maxStamina = playerData.maxStamina;
+player.experience = 0;
+player.level = 1;
+
+// Actualizar la barra de experiencia
+function updateExpBar() {
+    const expBar = document.getElementById('exp-bar');
+    if (expBar) {
+        const expForNextLevel = 100;
+        expBar.style.width = `${(player.experience / expForNextLevel) * 100}%`;
+    }
+}
+
+// Verificar nivel y mostrar selección de habilidades
+function checkLevelUp() {
+    const expForNextLevel = 100;
+    if (player.experience >= expForNextLevel) {
+        player.experience -= expForNextLevel;
+        player.level++;
+        showSkillSelection();
+        updateExpBar();
+    }
+}
 // Asegurarse de que el inventario tenga la habilidad seleccionada
 player.inventory = Array.isArray(playerData.inventory) && playerData.inventory.length > 0 ? playerData.inventory : [];
 if (player.inventory.length === 0 && playerData.selectedSkill && playerData.skillStats) {
@@ -190,9 +232,25 @@ function updateWaveHUD() {
 }
 
 // Función para gestionar las oleadas
+// Actualizar la experiencia y nivel del jugador
+function updatePlayerExperience() {
+  const expBar = document.getElementById('exp-bar');
+  if (expBar) {
+    const expForNextLevel = 100;
+    expBar.style.width = `${(player.experience / expForNextLevel) * 100}%`;
+    
+    if (player.experience >= expForNextLevel) {
+      player.experience -= expForNextLevel;
+      player.level++;
+      showSkillSelection();
+    }
+  }
+}
+
 function waveManager(dt) {
   if (isWaveActive) {
     waveTimer -= dt;
+    updatePlayerExperience();
     
     // Generar enemigos durante la oleada
     if (enemiesInWave < maxEnemiesInWave && Math.random() < 0.1) {
@@ -232,101 +290,56 @@ function waveManager(dt) {
       const skillSelection = document.getElementById('skill-selection');
       skillSelection.style.display = 'block';
       
-      // Generar cartas de mejora aleatorias
-      const generateUpgradeCards = () => {
-        const availableUpgrades = [
-          { type: 'new_skill', name: 'Nueva Habilidad', description: 'Desbloquea una nueva habilidad' },
-          { type: 'multi_projectile', name: 'Proyectil Múltiple', description: 'Dispara 2 proyectiles a la vez' },
-          { type: 'damage_boost', name: 'Aumento de Daño', description: 'Aumenta el daño de tus habilidades en 25%' },
-          { type: 'cooldown_reduction', name: 'Reducción de Enfriamiento', description: 'Reduce el tiempo de enfriamiento en 20%' },
-          { type: 'area_increase', name: 'Aumento de Área', description: 'Aumenta el área de efecto de las habilidades' }
-        ];
-        
-        // Seleccionar 3 mejoras aleatorias sin repetir
-        const selectedUpgrades = [];
-        while (selectedUpgrades.length < 3) {
-          const randomIndex = Math.floor(Math.random() * availableUpgrades.length);
-          const upgrade = availableUpgrades[randomIndex];
-          if (!selectedUpgrades.find(u => u.type === upgrade.type)) {
-            selectedUpgrades.push(upgrade);
+      // Forzar el fin de la ronda actual
+      nextWaveTimer = 0;
+      
+      // Manejar selección de habilidad
+      const selectSkill = (index) => {
+        const selectedSkill = skillSystem.skills[index];
+        if (selectedSkill) {
+          // Encontrar el siguiente slot vacío
+          const emptySlotIndex = skillSystem.equippedSkills.findIndex(slot => slot === null);
+          if (emptySlotIndex !== -1) {
+            skillSystem.equippedSkills[emptySlotIndex] = selectedSkill;
+            skillSystem.updateSkillIcon(emptySlotIndex);
           }
-        }
-        
-        return selectedUpgrades;
-      };
-      
-      const upgrades = generateUpgradeCards();
-      
-      // Actualizar información de las cartas
-      upgrades.forEach((upgrade, index) => {
-        const nameElement = document.getElementById(`skill-name-${index}`);
-        const descElement = document.getElementById(`skill-desc-${index}`);
-        if (nameElement) nameElement.textContent = upgrade.name;
-        if (descElement) descElement.textContent = upgrade.description;
-      });
-      
-      // Manejar selección de mejora
-      const selectUpgrade = (index) => {
-        const selectedUpgrade = upgrades[index];
-        switch(selectedUpgrade.type) {
-          case 'new_skill':
-            skillSystem.unlockSkillSlot();
-            break;
-          case 'multi_projectile':
-            player.projectileCount = (player.projectileCount || 1) + 1;
-            break;
-          case 'damage_boost':
-            player.damageMultiplier = (player.damageMultiplier || 1) * 1.25;
-            break;
-          case 'cooldown_reduction':
-            skillSystem.skills.forEach(skill => {
-              skill.cooldown *= 0.8;
-            });
-            break;
-          case 'area_increase':
-            player.areaMultiplier = (player.areaMultiplier || 1) * 1.3;
-            break;
         }
         
         skillSelection.style.display = 'none';
         if (timer) clearInterval(timer);
         isWaveActive = false;
-        nextWaveTimer = 30;
+        nextWaveTimer = 0; // Forzar el inicio inmediato de la siguiente ronda
+        engine.isPaused = false;
       };
       
       // Iniciar temporizador de selección
-      let timeLeft = 30;
+      let timeLeft = 0; // Forzar selección inmediata
       const timerElement = document.getElementById('weapon-selection-timer');
+      const nextWaveTimerElement = document.getElementById('next-wave-timer');
       let timer = null;
       
       const startTimer = () => {
         if (timer) clearInterval(timer);
-        timeLeft = 30;
-        timerElement.textContent = timeLeft;
+        timeLeft = 0;
+        timerElement.textContent = Math.ceil(timeLeft);
+        nextWaveTimerElement.textContent = `${Math.ceil(timeLeft)}s`;
         
-        timer = setInterval(() => {
-          timeLeft--;
-          timerElement.textContent = timeLeft;
-          
-          if (timeLeft <= 0) {
-            clearInterval(timer);
-            // Seleccionar mejora aleatoria si no se eligió ninguna
-            const randomUpgrade = Math.floor(Math.random() * upgrades.length);
-            selectUpgrade(randomUpgrade);
-          }
-        }, 1000);
+        // Seleccionar habilidad aleatoria inmediatamente
+        const randomSkill = Math.floor(Math.random() * 3);
+        selectSkill(randomSkill);
       };
       
       startTimer();
       
       // Agregar eventos de clic a las cartas
-      document.querySelectorAll('.weapon-card').forEach((card, index) => {
+      document.querySelectorAll('.skill-card').forEach((card, index) => {
         card.onclick = () => {
-          document.querySelectorAll('.weapon-card').forEach(c => c.classList.remove('selected'));
+          document.querySelectorAll('.skill-card').forEach(c => c.classList.remove('selected'));
           card.classList.add('selected');
-          selectUpgrade(index);
+          selectSkill(index);
         };
       });
+
     }
   } else {
     nextWaveTimer -= dt;

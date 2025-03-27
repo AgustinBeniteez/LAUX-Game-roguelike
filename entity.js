@@ -149,7 +149,18 @@ class Entity {
         document.getElementById('stamina-value').textContent = Math.ceil(this.stamina);
       }
 
-      if (this.health <= 0 && !this.isDead && !this.isEnemy) {
+      if (this.health <= 0 && !this.isDead) {
+        if (this.isEnemy) {
+          // Crear orbe de experiencia cuando muere un enemigo
+          const expOrb = new ExperienceOrb(this.x, this.y);
+          engine.addEntity(expOrb);
+          this.isDead = true;
+          const index = engine.entities.indexOf(this);
+          if (index > -1) {
+            engine.entities.splice(index, 1);
+          }
+          return;
+        }
         this.isDead = true;
         this.deathSprite = new Image();
         this.deathSprite.src = 'sprites/player_sprite_dead.png';

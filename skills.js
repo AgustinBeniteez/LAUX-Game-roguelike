@@ -64,30 +64,21 @@ class SkillSystem {
             if (weaponIndex >= 0 && weaponIndex < this.skills.length) {
                 const selectedSkill = this.skills[weaponIndex];
                 
-                // Buscar si la habilidad ya está equipada
-                const existingSlotIndex = this.equippedSkills.findIndex(skill => skill && skill.name === selectedSkill.name);
+                // Buscar el primer slot vacío disponible
+                let slotIndex = this.equippedSkills.findIndex(slot => slot === null);
                 
-                if (existingSlotIndex !== -1) {
-                    // Mejorar la habilidad existente
-                    this.skillLevels[existingSlotIndex]++;
-                    this.updateSkillIcon(existingSlotIndex);
-                } else {
-                    // Buscar el primer slot vacío disponible
-                    let slotIndex = this.equippedSkills.findIndex(slot => slot === null);
-                    
-                    // Si no hay slots vacíos, reemplazar la primera habilidad
-                    if (slotIndex === -1) {
-                        slotIndex = 0;
-                        this.skillLevels[slotIndex] = 1;
-                    }
-                    
-                    // Equipar la habilidad en el slot
-                    this.equippedSkills[slotIndex] = selectedSkill;
-                    this.skillLevels[slotIndex] = 1;
-                    this.updateSkillIcon(slotIndex);
-                }
+                // Si no hay slots vacíos, no hacer nada
+                if (slotIndex === -1) return;
                 
+                // Equipar la habilidad en el slot
+                this.equippedSkills[slotIndex] = selectedSkill;
+                this.skillLevels[slotIndex] = 1;
+                this.updateSkillIcon(slotIndex);
                 this.updateHUDSlots();
+                
+                // Reanudar el juego después de seleccionar
+                engine.isPaused = false;
+                document.getElementById('skill-selection').style.display = 'none';
             }
         });
     }
@@ -213,34 +204,6 @@ class SkillSystem {
             engine.entities.push(projectile);
         }
 
-        return true;
-
-        for (let i = 0; i < projectileCount; i++) {
-            const angle = (i - (projectileCount - 1) / 2) * spreadAngle;
-            const rad = angle * Math.PI / 180;
-            
-            // Calcular la dirección ajustada
-            const dx = targetX - player.x;
-            const dy = targetY - player.y;
-            const baseAngle = Math.atan2(dy, dx);
-            const finalAngle = baseAngle + rad;
-            
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            const adjustedX = player.x + Math.cos(finalAngle) * distance;
-            const adjustedY = player.y + Math.sin(finalAngle) * distance;
-
-            // Disparar el proyectil con daño ajustado según el nivel
-            const projectile = new Projectile(
-                player.x,
-                player.y,
-                adjustedX,
-                adjustedY,
-                skill.projectileType,
-                skill.damage * (1 + (level - 1) * 0.2) // 20% más de daño por nivel
-            );
-            engine.addEntity(projectile);
-        }
-
         // Emitir evento de uso de habilidad
         const event = new CustomEvent('skillUsed', {
             detail: {
@@ -268,43 +231,30 @@ class SkillSystem {
 
     startAutoFire() {
         setInterval(() => {
-            const player = engine.entities.find(e => !e.isEnemy && !e.isDead);
-            if (!player || engine.isPaused || engine.isRoundTransition) return;
+            if (engine.isPaused || engine.isRoundTransition) return;
             
-            // Revisar cada habilidad equipada
-            for (let i = 0; i < this.maxEquippedSkills; i++) {
-                const skill = this.equippedSkills[i];
-                if (!skill) continue;
-
-                // Actualizar el cooldown
-                if (this.cooldowns[i] > 0) {
-                    this.cooldowns[i] = Math.max(0, this.cooldowns[i] - 0.1);
-                }
-
-                // Verificar si la habilidad no está en cooldown
-                if (this.cooldowns[i] <= 0) {
-                    // Encontrar el enemigo más cercano
-                    let nearestEnemy = null;
-                    let minDistance = Infinity;
-
-                    for (const entity of engine.entities) {
-                        if (entity.isEnemy && !entity.isDead) {
-                            const dx = entity.x - player.x;
-                            const dy = entity.y - player.y;
-                            const distance = Math.sqrt(dx * dx + dy * dy);
-
-                            if (distance < minDistance) {
-                                minDistance = distance;
-                                nearestEnemy = entity;
-                            }
+            const player = engine.entities.find(e => !e.isEnemy && !e.isDead);
+            if (!player) return;
+            
+            // Encontrar el enemigo más cercano
+            const nearestEnemy = engine.entities
+                .filter(e => e.isEnemy && !e.isDead)
+                .reduce((nearest, current) => {
+                    const distToCurrent = Math.hypot(current.x - player.x, current.y - player.y);
+                    const distToNearest = nearest ? Math.hypot(nearest.x - player.x, nearest.y - player.y) : Infinity;
+                    return distToCurrent < distToNearest ? current : nearest;
+                }, null);
+            
+            if (nearestEnemy) {
+                // Disparar todas las habilidades equipadas si están disponibles
+                for (let i = 0; i < this.maxEquippedSkills; i++) {
+                    const skill = this.equippedSkills[i];
+                    if (skill) {
+                        const currentTime = Date.now();
+                        if (currentTime - this.lastAutoFireTime[i] >= skill.cooldown * 1000) {
+                            this.useSkill(i, nearestEnemy.x, nearestEnemy.y);
+                            this.lastAutoFireTime[i] = currentTime;
                         }
-                    }
-
-                    // Si hay un enemigo, disparar hacia él
-                    if (nearestEnemy) {
-                        this.useSkill(i, nearestEnemy.x, nearestEnemy.y);
-                        // Establecer el cooldown después de usar la habilidad
-                        this.cooldowns[i] = skill.cooldown;
                     }
                 }
             }
