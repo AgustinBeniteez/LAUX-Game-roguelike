@@ -16,11 +16,11 @@ class SkillSystem {
             },
             {
                 name: 'Rayo de Hielo',
-                icon: 'sprites/frezee.png',
+                icon: 'sprites/proyectil_sprite_2.png',
                 cooldown: 3.0,
                 damage: 35,
                 projectileType: 'ice',
-                projectileSprite: 'sprites/frezee.png'
+                projectileSprite: 'sprites/proyectil_sprite_2.png'
             },
             {
                 name: 'Explosión de Energía',
