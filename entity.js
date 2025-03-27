@@ -17,17 +17,6 @@ class Entity {
       this.experience = 0;
       this.statusEffects = {}; // Almacena efectos de estado activos
       
-      // Cargar el sprite seleccionado por el usuario
-      if (!isEnemy && !bossType) {
-        const selectedSkin = localStorage.getItem('selectedSkin') || 'default';
-        const skinSprites = {
-          default: 'sprites/player_sprite.png',
-          barita: 'sprites/player_sprite_skin1.png',
-          espada: 'sprites/player_sprite_skin3.png'
-        };
-        spriteSrc = skinSprites[selectedSkin];
-      }
-      
       // Configuración de jefes
       if (this.isBoss) {
         switch(bossType) {
@@ -84,7 +73,7 @@ class Entity {
       this.manaCost = 10; // Mana cost per shot
       
       if (spriteSrc) {
-        this.loadSprite(spriteSrc);
+        this.loadSprite(localStorage.getItem('selectedSkin') || 'sprites/player_sprite.png');
       }
     }
 
@@ -227,7 +216,10 @@ class Entity {
         }
         this.isDead = true;
         this.deathSprite = new Image();
-        this.deathSprite.src = 'sprites/player_sprite_dead.png';
+        const selectedSkin = localStorage.getItem('selectedSkin') || 'default';
+        const deathSpritePath = `sprites/${selectedSkin}_dead.png`;
+        
+        
         setTimeout(() => {
           const deathPanel = document.createElement('div');
           deathPanel.id = 'deathPanel';

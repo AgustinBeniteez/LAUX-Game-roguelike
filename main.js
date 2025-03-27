@@ -48,7 +48,14 @@ function showSkillSelection() {
 }
 
 const player = new Entity(100, 100);
-player.loadSprite(playerData.class === 'wizard' ? 'sprites/player_sprite.png' : 'sprites/player_sprite.png', 32, 32, 4);
+const selectedSkin = localStorage.getItem('selectedSkin') || 'default';
+const skinSprites = {
+  default: 'sprites/player_sprite.png',
+  magenta: 'sprites/player_sprite_skin1.png',
+  azul: 'sprites/player_sprite_skin2.png',
+  amarillo: 'sprites/player_sprite_skin3.png'
+};
+player.loadSprite(skinSprites[selectedSkin], 32, 32, 4);
 player.health = playerData.health;
 player.maxHealth = playerData.health;
 player.speed = 100; // Velocidad reducida del jugador
