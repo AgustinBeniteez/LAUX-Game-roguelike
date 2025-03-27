@@ -142,12 +142,24 @@
         if (currentLanguage) localStorage.setItem('language', currentLanguage);
 
         const skillStats = {
-          fire: { name: 'Fuego', damage: 20, speed: 400, icon: 'sprites/proyectil_sprite_1.png' },
-          ice: { name: 'Hielo', damage: 24, speed: 400, icon: 'sprites/proyectil_sprite_2.png' },
-          energy: { name: 'Energía', damage: 28, speed: 400, icon: 'sprites/proyectil_sprite_3.png' },
-          shock: { name: 'Choque', damage: 32, speed: 400, icon: 'sprites/proyectil_sprite_4.png' },
-          dark: { name: 'Oscuridad', damage: 36, speed: 400, icon: 'sprites/proyectil_sprite_5.png' }
+          fire: { name: 'Fuego', damage: 20, speed: 400, icon: 'sprites/proyectil_sprite_1.png', projectileType: 'fire', cooldown: 2.0, projectileSprite: 'sprites/proyectil_sprite_1.png' },
+          ice: { name: 'Hielo', damage: 24, speed: 400, icon: 'sprites/proyectil_sprite_2.png', projectileType: 'ice', cooldown: 3.0, projectileSprite: 'sprites/proyectil_sprite_2.png' },
+          energy: { name: 'Energía', damage: 28, speed: 400, icon: 'sprites/proyectil_sprite_3.png', projectileType: 'energy', cooldown: 4.0, projectileSprite: 'sprites/proyectil_sprite_3.png' },
+          shock: { name: 'Choque', damage: 32, speed: 400, icon: 'sprites/proyectil_sprite_4.png', projectileType: 'shock', cooldown: 5.0, projectileSprite: 'sprites/proyectil_sprite_4.png' },
+          dark: { name: 'Oscuridad', damage: 36, speed: 400, icon: 'sprites/proyectil_sprite_5.png', projectileType: 'dark', cooldown: 6.0, projectileSprite: 'sprites/proyectil_sprite_5.png' }
         };
+        const selectedSkillData = skillStats[selectedSkill];
+        const skillItem = {
+          type: 'skill',
+          name: selectedSkillData.name,
+          damage: selectedSkillData.damage,
+          speed: selectedSkillData.speed,
+          icon: selectedSkillData.icon,
+          projectileType: selectedSkillData.projectileType,
+          cooldown: selectedSkillData.cooldown,
+          projectileSprite: selectedSkillData.projectileSprite
+        };
+
         const playerData = {
           class: 'wizard',
           health: 100,
@@ -158,9 +170,9 @@
           maxMana: 100,
           stamina: 0,
           maxStamina: 0,
-          inventory: [],
+          inventory: [skillItem],
           selectedSkill: selectedSkill,
-          skillStats: skillStats[selectedSkill]
+          skillStats: selectedSkillData
         };
         localStorage.setItem('playerData', JSON.stringify(playerData));
         window.location.href = 'game.html';

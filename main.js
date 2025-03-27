@@ -31,7 +31,17 @@ player.mana = playerData.mana;
 player.maxMana = playerData.maxMana;
 player.stamina = playerData.stamina;
 player.maxStamina = playerData.maxStamina;
-player.inventory = playerData.inventory;
+// Asegurarse de que el inventario tenga la habilidad seleccionada
+player.inventory = Array.isArray(playerData.inventory) && playerData.inventory.length > 0 ? playerData.inventory : [];
+if (player.inventory.length === 0 && playerData.selectedSkill && playerData.skillStats) {
+  player.inventory.push({
+    type: 'skill',
+    name: playerData.skillStats.name,
+    damage: playerData.skillStats.damage,
+    speed: playerData.skillStats.speed,
+    icon: playerData.skillStats.icon
+  });
+}
 player.equippedWeapon = playerData.equippedWeapon;
 
 // Update HUD values
@@ -249,8 +259,10 @@ function waveManager(dt) {
       
       // Actualizar información de las cartas
       upgrades.forEach((upgrade, index) => {
-        document.getElementById(`skill-name-${index}`).textContent = upgrade.name;
-        document.getElementById(`skill-desc-${index}`).textContent = upgrade.description;
+        const nameElement = document.getElementById(`skill-name-${index}`);
+        const descElement = document.getElementById(`skill-desc-${index}`);
+        if (nameElement) nameElement.textContent = upgrade.name;
+        if (descElement) descElement.textContent = upgrade.description;
       });
       
       // Manejar selección de mejora

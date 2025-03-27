@@ -246,9 +246,31 @@
       const skillSelectionTimer = document.getElementById('weapon-selection-timer');
       let timeLeft = 30;
       let currentSkill = null;
+      let timerInterval = null;
+      
+      // Asegurarse de que el sistema de habilidades esté inicializado
+      if (!window.skillSystem) {
+        window.skillSystem = new SkillSystem();
+      }
+
+      // Cargar la habilidad guardada del localStorage
+      const savedPlayerData = localStorage.getItem('playerData');
+      if (savedPlayerData) {
+        const playerData = JSON.parse(savedPlayerData);
+        if (playerData.inventory && playerData.inventory.length > 0) {
+          const savedSkill = playerData.inventory[0];
+          window.skillSystem.equippedSkills[0] = savedSkill;
+          window.skillSystem.updateSkillIcon(0);
+          document.getElementById('skill-selection').style.display = 'none';
+          return;
+        }
+      }
       
       // Limpiar el contenedor de cartas
       skillSelectionContainer.innerHTML = '';
+      
+      // Mostrar el tiempo inicial
+      skillSelectionTimer.textContent = timeLeft;
       
       // Obtener habilidades aleatorias del sistema de habilidades
       const availableSkills = skillSystem.skills;
@@ -275,6 +297,11 @@
         `;
         
         card.addEventListener('click', () => {
+          // Asignar la habilidad seleccionada al primer slot
+          const selectedSkill = selectedSkills[index];
+          skillSystem.equippedSkills[0] = selectedSkill;
+          skillSystem.updateSkillIcon(0);
+          
           const event = new CustomEvent('weaponSelected', {
             detail: { weaponIndex: index }
           });
@@ -301,11 +328,17 @@
         } else {
           // Si se acaba el tiempo, seleccionar una habilidad aleatoria
           const skillCards = document.querySelectorAll('.skill-card');
-          const randomSkill = Math.floor(Math.random() * skillCards.length);
-          skillCards[randomSkill].click();
+          if (skillCards.length > 0) {
+            const randomSkill = Math.floor(Math.random() * skillCards.length);
+            skillCards[randomSkill].click();
+          }
+          document.getElementById('skill-selection').style.display = 'none';
         }
       };
 
+      // Iniciar el temporizador
+      timeLeft = 30;
+      skillSelectionTimer.textContent = timeLeft;
       updateTimer();
     });
   </script>

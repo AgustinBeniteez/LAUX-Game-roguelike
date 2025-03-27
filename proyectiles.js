@@ -12,36 +12,38 @@ class Projectile extends Entity {
         this.opacity = 1.0; // Opacidad para el efecto de desvanecimiento
         
         // Configurar daño y sprite según el tipo de habilidad
-        switch(skillType) {
-            case 'fire':
-                this.damage = damage;
-                this.loadSprite('sprites/proyectil_sprite_1.png', 32, 32, 1);
-                break;
-            case 'ice':
-                this.damage = damage * 1.2;
-                this.loadSprite('sprites/proyectil_sprite_2.png', 32, 32, 1);
-                this.slowEffect = true;
-                break;
-            case 'energy':
-                this.damage = damage * 1.4;
-                this.loadSprite('sprites/proyectil_sprite_3.png', 32, 32, 1);
-                this.areaEffect = true;
-                this.areaRadius = 80;
-                break;
-            case 'shock':
-                this.damage = damage * 1.6;
-                this.loadSprite('sprites/proyectil_sprite_1.png', 32, 32, 1); // Fallback to basic projectile
-                this.chainEffect = true;
-                break;
-            case 'dark':
-                this.damage = damage * 1.8;
-                this.loadSprite('sprites/proyectil_sprite_1.png', 32, 32, 1); // Fallback to basic projectile
-                this.vortexEffect = true;
-                break;
-            default:
-                this.damage = damage;
-                this.loadSprite('sprites/proyectil_sprite_1.png', 32, 32, 1);
-        }
+        const skillConfig = {
+            'fire': {
+                damage: damage,
+                sprite: 'sprites/proyectil_sprite_1.png',
+                effects: { burnDamage: damage * 0.2, burnDuration: 3 }
+            },
+            'ice': {
+                damage: damage * 1.2,
+                sprite: 'sprites/proyectil_sprite_2.png',
+                effects: { slowEffect: true, slowDuration: 3, slowAmount: 0.7 }
+            },
+            'energy': {
+                damage: damage * 1.4,
+                sprite: 'sprites/proyectil_sprite_3.png',
+                effects: { areaEffect: true, areaRadius: 80, areaDamageMultiplier: 0.5 }
+            },
+            'shock': {
+                damage: damage * 1.6,
+                sprite: 'sprites/proyectil_sprite_1.png',
+                effects: { chainEffect: true, chainRange: 120, chainCount: 3, chainDamageMultiplier: 0.7 }
+            },
+            'dark': {
+                damage: damage * 1.8,
+                sprite: 'sprites/proyectil_sprite_1.png',
+                effects: { vortexEffect: true, vortexRadius: 100, vortexPull: 50, vortexDamageMultiplier: 0.2 }
+            }
+        };
+
+        const config = skillConfig[skillType] || skillConfig['fire'];
+        this.damage = config.damage;
+        this.loadSprite(config.sprite, 32, 32, 1);
+        this.effects = config.effects;
         
         // Calcular la dirección del proyectil
         const dx = targetX - x;

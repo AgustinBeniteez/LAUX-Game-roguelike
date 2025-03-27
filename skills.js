@@ -3,6 +3,7 @@ class SkillSystem {
         this.equippedSkills = new Array(5).fill(null);
         this.skillLevels = new Array(5).fill(1); // Nivel de cada habilidad equipada
         this.maxEquippedSkills = 1; // Inicialmente solo 1 slot disponible
+        this.lastAutoFireTime = new Array(5).fill(0); // Tiempo del último disparo automático
         this.skills = [
             {
                 name: 'Proyectil de Fuego',
@@ -50,11 +51,12 @@ class SkillSystem {
         this.setupEventListeners();
         this.initializeSkillIcons();
         this.updateHUDSlots();
+        this.startAutoFire();
     }
 
     setupEventListeners() {
-        // Seleccionar la primera habilidad por defecto
-        this.equippedSkills[0] = this.skills[0];
+        // No seleccionar ninguna habilidad por defecto
+        this.equippedSkills[0] = null;
         this.updateSkillIcon(0);
 
         document.addEventListener('weaponSelected', (event) => {
@@ -187,6 +189,32 @@ class SkillSystem {
             }, skill.cooldown * 1000);
         }
 
+        // Crear proyectiles según el tipo de habilidad
+        for (let i = 0; i < projectileCount; i++) {
+            const angle = (i - (projectileCount - 1) / 2) * spreadAngle;
+            const rad = angle * Math.PI / 180;
+            
+            // Calcular la dirección ajustada
+            const dx = targetX - player.x;
+            const dy = targetY - player.y;
+            const baseAngle = Math.atan2(dy, dx);
+            const finalAngle = baseAngle + rad;
+            
+            // Crear el proyectil con el tipo específico de la habilidad
+            const projectile = new Projectile(
+                player.x,
+                player.y,
+                player.x + Math.cos(finalAngle) * 1000,
+                player.y + Math.sin(finalAngle) * 1000,
+                skill.projectileType,
+                skill.damage * (1 + (level - 1) * 0.2)
+            );
+            
+            engine.entities.push(projectile);
+        }
+
+        return true;
+
         for (let i = 0; i < projectileCount; i++) {
             const angle = (i - (projectileCount - 1) / 2) * spreadAngle;
             const rad = angle * Math.PI / 180;
@@ -236,6 +264,51 @@ class SkillSystem {
         requestAnimationFrame(updateCooldown);
 
         return true;
+    }
+
+    startAutoFire() {
+        setInterval(() => {
+            const player = engine.entities.find(e => !e.isEnemy && !e.isDead);
+            if (!player || engine.isPaused || engine.isRoundTransition) return;
+            
+            // Revisar cada habilidad equipada
+            for (let i = 0; i < this.maxEquippedSkills; i++) {
+                const skill = this.equippedSkills[i];
+                if (!skill) continue;
+
+                // Actualizar el cooldown
+                if (this.cooldowns[i] > 0) {
+                    this.cooldowns[i] = Math.max(0, this.cooldowns[i] - 0.1);
+                }
+
+                // Verificar si la habilidad no está en cooldown
+                if (this.cooldowns[i] <= 0) {
+                    // Encontrar el enemigo más cercano
+                    let nearestEnemy = null;
+                    let minDistance = Infinity;
+
+                    for (const entity of engine.entities) {
+                        if (entity.isEnemy && !entity.isDead) {
+                            const dx = entity.x - player.x;
+                            const dy = entity.y - player.y;
+                            const distance = Math.sqrt(dx * dx + dy * dy);
+
+                            if (distance < minDistance) {
+                                minDistance = distance;
+                                nearestEnemy = entity;
+                            }
+                        }
+                    }
+
+                    // Si hay un enemigo, disparar hacia él
+                    if (nearestEnemy) {
+                        this.useSkill(i, nearestEnemy.x, nearestEnemy.y);
+                        // Establecer el cooldown después de usar la habilidad
+                        this.cooldowns[i] = skill.cooldown;
+                    }
+                }
+            }
+        }, 100); // Verificar cada 100ms
     }
 }
 
