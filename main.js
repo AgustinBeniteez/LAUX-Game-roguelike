@@ -31,8 +31,14 @@ function showSkillSelection() {
   // Manejar la selección de habilidades
   const skillCards = document.querySelectorAll('.skill-card');
   skillCards.forEach(card => {
+    const skillIndex = parseInt(card.dataset.skill);
+    const skillLevel = skillSystem.skills[skillIndex].level || 1;
+    const levelIndicator = document.createElement('div');
+    levelIndicator.className = 'skill-level';
+    levelIndicator.textContent = `Lv${skillLevel}`;
+    card.appendChild(levelIndicator);
+
     card.onclick = () => {
-      const skillIndex = parseInt(card.dataset.skill);
       document.dispatchEvent(new CustomEvent('weaponSelected', { detail: { weaponIndex: skillIndex } }));
       document.getElementById('skill-selection').style.display = 'none';
       engine.isPaused = false;
@@ -52,24 +58,27 @@ player.maxMana = playerData.maxMana;
 player.stamina = playerData.stamina;
 player.maxStamina = playerData.maxStamina;
 player.experience = 0;
-player.level = 1;
+player.level = playerData.level;
 
 // Actualizar la barra de experiencia
 function updateExpBar() {
     const expBar = document.getElementById('exp-bar');
-    if (expBar) {
+    const levelText = document.getElementById('level-text');
+    if (expBar && levelText) {
         const expForNextLevel = 100;
         expBar.style.width = `${(player.experience / expForNextLevel) * 100}%`;
+        levelText.textContent = `Level ${player.level}`;
     }
 }
 
 // Verificar nivel y mostrar selección de habilidades
 function checkLevelUp() {
-    const expForNextLevel = 100;
+    const expForNextLevel = 5 + (player.level - 1) * 4; // Dynamic experience requirement
     if (player.experience >= expForNextLevel) {
         player.experience -= expForNextLevel;
         player.level++;
         showSkillSelection();
+        checkLevelUp();
         updateExpBar();
     }
 }

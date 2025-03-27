@@ -36,7 +36,7 @@ class Entity {
             this.damageRate = 35;
             this.width = 180;
             this.height = 180;
-            this.spritePath = 'sprites/plant_enemy_boss_sprite.png'; // Misma ruta temporal
+            this.spritePath = 'sprites/plant_enemy_boss_sprite.png';
             break;
           case 'shadowBoss':
             this.speed = 120;
@@ -45,7 +45,7 @@ class Entity {
             this.damageRate = 30;
             this.width = 130;
             this.height = 130;
-            this.spritePath = 'sprites/plant_enemy_4_sprite.png'; // Misma ruta temporal
+            this.spritePath = 'sprites/plant_enemy_4_sprite.png';
             break;
         }
         if (spriteSrc === null) {
@@ -297,13 +297,36 @@ class Entity {
         }
       }
 
-      if (this.isEnemy && this.target && !engine.isPaused) {
-        const dx = this.target.x - this.x;
-        const dy = this.target.y - this.y;
+      if (this.isEnemy && !engine.isPaused) {
+        // Si no tenemos posición objetivo, establecer una aleatoria cerca del centro
+        if (!this.targetX || !this.targetY) {
+          const centerX = engine.map.getMapWidth() / 2;
+          const centerY = engine.map.getMapHeight() / 2;
+          const randomAngle = Math.random() * Math.PI * 2;
+          const randomDistance = Math.random() * 400; // Distancia máxima desde el centro
+          this.targetX = centerX + Math.cos(randomAngle) * randomDistance;
+          this.targetY = centerY + Math.sin(randomAngle) * randomDistance;
+        }
+
+        const dx = this.target ? this.target.x - this.x : this.targetX - this.x;
+        const dy = this.target ? this.target.y - this.y : this.targetY - this.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
         const followDistance = 20; // Distancia a la que el enemigo seguirá al jugador
+        const aggroRange = 1000; // Rango de detección del jugador (10 unidades de ancho)
         const damageRange = 80; // Rango en el que el enemigo puede hacer daño
         const minEnemyDistance = 60; // Distancia mínima entre enemigos
+
+        // Comprobar si el jugador está dentro del rango de agro
+        if (this.target && Math.abs(this.target.x - this.x) <= aggroRange) {
+          this.targetX = this.target.x;
+          this.targetY = this.target.y;
+        }
+
+        // Comprobar si el jugador está dentro del rango de agro
+        if (this.target && Math.abs(this.target.x - this.x) <= aggroRange) {
+          this.targetX = this.target.x;
+          this.targetY = this.target.y;
+        }
         
         // Calcular fuerzas de separación entre enemigos
         let separationX = 0;

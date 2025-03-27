@@ -1,16 +1,17 @@
 class ExperienceOrb extends Entity {
     constructor(x, y) {
         super(x, y);
-        this.width = 32;
-        this.height = 32;
+        this.width = 16;
+        this.height = 16;
         this.loadSprite('sprites/orbe_exp.png');
         this.expValue = 25;
         this.isCollected = false;
         this.experience = 0;
         this.baseSpeed = 200;
         this.maxSpeed = 500;
-        this.attractionRange = 200;
-        this.collectionRange = 40;
+        this.attractionRange = 96;
+        this.collectionRange = 20;
+        this.isExperienceOrb = true;
     }
 
     update(dt) {

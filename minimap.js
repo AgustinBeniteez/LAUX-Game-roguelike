@@ -37,7 +37,14 @@ class Minimap {
         
         // Dibujar los enemigos y jefes
         engine.entities.forEach(entity => {
-            if (entity.isEnemy) {
+            if (entity.isExperienceOrb) {
+                const x = entity.x * scaleX;
+                const y = entity.y * scaleY;
+                this.ctx.beginPath();
+                this.ctx.fillStyle = '#5abdef';
+                this.ctx.arc(x, y, 3, 0, Math.PI * 2);
+                this.ctx.fill();
+            } else if (entity.isEnemy) {
                 const x = entity.x * scaleX;
                 const y = entity.y * scaleY;
                 this.ctx.beginPath();
