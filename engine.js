@@ -52,6 +52,16 @@ class Engine {
     }
   
     render() {
+      // Mostrar FPS si está activado
+      if (localStorage.getItem('showFPS') === 'on') {
+        const now = performance.now();
+        const fps = Math.round(1000 / (now - this.lastFrame));
+        this.ctx.fillStyle = 'white';
+        this.ctx.font = '16px Mineglyph';
+        this.ctx.fillText(`FPS: ${fps}`, 10, 20);
+        this.lastFrame = now;
+      }
+
       const player = this.entities.find(e => !e.isEnemy);
       if (player) {
         // Mantener al jugador en el centro de la pantalla

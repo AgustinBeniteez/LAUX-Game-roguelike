@@ -9,6 +9,13 @@ class FloatingNumber {
         this.lifetime = 1.0; // Duración total de la animación en segundos
         this.timeAlive = 0;
         this.initialY = y;
+        this.enabled = localStorage.getItem('damageNumbers') !== 'off';
+        // Actualizar el estado cuando cambia la configuración
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'damageNumbers') {
+                this.enabled = e.newValue !== 'off';
+            }
+        });
     }
 
     update(dt) {
@@ -35,6 +42,8 @@ class FloatingNumber {
     }
 
     render(ctx) {
+        if (!this.enabled || !window.damageNumbersEnabled) return;
+        
         ctx.save();
         ctx.globalAlpha = this.alpha;
         ctx.fillStyle = this.color;

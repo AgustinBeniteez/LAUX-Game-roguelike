@@ -308,10 +308,10 @@
   </div>
   <div style="display: flex; width: 100%; max-width: 90%;height: 90%;">
     <nav class="settings-nav">
-      <button data-section="home" class="active"><i class="fa-solid fa-house"></i><span>Inicio</span></button>
-      <button data-section="performance"><i class="fa-solid fa-display"></i><span>Rendimiento</span></button>
-      <button data-section="sound"><i class="fa-solid fa-volume-low"></i><span>Sonido</span></button>
-      <button data-section="controls"><i class="fa-regular fa-keyboard"></i><span>Controles</span></button>
+      <button data-section="home" class="active"><i class="fa-solid fa-house"></i><span data-translate="home">Inicio</span></button>
+      <button data-section="performance"><i class="fa-solid fa-display"></i><span data-translate="performance">Rendimiento</span></button>
+      <button data-section="sound"><i class="fa-solid fa-volume-low"></i><span data-translate="sound">Sonido</span></button>
+      <button data-section="controls"><i class="fa-regular fa-keyboard"></i><span data-translate="controls">Controles</span></button>
     </nav>
   
   <div class="config-container" id="configContainer" style="flex: 1;">
@@ -354,7 +354,7 @@
     <div class="config-item" style="display: flex; align-items: center; gap: 10px;">
       <label class="config-label"><i class="fa-solid fa-triangle-exclamation"></i> <span data-translate="damageNumbers">Números de daño</span></label>
       <label class="custom-checkbox">
-        <input type="checkbox" id="damageNumbersSelect">
+        <input type="checkbox" id="damageNumbersSelect" checked>
         <span class="checkmark"></span>
       </label>
     </div>
@@ -466,7 +466,11 @@
     document.getElementById('musicVolume').addEventListener('input', function() {
       this.nextElementSibling.textContent = this.value + '%';
     });
-    document.getElementById('damageNumbersSelect').value = localStorage.getItem('damageNumbers') || 'on';
+    const damageNumbersCheckbox = document.getElementById('damageNumbersSelect');
+damageNumbersCheckbox.checked = localStorage.getItem('damageNumbers') !== 'off';
+damageNumbersCheckbox.addEventListener('change', function() {
+    localStorage.setItem('damageNumbers', this.checked ? 'on' : 'off');
+});
     document.getElementById('showFPSSelect').value = localStorage.getItem('showFPS') || 'off';
     document.getElementById('brightnessSlider').value = localStorage.getItem('brightness') || '100';
     document.getElementById('brightnessSlider').nextElementSibling.textContent = document.getElementById('brightnessSlider').value + '%';
@@ -499,7 +503,7 @@
       // Save all configurations
       localStorage.setItem('soundVolume', document.getElementById('soundVolume').value);
       localStorage.setItem('musicVolume', document.getElementById('musicVolume').value);
-      localStorage.setItem('damageNumbers', document.getElementById('damageNumbersSelect').value);
+      localStorage.setItem('damageNumbers', document.getElementById('damageNumbersSelect').checked ? 'on' : 'off');
       localStorage.setItem('language', document.getElementById('languageSelect').value);
       localStorage.setItem('gameControls', JSON.stringify(gameControls));
       localStorage.setItem('terms', document.getElementById('termsSelect').value);

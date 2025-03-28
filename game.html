@@ -257,6 +257,28 @@
   <script src="main.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      // Cargar configuraciones guardadas
+      const damageNumbers = localStorage.getItem('damageNumbers') || 'on';
+      const showFPS = localStorage.getItem('showFPS') || 'off';
+      const brightness = localStorage.getItem('brightness') || '100';
+      const performance = localStorage.getItem('performance') || 'off';
+
+      // Aplicar configuración de números de daño
+      if (damageNumbers === 'off') {
+        window.damageNumbersEnabled = false;
+      } else {
+        window.damageNumbersEnabled = true;
+      }
+      
+      // Aplicar configuraciones
+      document.body.style.filter = `brightness(${brightness}%)`;
+      if (performance === 'on') {
+        // Aplicar configuraciones de rendimiento
+        document.querySelectorAll('.skill-card').forEach(card => {
+          card.style.transition = 'none';
+        });
+      }
+
       const skillSelectionContainer = document.querySelector('#skill-selection div[style*="display: flex"]');
       const skillSelectionTimer = document.getElementById('weapon-selection-timer');
       let timeLeft = 30;
