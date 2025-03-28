@@ -52,6 +52,15 @@
     }
   }
 
+
+  @keyframes gradientAnimation1 {
+    0% {
+      background-position: 0% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
   body {
       margin: 0;
       background: linear-gradient(
@@ -59,6 +68,8 @@
         rgba(40, 40, 40, 1) 0%,
         rgba(98, 11, 56, 1) 100%
       );
+      background-size: 200% 200%;
+      animation: gradientAnimation1 10s ease infinite;
       overflow: hidden;
       height: 100vh;
       display: flex;
@@ -267,7 +278,7 @@
     align-items: center;
   }
   .modal-content {
-    background-color: #222222f0;
+    background-color: #222222ba;
     padding: 30px;
     border-radius: 10px;
     width: 80%;

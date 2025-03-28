@@ -16,7 +16,7 @@ class Minimap {
         this.canvas.style.border = '2px solid #333';
         this.canvas.style.borderRadius = '10px';
         this.canvas.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-        this.canvas.style.zIndex = '1000';
+        this.canvas.style.zIndex = '800';
         
         document.body.appendChild(this.canvas);
     }

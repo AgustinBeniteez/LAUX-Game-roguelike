@@ -34,4 +34,37 @@ select:hover {
 
 select:active {
   cursor: url('sprites/mouse_game.png'), auto;
+}select {
+  cursor: url('sprites/mouse_game.png'), auto;
+}
+select:hover {
+  cursor: url('sprites/mouse_game_hover.png'), pointer;
+}
+
+select:active {
+  cursor: url('sprites/mouse_game.png'), auto;
+}
+
+input[type="checkbox"] {
+  cursor: url('sprites/mouse_game.png'), auto;
+}
+
+input[type="checkbox"]:hover {
+  cursor: url('sprites/mouse_game_hover.png'), pointer;
+}
+
+input[type="checkbox"]:active {
+  cursor: url('sprites/mouse_game.png'), auto;
+}
+
+.custom-checkbox {
+  cursor: url('sprites/mouse_game.png'), auto;
+}
+
+.custom-checkbox:hover {
+  cursor: url('sprites/mouse_game_hover.png'), pointer;
+}
+
+.custom-checkbox input:checked ~ .checkmark {
+  cursor: url('sprites/mouse_game.png'), auto;
 }
