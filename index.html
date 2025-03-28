@@ -137,14 +137,10 @@
       gap: 20px;
     }
     #selectedSkinPreview {
-      width: 1600px;
-      height: 500px;
-      image-rendering: pixelated;
-      object-position: 0;
-      clip-path: inset(0px 1145px 0px 0px);
-      margin-left: 130%;
-      overflow: hidden;
-    }
+    height: 600px;
+    background-color: transparent;
+    image-rendering: pixelated;
+  }
 
   </style>
 </head>
@@ -162,7 +158,7 @@
     </div>
   </section>
   <section class="right">
-    <img id="selectedSkinPreview" src="sprites/player_sprite.png" alt="Player Sprite">
+    <canvas id="selectedSkinPreview"></canvas>
     <div id="skinModal" class="modal">
       <div class="modal-content">
         <h1 class="title" data-translate="selectSkin">Selecciona tu Skin</h1>
@@ -197,6 +193,52 @@
     const skinCards = document.querySelectorAll('.skin-card');
     const continueBtn = document.querySelector('.continue-btn');
     let selectedSkin = null;
+    
+    // Cargar y dibujar el sprite en el canvas
+    const canvas = document.getElementById('selectedSkinPreview');
+    const ctx = canvas.getContext('2d');
+    
+    // Configurar el canvas para mantener calidad pixelada
+    canvas.style.imageRendering = 'pixelated';
+    ctx.imageSmoothingEnabled = false;
+    
+    let frameCount = 0;
+    const frameWidth = 32;
+    const frameHeight = 32;
+    const totalFrames = 4;
+    
+    function drawSkin(skin) {
+      const img = new Image();
+      img.onload = function() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // Calcular posición para centrar manteniendo relación de aspecto
+        const scale = Math.min(
+          canvas.width / (frameWidth * totalFrames),
+          canvas.height / frameHeight
+        ) * 1.5;
+        const x = (canvas.width - frameWidth * scale) / 2;
+        const y = (canvas.height - frameHeight * scale) / 2;
+        
+        // Dibujar el frame actual
+        const currentFrame = Math.floor(frameCount) % totalFrames;
+        ctx.drawImage(
+          img,
+          currentFrame * frameWidth, 0, frameWidth, frameHeight,
+          x, y, frameWidth * scale, frameHeight * scale
+        );
+      };
+      img.src = skinSprites[skin];
+    }
+    
+    // Animación continua
+    function animate() {
+      frameCount += 0.1;
+      if (selectedSkin) {
+        drawSkin(selectedSkin);
+      }
+      requestAnimationFrame(animate);
+    }
+    animate();
   
     skinCards.forEach(card => {
       card.addEventListener('click', () => {
@@ -204,7 +246,7 @@
         card.classList.add('selected');
         selectedSkin = card.dataset.skin;
         continueBtn.style.display = 'block';
-        document.getElementById('selectedSkinPreview').src = skinSprites[selectedSkin];
+        drawSkin(selectedSkin);
       });
     });
   
@@ -212,9 +254,13 @@
       if (selectedSkin) {
         localStorage.setItem('selectedSkin', selectedSkin);
         document.getElementById('skinModal').style.display = 'none';
-        document.getElementById('selectedSkinPreview').src = skinSprites[selectedSkin];
+        drawSkin(selectedSkin);
       }
     });
+    
+    // Dibujar la skin seleccionada al cargar la página
+    selectedSkin = localStorage.getItem('selectedSkin') || 'default';
+    drawSkin(selectedSkin);
   </script>
     <script>
       selectedSkin = localStorage.getItem('selectedSkin') || 'default';
