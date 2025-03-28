@@ -2,14 +2,59 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LAUX GAME</title>
   <link rel="shortcut icon" href="sprites/laux_logo.webp" type="image/x-icon">
   <link rel="stylesheet" href="custom_cursor.css">
   <link rel="stylesheet" href="src/fonts.css">
+  <link href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css' rel='stylesheet'/>
   <style>
+    #orientation-message {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.9);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      color: white;
+      font-size: 24px;
+      text-align: center;
+    }
+
+    #orientation-message img {
+      width: 100px;
+      height: 100px;
+      margin-bottom: 20px;
+      animation: rotate 2s infinite linear;
+    }
+
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(90deg); }
+    }
+
+    @media (max-width: 768px) and (orientation: portrait) {
+      #orientation-message {
+        display: flex;
+      }
+      .config-container {
+        display: none;
+      }
+    }
+
     body { 
       margin: 0; 
-      background: #222; 
+      background: linear-gradient(
+        113.65deg,
+        rgba(40, 40, 40, 1) 0%,
+        rgba(98, 11, 56, 1) 100%
+      );
+      background-size: cover; 
       overflow: hidden;
       width: 100vw;
       height: 100vh;
@@ -19,11 +64,40 @@
       flex-direction: column;
       font-family: 'Mineglyph', sans-serif;
     }
-    .config-title {
-      color: rgb(206, 111, 206);
-      font-size: 48px;
-      margin-bottom: 40px;
-      text-shadow: 0 0 10px rgba(253, 78, 201, 0.5);
+    .settings-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-right: 20px;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      height: fit-content;
+    }
+    .settings-nav button {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #666;
+      width: 150px;
+      height: 40px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 15px;
+    }
+    .settings-nav button:hover {
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      transform: translateY(-2px);
+    }
+    .settings-nav button.active {
+      background: rgba(184, 71, 178, 0.3);
+      color: #fff;
+      border-color: #b847b2;
     }
     .config-container {
       background: rgba(0, 0, 0, 0.7);
@@ -36,6 +110,42 @@
       margin-bottom: 20px;
       color: white;
     }
+    .key-binding {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      justify-content: flex-start;
+      flex-wrap: nowrap;
+      flex-direction: row-reverse;
+    }
+    .key-display {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 5px 15px;
+      border-radius: 5px;
+      min-width: 30px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .key-display:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+    .key-display.listening {
+      background: rgba(184, 71, 178, 0.3);
+      border-color: #b847b2;
+      animation: pulse 1s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    .key-label {
+      flex: 1;
+    }
     .config-label {
       display: block;
       margin-bottom: 10px;
@@ -45,7 +155,7 @@
     select {
       width: 100%;
       padding: 10px;
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(34, 34, 34, 0.95);
       border: 2px solid rgba(255, 255, 255, 0.3);
       color: white;
       border-radius: 5px;
@@ -54,11 +164,50 @@
       font-family: 'Mineglyph', sans-serif !important;
     }
     select:hover {
-      border-color: rgba(43, 39, 39, 0.5);
+      border-color: rgba(255, 255, 255, 0.5);
+      background: rgba(51, 51, 51, 0.95);
     }
     select:focus {
       outline: none;
-      border-color: rgba(85, 83, 83, 0.5);
+      border-color: rgba(255, 255, 255, 0.5);
+      background: rgba(51, 51, 51, 0.95);
+    }
+    .volume-slider {
+      width: 100%;
+      height: 20px;
+      -webkit-appearance: none;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      outline: none;
+      margin: 10px 0;
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      background: #b847b2;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .volume-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+      background: #ce6fce;
+    }
+    .volume-value {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: white;
+      font-size: 14px;
+      pointer-events: none;
+    }
+    .volume-slider-container {
+      position: relative;
+      width: 100%;
     }
 
     .button-container {
@@ -92,14 +241,93 @@
   </style>
 </head>
 <body>
-  <h1 class="config-title" data-translate="settings">Configuración</h1>
-  <div class="config-container">
+  <div id="orientation-message">
+    <img src="sprites/laux_logo.webp" alt="Rotate device">
+    <p>Por favor, gira tu dispositivo para jugar</p>
+  </div>
+  <div style="display: flex; width: 100%; max-width: 90%;height: 90%;">
+    <nav class="settings-nav">
+      <button data-section="home" class="active"><i class="fa-solid fa-house"></i><span>Inicio</span></button>
+      <button data-section="performance"><i class="fa-solid fa-display"></i><span>Rendimiento</span></button>
+      <button data-section="sound"><i class="fa-solid fa-volume-low"></i><span>Sonido</span></button>
+      <button data-section="controls"><i class="fa-regular fa-keyboard"></i><span>Controles</span></button>
+    </nav>
+  
+  <div class="config-container" id="configContainer" style="flex: 1;">
     <div class="config-item">
-      <label class="config-label" data-translate="language">Idioma</label>
+      <label class="config-label"><i class="fa-solid fa-volume-high"></i> <span data-translate="sound">Sonido</span></label>
+      <div class="volume-slider-container">
+        <input type="range" id="soundVolume" min="0" max="100" value="70" class="volume-slider">
+        <span class="volume-value">70%</span>
+      </div>
+    </div>
+    <div class="config-item">
+      <label class="config-label"><i class="fa-solid fa-music"></i> <span data-translate="music">Música</span></label>
+      <div class="volume-slider-container">
+        <input type="range" id="musicVolume" min="0" max="100" value="70" class="volume-slider">
+        <span class="volume-value">70%</span>
+      </div>
+    </div>
+    <div class="config-item">
+      <label class="config-label"><i class="fa-solid fa-comments"></i> <span data-translate="language">Idioma</span></label>
       <select id="languageSelect">
         <option value="es">Español</option>
         <option value="en">English</option>
       </select>
+    </div>
+    <div class="config-item">
+      <label class="config-label"><i class="fa-solid fa-sun"></i> <span data-translate="brightness">Brillo</span></label>
+      <div class="volume-slider-container">
+        <input type="range" id="brightnessSlider" min="0" max="100" value="100" class="volume-slider">
+        <span class="volume-value">100%</span>
+      </div>
+    </div>
+    <div class="config-item">
+      <label class="config-label"><i class="fa-solid fa-gauge-high"></i> <span data-translate="showFPS">Mostrar FPS</span></label>
+      <select id="showFPSSelect">
+        <option value="on">On</option>
+        <option value="off">Off</option>
+      </select>
+    </div>
+    <div class="config-item">
+      <label class="config-label"><i class="fa-solid fa-circle-exclamation"></i> <span data-translate="damageNumbers">Números de daño</span></label>
+      <select id="damageNumbersSelect">
+        <option value="on">On</option>
+        <option value="off">Off</option>
+      </select>
+    </div>
+    <div class="config-item">
+      <label class="config-label"><i class="fa-solid fa-file-signature"></i> <span data-translate="terms">Acuerdo de Políticas y términos de uso</span></label>
+      <select id="termsSelect">
+        <option value="accepted">Aceptado</option>
+        <option value="not_accepted">No Aceptado</option>
+      </select>
+    </div>
+    <div class="config-item">
+      <label class="config-label"><i class="fa-solid fa-bolt"></i> <span data-translate="performance">Modo rendimiento</span></label>
+      <select id="performanceSelect">
+        <option value="on">On</option>
+        <option value="off">Off</option>
+      </select>
+    </div>
+    <div id="controlsContainer" class="config-item" style="display: none;">
+      <label class="config-label"><i class="fa-solid fa-keyboard"></i> <span data-translate="gameControls">Controles del juego</span></label>
+      <div class="key-binding">
+        <span class="key-label">Arriba</span>
+        <div class="key-display" data-key="up">W</div>
+      </div>
+      <div class="key-binding">
+        <span class="key-label">Abajo</span>
+        <div class="key-display" data-key="down">S</div>
+      </div>
+      <div class="key-binding">
+        <span class="key-label">Izquierda</span>
+        <div class="key-display" data-key="left">A</div>
+      </div>
+      <div class="key-binding">
+        <span class="key-label">Derecha</span>
+        <div class="key-display" data-key="right">D</div>
+      </div>
     </div>
     <div class="button-container">
       <button class="config-button save-button" data-translate="save" onclick="saveConfig()">Guardar</button>
@@ -109,7 +337,79 @@
 
   <script>
     let translations = {};
+    let currentKeyBinding = null;
+    
+    // Cargar las teclas guardadas o usar las predeterminadas
+    const defaultControls = {
+      up: 'W',
+      down: 'S',
+      left: 'A',
+      right: 'D'
+    };
+    
+    let gameControls = JSON.parse(localStorage.getItem('gameControls')) || defaultControls;
+    
+    // Actualizar la visualización de las teclas
+    function updateKeyDisplays() {
+      Object.entries(gameControls).forEach(([key, value]) => {
+        const keyDisplay = document.querySelector(`[data-key="${key}"]`);
+        if (keyDisplay) keyDisplay.textContent = value;
+      });
+    }
+    
+    // Agregar event listeners para cambiar las teclas
+    document.querySelectorAll('.key-display').forEach(keyDisplay => {
+      keyDisplay.addEventListener('click', function() {
+        // Remover la clase listening de cualquier otro elemento
+        document.querySelectorAll('.key-display').forEach(el => el.classList.remove('listening'));
+        // Agregar la clase listening al elemento actual
+        this.classList.add('listening');
+        currentKeyBinding = this.dataset.key;
+      });
+    });
+    
+    // Escuchar las pulsaciones de teclas cuando se está en modo de escucha
+    document.addEventListener('keydown', function(event) {
+      if (currentKeyBinding) {
+        event.preventDefault();
+        const key = event.key.toUpperCase();
+        gameControls[currentKeyBinding] = key;
+        const keyDisplay = document.querySelector(`[data-key="${currentKeyBinding}"]`);
+        if (keyDisplay) {
+          keyDisplay.textContent = key;
+          keyDisplay.classList.remove('listening');
+        }
+        currentKeyBinding = null;
+        localStorage.setItem('gameControls', JSON.stringify(gameControls));
+      }
+    });
+    
+    // Inicializar las teclas
+    updateKeyDisplays();
     let currentLang = localStorage.getItem('language') || 'es';
+
+    // Load saved configurations
+    document.getElementById('soundVolume').value = localStorage.getItem('soundVolume') || '70';
+    document.getElementById('musicVolume').value = localStorage.getItem('musicVolume') || '70';
+
+    // Update volume values display
+    document.getElementById('soundVolume').nextElementSibling.textContent = document.getElementById('soundVolume').value + '%';
+    document.getElementById('musicVolume').nextElementSibling.textContent = document.getElementById('musicVolume').value + '%';
+
+    // Add event listeners for volume sliders
+    document.getElementById('soundVolume').addEventListener('input', function() {
+      this.nextElementSibling.textContent = this.value + '%';
+    });
+    document.getElementById('musicVolume').addEventListener('input', function() {
+      this.nextElementSibling.textContent = this.value + '%';
+    });
+    document.getElementById('damageNumbersSelect').value = localStorage.getItem('damageNumbers') || 'on';
+    document.getElementById('showFPSSelect').value = localStorage.getItem('showFPS') || 'off';
+    document.getElementById('brightnessSlider').value = localStorage.getItem('brightness') || '100';
+    document.getElementById('brightnessSlider').nextElementSibling.textContent = document.getElementById('brightnessSlider').value + '%';
+    document.getElementById('languageSelect').value = currentLang;
+    document.getElementById('termsSelect').value = localStorage.getItem('terms') || 'not_accepted';
+    document.getElementById('performanceSelect').value = localStorage.getItem('performance') || 'off';
 
     async function loadTranslations() {
       try {
@@ -130,13 +430,22 @@
           element.textContent = translations[currentLang][key];
         }
       });
-      document.getElementById('languageSelect').value = currentLang;
     }
 
     function saveConfig() {
-      const langSelect = document.getElementById('languageSelect');
-      currentLang = langSelect.value;
-      localStorage.setItem('language', currentLang);
+      // Save all configurations
+      localStorage.setItem('soundVolume', document.getElementById('soundVolume').value);
+      localStorage.setItem('musicVolume', document.getElementById('musicVolume').value);
+      localStorage.setItem('damageNumbers', document.getElementById('damageNumbersSelect').value);
+      localStorage.setItem('language', document.getElementById('languageSelect').value);
+      localStorage.setItem('gameControls', JSON.stringify(gameControls));
+      localStorage.setItem('terms', document.getElementById('termsSelect').value);
+      localStorage.setItem('performance', document.getElementById('performanceSelect').value);
+      localStorage.setItem('showFPS', document.getElementById('showFPSSelect').value);
+      localStorage.setItem('brightness', document.getElementById('brightnessSlider').value);
+      alert('Configuración guardada correctamente');
+      
+      currentLang = document.getElementById('languageSelect').value;
       updateLanguage();
       handleBack();
     }
@@ -150,8 +459,46 @@
     }
 
     // Initialize
-    document.getElementById('languageSelect').value = currentLang;
     loadTranslations();
+
+    // Configuración de la navegación
+    const configSections = {
+      home: ['languageSelect', 'termsSelect', 'damageNumbersSelect', 'brightnessSlider'],
+      performance: ['performanceSelect', 'showFPSSelect'],
+      sound: ['soundVolume', 'musicVolume'],
+      controls: ['controlsContainer']
+    };
+
+    function showSection(section) {
+      const items = document.querySelectorAll('.config-item');
+      items.forEach(item => {
+        if (section === 'controls' && item.id === 'controlsContainer') {
+          item.style.display = 'block';
+        } else if (section !== 'controls' && item.id === 'controlsContainer') {
+          item.style.display = 'none';
+        } else {
+          const input = item.querySelector('input, select');
+          if (input && configSections[section].includes(input.id)) {
+            item.style.display = 'block';
+          } else {
+            item.style.display = 'none';
+          }
+        }
+      });
+
+      // Actualizar botones activos
+      document.querySelectorAll('.settings-nav button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.section === section);
+      });
+    }
+
+    // Agregar event listeners a los botones de navegación
+    document.querySelectorAll('.settings-nav button').forEach(button => {
+      button.addEventListener('click', () => showSection(button.dataset.section));
+    });
+
+    // Mostrar la sección inicial
+    showSection('home');
   </script>
 </body>
 </html>

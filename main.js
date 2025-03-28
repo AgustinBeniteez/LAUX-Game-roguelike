@@ -377,10 +377,30 @@ function waveManager(dt) {
 // Generar enemigo inicial
 spawnEnemy();
 
+// Cargar controles personalizados
+const defaultControls = {
+  up: 'w',
+  down: 's',
+  left: 'a',
+  right: 'd'
+};
+let gameControls = JSON.parse(localStorage.getItem('gameControls'));
+if (!gameControls) {
+  gameControls = defaultControls;
+  localStorage.setItem('gameControls', JSON.stringify(defaultControls));
+}
+
 // Entrada de teclado
 let keys = {};
-window.addEventListener('keydown', e => keys[e.key] = true);
-window.addEventListener('keyup', e => keys[e.key] = false);
+window.addEventListener('keydown', e => {
+  const key = e.key.toLowerCase();
+  keys[key] = true;
+});
+window.addEventListener('keyup', e => {
+  const key = e.key.toLowerCase();
+  keys[key] = false;
+});
+
 
 // Mouse click event disabled for shooting - only automatic shooting is enabled
 window.addEventListener('click', (e) => {
@@ -419,10 +439,10 @@ function gameLoop(time) {
   if (!engine.isPaused && !player.isDead) {
     // Mover el jugador y ajustar la cámara
     const moveSpeed = 200 * dt;
-    if (keys['ArrowRight'] || keys['d']) player.x += moveSpeed;
-    if (keys['ArrowLeft'] || keys['a']) player.x -= moveSpeed;
-    if (keys['ArrowUp'] || keys['w']) player.y -= moveSpeed;
-    if (keys['ArrowDown'] || keys['s']) player.y += moveSpeed;
+    if (keys['arrowright'] || keys[gameControls.right]) player.x += moveSpeed;
+    if (keys['arrowleft'] || keys[gameControls.left]) player.x -= moveSpeed;
+    if (keys['arrowup'] || keys[gameControls.up]) player.y -= moveSpeed;
+    if (keys['arrowdown'] || keys[gameControls.down]) player.y += moveSpeed;
     
     // Mantener al jugador dentro de los límites del mapa
     player.x = Math.max(0, Math.min(player.x, engine.map.getMapWidth()));
