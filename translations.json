@@ -47,12 +47,16 @@
     "slowEnemies": "Ralentiza a los enemigos",
     "areaDamage": "Daño en área",
     "chainDamage": "Daño en cadena",
-    "vortexDamage": "Crea un vórtice dañino"
+    "vortexDamage": "Crea un vórtice dañino",
+    "moveUp": "Arriba (W)",
+    "moveDown": "Abajo (S)",
+    "moveLeft": "Izquierda (A)",
+    "moveRight": "Derecha (D)"
   },
   "en": {
     "title": "LAUX GAME",
     "play": "Play",
-    "options": "Options",
+    "options": "Config",
     "resume": "Resume",
     "settings": "Settings",
     "mainMenu": "Main Menu",
@@ -97,6 +101,10 @@
     "slowEnemies": "Slows down enemies",
     "areaDamage": "Area damage",
     "chainDamage": "Chain damage",
-    "vortexDamage": "Creates a damaging vortex"
+    "vortexDamage": "Creates a damaging vortex",
+    "moveUp": "Up (W)",
+    "moveDown": "Down (S)",
+    "moveLeft": "Left (A)",
+    "moveRight": "Right (D)"
   }
 }
