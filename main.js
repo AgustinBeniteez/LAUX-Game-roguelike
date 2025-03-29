@@ -486,10 +486,22 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Game loop
-let lastTime = 0;
+let lastTime = performance.now();
+let frameCount = 0;
+let fps = 0;
+let fpsUpdateInterval = 1000;
+let lastFpsUpdate = performance.now();
+
 function gameLoop(time) {
   let dt = (time - lastTime) / 1000;
   lastTime = time;
+  
+  frameCount++;
+  if (time - lastFpsUpdate >= fpsUpdateInterval) {
+    fps = Math.round((frameCount * 1000) / (time - lastFpsUpdate));
+    frameCount = 0;
+    lastFpsUpdate = time;
+  }
 
   if (!engine.isPaused && !player.isDead) {
     // Mover el jugador y ajustar la cámara

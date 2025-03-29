@@ -3,6 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <title>LAUX GAME</title>
+  <div id="version-display" style="position: fixed; bottom: 10px; left: 10px; color: rgba(255, 255, 255, 0.7); font-family: 'Mineglyph', sans-serif; font-size: 14px;"></div>
+  <script type="module">
+    import { VERSION } from './version.js';
+    document.getElementById('version-display').textContent = VERSION;
+  </script>
   <link rel="shortcut icon" href="sprites/laux_logo.webp" type="image/x-icon">
   <link href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css' rel='stylesheet'/>
   <link rel="stylesheet" href="custom_cursor.css">
@@ -172,6 +177,10 @@
       <span class="stat-label" data-translate="position">Posición:</span>
       <span class="stat-value" id="position-value">X: 0, Y: 0</span>
     </div>
+    <div class="stat-container" id="fps-container" style="display: none;">
+      <span class="stat-label">FPS:</span>
+      <span class="stat-value" id="fps-value">0</span>
+    </div>
     <div class="exp-bar-container" style="position: absolute; bottom: 95px; left: 50%; transform: translateX(-50%); width: 300px; height: 10px; background: rgba(0, 0, 0, 0.7); border-radius: 5px; overflow: visible;">
       <div style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); color: white; font-size: 14px; text-shadow: 1px 1px 2px black;" id="level-display">Level 1</div>
       <div id="exp-bar" style="width: 0%; height: 100%; background: #3bc2ab; border-radius: 5px; transition: width 0.3s ease;"></div>
@@ -183,6 +192,11 @@
     <button id="resumeButton" class="menu-button" data-translate="resume">Reanudar</button>
     <button id="settingsButton" class="menu-button" data-translate="settings">Configuración</button>
     <button id="mainMenuButton" class="menu-button" data-translate="mainMenu" onclick="window.location.href='index.html'">Menú Principal</button>
+    <div id="pause-version-display" style="position: fixed; bottom: 10px; left: 10px; color: rgba(255, 255, 255, 0.7); font-family: 'Mineglyph', sans-serif; font-size: 14px;"></div>
+    <script type="module">
+      import { VERSION } from './version.js';
+      document.getElementById('pause-version-display').textContent = VERSION;
+    </script>
   </div>
   <iframe id="settingsFrame" src="config.html"></iframe>
   <script>
@@ -212,6 +226,54 @@
     settingsButton.addEventListener('click', () => {
       settingsFrame.style.display = 'block';
       pauseMenu.style.display = 'none';
+      
+      // Cargar configuraciones guardadas en el iframe
+      const configIframe = document.getElementById('settingsFrame');
+      configIframe.onload = () => {
+        // Obtener todas las configuraciones del localStorage
+        const brightness = localStorage.getItem('brightness') || '100';
+        const showFPS = localStorage.getItem('showFPS') || 'off';
+        const damageNumbers = localStorage.getItem('damageNumbers') || 'on';
+        const soundVolume = localStorage.getItem('soundVolume') || '70';
+        const musicVolume = localStorage.getItem('musicVolume') || '70';
+        const performance = localStorage.getItem('performance') || 'off';
+        const language = localStorage.getItem('language') || 'es';
+        
+        // Enviar todas las configuraciones al iframe para sincronización
+        configIframe.contentWindow.postMessage({
+          type: 'loadConfig',
+          config: {
+            brightness,
+            showFPS,
+            damageNumbers,
+            soundVolume,
+            musicVolume,
+            performance,
+            language
+          }
+        }, '*');
+
+        // Aplicar configuraciones inmediatamente
+        document.body.style.filter = `brightness(${brightness}%)`;
+        const fpsContainer = document.getElementById('fps-container');
+        if (fpsContainer) {
+          fpsContainer.style.display = showFPS === 'on' ? 'block' : 'none';
+        }
+        window.damageNumbersEnabled = damageNumbers !== 'off';
+        
+        // Aplicar configuración de sonido
+        if (window.audioManager) {
+          window.audioManager.setVolume('sound', parseInt(soundVolume) / 100);
+          window.audioManager.setVolume('music', parseInt(musicVolume) / 100);
+        }
+        
+        // Aplicar configuración de rendimiento
+        if (performance === 'on') {
+          document.querySelectorAll('.skill-card').forEach(card => {
+            card.style.transition = 'none';
+          });
+        }
+      };
     });
 
     window.addEventListener('message', (event) => {

@@ -10,7 +10,7 @@ class SkillSystem {
                 name: 'Proyectil de Fuego',
                 icon: 'sprites/proyectil_sprite_1.png',
                 cooldown: 2.0,
-                damage: 25,
+                damage: 15,
                 projectileType: 'fire',
                 projectileSprite: 'sprites/proyectil_sprite_1.png'
             },
@@ -39,11 +39,11 @@ class SkillSystem {
                 projectileSprite: 'sprites/proyectil_sprite_4.png'
             },
             {
-                name: 'Vórtice Oscuro',
+                name: 'Vórtice de Hojas',
                 icon: 'sprites/proyectil_sprite_leaves.png',
                 cooldown: 5.0,
-                damage: 65,
-                projectileType: 'dark',
+                damage: 15,
+                projectileType: 'leaves',
                 projectileSprite: 'sprites/proyectil_sprite_leaves.png'
             }
         ];
@@ -124,6 +124,11 @@ class SkillSystem {
     updateHUDSlots() {
         const skillsBar = document.getElementById('skills-bar');
         skillsBar.innerHTML = '';
+
+        // Crear el tooltip
+        const tooltip = document.createElement('div');
+        tooltip.style.cssText = 'display: none; position: absolute; background: rgba(0, 0, 0, 0.9); color: white; padding: 10px; border-radius: 5px; font-size: 14px; z-index: 1000; pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.3); box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); font-family: "Mineglyph", sans-serif; max-width: 250px;';
+        document.body.appendChild(tooltip);
         
         // Crear 5 slots de habilidades
         for (let i = 0; i < 5; i++) {
@@ -167,6 +172,64 @@ class SkillSystem {
             skillBox.appendChild(skillIcon);
             skillBox.appendChild(cooldownOverlay);
             skillsBar.appendChild(skillBox);
+
+            // Agregar eventos para el tooltip
+            let translations = null;
+
+            skillBox.addEventListener('mousemove', async (e) => {
+                const skill = this.equippedSkills[i];
+                if (skill) {
+                    tooltip.style.display = 'block';
+                    tooltip.style.left = e.pageX + 10 + 'px';
+                    tooltip.style.top = Math.max(10, e.pageY - 150) + 'px';
+                    
+                    try {
+                        if (!translations) {
+                            translations = await fetch('translations.json').then(response => response.json());
+                        }
+                        const currentLang = localStorage.getItem('language') || 'es';
+                        const t = translations[currentLang] || translations['es'];
+                        
+                        let description = t[`${skill.projectileType.toLowerCase()}Description`] || t[`${skill.projectileType}Description`] || '';
+
+                        let tooltipContent = `
+                        <div style="display: flex; flex-direction: column; gap: 5px; max-width: 180px;">
+                            <div style="display: flex; align-items: start; gap: 10px;">
+                                <div style="flex-grow: 1;">
+                                    <div style="font-weight: bold; margin-bottom: 3px;">${skill.name}</div>
+                                    <div style="font-size: 12px; color: #aaa; line-height: 1.3; word-wrap: break-word;">${description}</div>
+                                    <div style="margin-top: 5px;"><i class="fa-solid fa-clock"></i> ${t.cooldown}: ${skill.cooldown.toFixed(1)}s</div>
+                                    <div><i class="fa-solid fa-burst"></i> ${t.damage}: ${Math.round(skill.damage)}</div>
+                                    <div><i class="fa-solid fa-arrows-up-down"></i> ${t.projectiles}: ${Math.min(this.skillLevels[i], 3)}</div>
+                                    ${skill.projectileType === 'ice' ? `<div><i class="fa-solid fa-icicles"></i> ${t.effect}: ${t.slowEffect}</div>` : ''}
+                                    ${skill.projectileType === 'leaves' ? `<div><i class="fa-solid fa-rotate"></i> ${t.effect}: ${t.vortexEffect}</div>` : ''}
+                                </div>
+                                <div style="width: 32px; height: 32px; background-image: url('${skill.projectileSprite}'); background-size: contain; background-repeat: no-repeat; background-position: center;"></div>
+                            </div>
+                        </div>`;
+                        tooltip.innerHTML = tooltipContent;
+                    } catch (error) {
+                        console.error('Error loading translations:', error);
+                        // Mostrar un tooltip básico sin traducciones en caso de error
+                        let tooltipContent = `
+                        <div style="display: flex; flex-direction: column; gap: 5px; max-width: 180px;">
+                            <div style="display: flex; align-items: start; gap: 10px;">
+                                <div style="flex-grow: 1;">
+                                    <div style="font-weight: bold; margin-bottom: 3px;">${skill.name}</div>
+                                    <div style="margin-top: 5px;">Cooldown: ${skill.cooldown.toFixed(1)}s</div>
+                                    <div>Damage: ${Math.round(skill.damage)}</div>
+                                    <div>Projectiles: ${Math.min(this.skillLevels[i], 3)}</div>
+                                </div>
+                                <div style="width: 32px; height: 32px; background-image: url('${skill.projectileSprite}'); background-size: contain; background-repeat: no-repeat; background-position: center;"></div>
+                            </div>
+                        </div>`;
+                        tooltip.innerHTML = tooltipContent;
+                    }
+            }});
+
+            skillBox.addEventListener('mouseleave', () => {
+                tooltip.style.display = 'none';
+            });
             
             if (this.equippedSkills[i]) {
                 this.updateSkillIcon(i);
@@ -187,7 +250,8 @@ class SkillSystem {
         if (!this.equippedSkills[index].baseStats) {
             this.equippedSkills[index].baseStats = {
                 damage: this.equippedSkills[index].damage,
-                cooldown: this.equippedSkills[index].cooldown
+                cooldown: this.equippedSkills[index].cooldown,
+                orbitalRadius: this.equippedSkills[index].orbitalRadius || 60
             };
         }
         
@@ -198,6 +262,11 @@ class SkillSystem {
         const baseStats = this.equippedSkills[index].baseStats;
         this.equippedSkills[index].damage = Math.floor(baseStats.damage * (1 + (level - 1) * 0.2)); // +20% por nivel
         this.equippedSkills[index].cooldown = Math.max(0.5, baseStats.cooldown * Math.pow(0.9, level - 1)); // -10% por nivel
+
+        // Aumentar el radio orbital para la habilidad de hojas
+        if (this.equippedSkills[index].projectileType === 'leaves') {
+            this.equippedSkills[index].orbitalRadius = baseStats.orbitalRadius * (1 + (level - 1) * 0.15); // +15% por nivel
+        }
         
         // Actualizar el indicador de nivel solo para este slot
         const skillBox = document.querySelector(`#skill-slot-${index}`);

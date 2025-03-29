@@ -185,6 +185,11 @@
     </div>
     <a href="#" class="menu-button" data-translate="selectSkin" id="selectSkinBtn">Seleccionar Skin</a>
   </section>
+  <div id="version-display" style="position: fixed; bottom: 10px; left: 10px; color: rgba(255, 255, 255, 0.7); font-family: 'Mineglyph', sans-serif; font-size: 14px;"></div>
+  <script type="module">
+    import { VERSION } from './version.js';
+    document.getElementById('version-display').textContent = VERSION;
+  </script>
   <script>
     document.getElementById('selectSkinBtn').addEventListener('click', () => {
       document.getElementById('skinModal').style.display = 'flex';
@@ -274,6 +279,11 @@
       document.getElementById('selectedSkinPreview').src = skinSprites[selectedSkin];
     </script>
   </section>
+  <div id="version-display" style="position: fixed; bottom: 10px; left: 10px; color: rgba(255, 255, 255, 0.7); font-family: 'Mineglyph', sans-serif; font-size: 14px;"></div>
+  <script type="module">
+    import { VERSION } from './version.js';
+    document.getElementById('version-display').textContent = VERSION;
+  </script>
   <script>
     document.getElementById('loadGame').addEventListener('click', () => {
       const savedData = localStorage.getItem('playerData');

@@ -1,5 +1,44 @@
 class Engine {
     constructor(canvasId, gameWidth = 120000, gameHeight = 600) {
+        this.canvas = document.getElementById(canvasId);
+        this.ctx = this.canvas.getContext('2d');
+        this.lastTime = performance.now();
+        this.frameCount = 0;
+        this.fps = 0;
+        this.fpsUpdateInterval = 1000;
+        this.lastFpsUpdate = performance.now();
+
+        // Cargar configuraciones
+        this.showFPS = localStorage.getItem('showFPS') === 'on';
+        this.damageNumbersEnabled = localStorage.getItem('damageNumbers') !== 'off';
+        this.brightness = localStorage.getItem('brightness') || '100';
+        this.soundVolume = parseInt(localStorage.getItem('soundVolume')) || 70;
+        this.musicVolume = parseInt(localStorage.getItem('musicVolume')) || 70;
+
+        // Aplicar brillo
+        document.body.style.filter = `brightness(${this.brightness}%)`;
+
+        // Mostrar/ocultar FPS
+        const fpsContainer = document.getElementById('fps-container');
+        if (fpsContainer) {
+            fpsContainer.style.display = this.showFPS ? 'block' : 'none';
+        }
+        this.lastTime = performance.now();
+        this.frameCount = 0;
+        this.fps = 0;
+        this.fpsUpdateInterval = 1000;
+        this.lastFpsUpdate = performance.now();
+
+        // Cargar configuraciones
+        this.showFPS = localStorage.getItem('showFPS') === 'on';
+        this.damageNumbersEnabled = localStorage.getItem('damageNumbers') !== 'off';
+        this.brightness = localStorage.getItem('brightness') || '100';
+        this.soundVolume = parseInt(localStorage.getItem('soundVolume')) || 70;
+        this.musicVolume = parseInt(localStorage.getItem('musicVolume')) || 70;
+
+        // Aplicar brillo
+        document.body.style.filter = `brightness(${this.brightness}%)`;
+
       this.canvas = document.getElementById(canvasId);
       this.ctx = this.canvas.getContext('2d');
       this.entities = [];
@@ -48,6 +87,20 @@ class Engine {
     }
   
     update(dt) {
+        // Actualizar FPS
+        this.frameCount++;
+        const currentTime = performance.now();
+        if (currentTime - this.lastFpsUpdate >= this.fpsUpdateInterval) {
+            this.fps = Math.round((this.frameCount * 1000) / (currentTime - this.lastFpsUpdate));
+            if (this.showFPS) {
+                const fpsValue = document.getElementById('fps-value');
+                if (fpsValue) {
+                    fpsValue.textContent = this.fps;
+                }
+            }
+            this.frameCount = 0;
+            this.lastFpsUpdate = currentTime;
+        }
       this.entities.forEach(e => e.update(dt));
     }
   

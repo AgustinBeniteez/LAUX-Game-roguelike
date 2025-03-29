@@ -4,6 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LAUX GAME - Selección de Personaje</title>
+  <div id="version-display" style="position: fixed; bottom: 10px; left: 10px; color: rgba(255, 255, 255, 0.7); font-family: 'Mineglyph', sans-serif; font-size: 14px;"></div>
+  <script type="module">
+    import { VERSION } from './version.js';
+    document.getElementById('version-display').textContent = VERSION;
+  </script>
   <link rel="shortcut icon" href="sprites/laux_logo.webp" type="image/x-icon">
   <link rel="stylesheet" href="custom_cursor.css">
   <link rel="stylesheet" href="src/fonts.css">
@@ -154,7 +159,7 @@
           ice: { name: 'Hielo', damage: 24, speed: 400, icon: 'sprites/frezee.png', projectileType: 'ice', cooldown: 3.0, projectileSprite: 'sprites/frezee.png' },
           energy: { name: 'Energía', damage: 28, speed: 400, icon: 'sprites/proyectil_sprite_3.png', projectileType: 'energy', cooldown: 4.0, projectileSprite: 'sprites/proyectil_sprite_3.png' },
           shock: { name: 'Choque', damage: 32, speed: 400, icon: 'sprites/proyectil_sprite_4.png', projectileType: 'shock', cooldown: 5.0, projectileSprite: 'sprites/proyectil_sprite_4.png' },
-          dark: { name: 'Oscuridad', damage: 36, speed: 400, icon: 'sprites/proyectil_sprite_leaves.png', projectileType: 'dark', cooldown: 6.0, projectileSprite: 'sprites/proyectil_sprite_5.png' }
+          dark: { name: 'Oscuridad', damage: 36, speed: 400, icon: 'sprites/proyectil_sprite_leaves.png', projectileType: 'leaves', cooldown: 6.0, projectileSprite: 'sprites/proyectil_sprite_leaves.png' }
         };
         const selectedSkillData = skillStats[selectedSkill];
         const skillItem = {

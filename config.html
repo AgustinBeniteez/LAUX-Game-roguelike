@@ -1,9 +1,15 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+  <script src="audioManager.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LAUX GAME</title>
+  <div id="version-display" style="position: fixed; bottom: 10px; left: 10px; color: rgba(255, 255, 255, 0.7); font-family: 'Mineglyph', sans-serif; font-size: 14px;"></div>
+  <script type="module">
+    import { VERSION } from './version.js';
+    document.getElementById('version-display').textContent = VERSION;
+  </script>
   <link rel="shortcut icon" href="sprites/laux_logo.webp" type="image/x-icon">
   <link rel="stylesheet" href="custom_cursor.css">
   <link rel="stylesheet" href="src/fonts.css">
@@ -317,16 +323,25 @@
   <div class="config-container" id="configContainer" style="flex: 1;">
     <div class="config-item">
       <label class="config-label"><i class="fa-solid fa-volume-high"></i> <span data-translate="sound">Sonido</span></label>
-      <div class="volume-slider-container">
-        <input type="range" id="soundVolume" min="0" max="100" value="70" class="volume-slider">
-        <span class="volume-value">70%</span>
+      <div class="volume-slider-container" style="display: flex; align-items: center; gap: 5px;">
+        <i id="soundVolumeIcon" class="fa-solid fa-volume-high" style="margin-right: 10px;"></i>
+        <div style="flex: 1; position: relative;">
+          <input type="range" id="soundVolume" min="0" max="100" value="70" class="volume-slider">
+          <span class="volume-value">70%</span>
+        </div>
+        <button class="config-button" style="padding: 2px 4px; font-size: 12px; min-width: 24px;" onclick="window.audioManager.playTestSound()">
+          <i class="fa-solid fa-volume-high" style="color: white;">  TEST</i>
+        </button>
       </div>
     </div>
     <div class="config-item">
       <label class="config-label"><i class="fa-solid fa-music"></i> <span data-translate="music">Música</span></label>
-      <div class="volume-slider-container">
-        <input type="range" id="musicVolume" min="0" max="100" value="70" class="volume-slider">
-        <span class="volume-value">70%</span>
+      <div class="volume-slider-container" style="display: flex; align-items: center; gap: 5px;">
+        <i id="musicVolumeIcon" class="fa-solid fa-volume-high" style="margin-right: 10px;"></i>
+        <div style="flex: 1; position: relative;">
+          <input type="range" id="musicVolume" min="0" max="100" value="70" class="volume-slider">
+          <span class="volume-value">70%</span>
+        </div>
       </div>
     </div>
     <div class="config-item">
@@ -393,12 +408,66 @@
       </div>
     </div>
     <div class="button-container">
-      <button class="config-button save-button" data-translate="save" onclick="saveConfig()">Guardar</button>
-      <button class="config-button back-button" data-translate="back" onclick="handleBack()">Volver</button>
+      <button class="config-button save-button" onclick="saveConfig()"><i class="fa-solid fa-floppy-disk"></i> <span data-translate="save">Guardar</span></button>
+      <button class="config-button back-button" onclick="handleBack()"><i class="fa-solid fa-reply"></i> <span data-translate="back">Volver</span></button>
     </div>
   </div>
-
   <script>
+    // Escuchar mensajes del padre (game.html)
+    window.addEventListener('message', (event) => {
+      if (event.data.type === 'loadConfig') {
+        const config = event.data.config;
+        
+        // Aplicar configuraciones recibidas
+        document.getElementById('languageSelect').value = config.language;
+        document.getElementById('brightnessSlider').value = config.brightness;
+        document.getElementById('showFPSSelect').value = config.showFPS;
+        document.getElementById('damageNumbersSelect').checked = config.damageNumbers !== 'off';
+        document.getElementById('soundVolume').value = config.soundVolume;
+        document.getElementById('musicVolume').value = config.musicVolume;
+        document.getElementById('performanceSelect').value = config.performance;
+        
+        // Aplicar efectos visuales
+        document.body.style.filter = `brightness(${config.brightness}%)`;
+        
+        // Actualizar valores mostrados
+        document.getElementById('soundVolume').nextElementSibling.textContent = config.soundVolume + '%';
+        document.getElementById('musicVolume').nextElementSibling.textContent = config.musicVolume + '%';
+      }
+    });
+
+    // Cargar configuraciones guardadas
+    document.addEventListener('DOMContentLoaded', () => {
+      // Cargar idioma
+      const currentLang = localStorage.getItem('language') || 'es';
+      document.getElementById('languageSelect').value = currentLang;
+
+      // Cargar brillo
+      const brightness = localStorage.getItem('brightness') || '100';
+      document.getElementById('brightnessSlider').value = brightness;
+      document.body.style.filter = `brightness(${brightness}%)`;
+
+      // Cargar configuración de FPS
+      const showFPS = localStorage.getItem('showFPS') || 'off';
+      document.getElementById('showFPSSelect').value = showFPS;
+
+      // Cargar configuración de números de daño
+      const damageNumbers = localStorage.getItem('damageNumbers') || 'on';
+      document.getElementById('damageNumbersSelect').checked = damageNumbers !== 'off';
+
+      // Cargar volúmenes
+      const soundVolume = localStorage.getItem('soundVolume') || '70';
+      const musicVolume = localStorage.getItem('musicVolume') || '70';
+      document.getElementById('soundVolume').value = soundVolume;
+      document.getElementById('musicVolume').value = musicVolume;
+
+      // Actualizar valores mostrados
+      document.querySelectorAll('.volume-slider').forEach(slider => {
+        const valueDisplay = slider.nextElementSibling;
+        valueDisplay.textContent = `${slider.value}%`;
+      });
+    });
+
     let translations = {};
     let currentKeyBinding = null;
     
@@ -462,9 +531,31 @@
     // Add event listeners for volume sliders
     document.getElementById('soundVolume').addEventListener('input', function() {
       this.nextElementSibling.textContent = this.value + '%';
+      window.audioManager.updateSoundVolume(parseInt(this.value));
+      
+      // Actualizar el ícono según el valor del volumen
+      const volumeIcon = document.getElementById('soundVolumeIcon');
+      const value = parseInt(this.value);
+      
+      volumeIcon.className = 'fa-solid ' + 
+        (value >= 70 ? 'fa-volume-high' :
+         value >= 30 ? 'fa-volume-low' :
+         value > 0 ? 'fa-volume-off' :
+         'fa-volume-xmark');
     });
-    document.getElementById('musicVolume').addEventListener('input', function() {
-      this.nextElementSibling.textContent = this.value + '%';
+    document.getElementById('musicVolume').addEventListener('input', function(e) {
+      const volume = e.target.value;
+      const volumeIcon = document.getElementById('musicVolumeIcon');
+      
+      volumeIcon.className = 'fa-solid ' + (
+        volume == 0 ? 'fa-volume-xmark' :
+        volume < 30 ? 'fa-volume-off' :
+        volume < 70 ? 'fa-volume-low' :
+        'fa-volume-high'
+      );
+      
+      e.target.nextElementSibling.textContent = volume + '%';
+      audioManager.updateMusicVolume(volume);
     });
     const damageNumbersCheckbox = document.getElementById('damageNumbersSelect');
 damageNumbersCheckbox.checked = localStorage.getItem('damageNumbers') !== 'off';
@@ -510,11 +601,46 @@ damageNumbersCheckbox.addEventListener('change', function() {
       localStorage.setItem('performance', document.getElementById('performanceSelect').value);
       localStorage.setItem('showFPS', document.getElementById('showFPSSelect').value);
       localStorage.setItem('brightness', document.getElementById('brightnessSlider').value);
-      alert('Configuración guardada correctamente');
       
-      currentLang = document.getElementById('languageSelect').value;
-      updateLanguage();
-      handleBack();
+      // Crear y mostrar el popup de guardado
+      const savePopup = document.createElement('div');
+      savePopup.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        background: rgb(24 24 24 / 71%);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-size: 14px;
+        z-index: 1000;
+        animation: fadeInOut 2s ease-in-out forwards;
+      `;
+      savePopup.textContent = 'Saving...';
+      document.body.appendChild(savePopup);
+      
+      // Agregar la animación al final del head
+      if (!document.querySelector('#savePopupAnimation')) {
+        const style = document.createElement('style');
+        style.id = 'savePopupAnimation';
+        style.textContent = `
+          @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(20px); }
+            20% { opacity: 1; transform: translateY(0); }
+            80% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-20px); }
+          }
+        `;
+        document.head.appendChild(style);
+      }
+      
+      // Eliminar el popup después de la animación
+      setTimeout(() => {
+        savePopup.remove();
+        currentLang = document.getElementById('languageSelect').value;
+        updateLanguage();
+        handleBack();
+      }, 2000);
     }
 
     function handleBack() {

@@ -33,10 +33,10 @@ class Projectile extends Entity {
                 sprite: 'sprites/proyectil_sprite_4.png',
                 effects: { chainEffect: true, chainRange: 100, chainCount: 3, chainDamageMultiplier: 0.7 }
             },
-            'dark': {
-                damage: damage * 1.8,
+            'leaves': {
+                damage: damage * 0.05,
                 sprite: 'sprites/proyectil_sprite_leaves.png',
-                effects: { vortexEffect: true, vortexRadius: 100, vortexPull: 50, vortexDamageMultiplier: 0.2 }
+                effects: { orbitalEffect: true, orbitalRadius: this.equippedSkills && this.equippedSkills[index] ? this.equippedSkills[index].orbitalRadius || 60 : 60, orbitalSpeed: 8, orbitalDamageMultiplier: 0.01 }
             }
         };
 
@@ -45,12 +45,19 @@ class Projectile extends Entity {
         this.loadSprite(config.sprite, 32, 32, 1);
         this.effects = config.effects;
         
-        // Calcular la dirección del proyectil
-        const dx = targetX - x;
-        const dy = targetY - y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        this.velocityX = (dx / distance) * speed;
-        this.velocityY = (dy / distance) * speed;
+        // Para el proyectil de hojas, no necesitamos calcular velocidad ya que orbitará
+        if (skillType === 'leaves') {
+            this.velocityX = 0;
+            this.velocityY = 0;
+            this.lifetime = 5; // Aumentamos el tiempo de vida para el efecto orbital
+        } else {
+            // Calcular la dirección del proyectil para otros tipos
+            const dx = targetX - x;
+            const dy = targetY - y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            this.velocityX = (dx / distance) * speed;
+            this.velocityY = (dy / distance) * speed;
+        }
         this.width = 32;
         this.height = 32;
     }
@@ -60,8 +67,52 @@ class Projectile extends Entity {
         if (engine.isPaused) return;
 
         // Actualizar posición
-        this.x += this.velocityX * dt;
-        this.y += this.velocityY * dt;
+        if (this.skillType === 'leaves') {
+            const player = engine.entities.find(e => !e.isEnemy && !e.isDead);
+            if (player) {
+                const angle = this.timeAlive * this.effects.orbitalSpeed;
+                this.x = player.x + Math.cos(angle) * this.effects.orbitalRadius;
+                this.y = player.y + Math.sin(angle) * this.effects.orbitalRadius;
+                
+                // Verificar colisiones con enemigos mientras orbita
+                engine.entities.forEach(entity => {
+                    if (entity.isEnemy && !entity.isDead) {
+                        const dx = entity.x - this.x;
+                        const dy = entity.y - this.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (distance <= 40 && !entity.isImmune) { // Radio de daño del proyectil
+                            const orbitalDamage = Math.min(this.damage * this.effects.orbitalDamageMultiplier, entity.health * 0.05);
+                            entity.health -= orbitalDamage;
+                            entity.isImmune = true;
+                            // Calcular el tiempo de inmunidad basado en la velocidad orbital
+                            const revolutionTime = (2 * Math.PI) / this.effects.orbitalSpeed * 1000; // Tiempo en milisegundos para una revolución completa
+                            setTimeout(() => { entity.isImmune = false; }, revolutionTime);
+                            // Crear número flotante de daño
+                            const damageNumber = new FloatingNumber(entity.x + entity.width / 2, entity.y, orbitalDamage);
+                            engine.addEntity(damageNumber);
+                            
+                            // Verificar si el enemigo murió
+                            if (entity.health <= 0) {
+                                entity.isDead = true;
+                                const expOrb = new ExperienceOrb(entity.x, entity.y);
+                                engine.addEntity(expOrb);
+                                
+                                const index = engine.entities.indexOf(entity);
+                                if (index > -1) {
+                                    engine.entities.splice(index, 1);
+                                    enemiesInWave--;
+                                    saveGame();
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        } else {
+            this.x += this.velocityX * dt;
+            this.y += this.velocityY * dt;
+        }
 
         // Actualizar tiempo de vida
         this.timeAlive += dt;
@@ -158,23 +209,9 @@ class Projectile extends Entity {
                                 entity.speed /= 0.7;
                             }
                         }, 3000);
-                    } else if (this.skillType === 'dark') {
-                        // Efecto de vórtice
-                        const vortexRadius = 100;
-                        engine.entities.forEach(nearbyEntity => {
-                            if (nearbyEntity.isEnemy && !nearbyEntity.isDead) {
-                                const dx = nearbyEntity.x - this.x;
-                                const dy = nearbyEntity.y - this.y;
-                                const distance = Math.sqrt(dx * dx + dy * dy);
-                                
-                                if (distance <= vortexRadius) {
-                                    const angle = Math.atan2(dy, dx);
-                                    nearbyEntity.x -= Math.cos(angle) * 50 * engine.deltaTime;
-                                    nearbyEntity.y -= Math.sin(angle) * 50 * engine.deltaTime;
-                                    nearbyEntity.health -= this.damage * 0.2;
-                                }
-                            }
-                        });
+                    } else if (this.skillType === 'leaves') {
+                        // Continuar orbitando y dañando enemigos
+                        return; // Evitar que el proyectil se elimine al impactar
                     }
                     // Eliminar el proyectil al impactar
                     const index = engine.entities.indexOf(this);
