@@ -9,8 +9,11 @@ class Entity {
       this.frameHeight = 0;
       this.totalFrames = 1;
       this.currentFrame = 0;
-      this.fps = 10;
+      this.fps = 4; // Ajustar FPS para una animación más suave
       this.frameTimer = 0;
+      this.animationSpeed = 0.15; // Nueva variable para controlar la velocidad de animación
+      this.isMoving = false; // Estado de movimiento
+      this.lastDirection = 'right'; // Última dirección
       this.isEnemy = isEnemy;
       this.isBoss = bossType !== null;
       this.bossType = bossType;
@@ -77,15 +80,24 @@ class Entity {
       }
     }
 
-    loadSprite(src, frameWidth = null, frameHeight = null, totalFrames = 1) {
+    loadSprite(src, frameWidth = null, frameHeight = null, totalFrames = 4) {
       this.sprite = new Image();
       this.sprite.src = src;
+      this.spriteUp = new Image();
+      this.spriteUp.src = 'sprites/player_sprite_up.png';
+      this.spriteDown = new Image();
+      this.spriteDown.src = 'sprites/player_sprite_down.png';
+      this.currentDirection = 'right';
+      this.isMoving = false;
+      this.animationSpeed = 0.15;
+      
       this.sprite.onload = () => {
-        this.frameWidth = frameWidth || this.sprite.width;
+        this.frameWidth = frameWidth || this.sprite.width / 4;
         this.frameHeight = frameHeight || this.sprite.height;
         this.width = this.frameWidth * 2;
         this.height = this.frameHeight * 2;
         this.totalFrames = totalFrames;
+        this.currentFrame = 0;
       };
     }
   
@@ -97,21 +109,7 @@ class Entity {
         visualElement: null
       };
 
-      // Crear elemento visual para el efecto de congelación
-      if (effectType === 'slow') {
-        const visualElement = document.createElement('div');
-        visualElement.style.cssText = `
-          position: absolute;
-          width: ${this.width}px;
-          height: ${this.height}px;
-          background: url('sprites/frezee.png') no-repeat center center;
-          background-size: contain;
-          pointer-events: none;
-          z-index: 2;
-        `;
-        document.body.appendChild(visualElement);
-        this.statusEffects[effectType].visualElement = visualElement;
-      }
+     
     }
 
     updateStatusEffects() {
@@ -502,8 +500,34 @@ class Entity {
         ctx.fill();
       }
 
-      if (this.sprite && this.sprite.complete) {
-        // Draw the main player sprite
+      if (!this.isEnemy && !this.isDead) {
+        let currentSprite = this.sprite;
+        if (this.currentDirection === 'up' && this.spriteUp.complete) {
+          currentSprite = this.spriteUp;
+        } else if (this.currentDirection === 'down' && this.spriteDown.complete) {
+          currentSprite = this.spriteDown;
+        }
+
+        if (currentSprite && currentSprite.complete) {
+          // Solo actualizar la animación si el personaje está en movimiento
+          if (this.isMoving) {
+            this.frameTimer += 1/60; // Usar un timer más suave
+            if (this.frameTimer >= 1/this.fps) {
+              this.frameTimer = 0;
+              this.currentFrame = (this.currentFrame + 1) % this.totalFrames;
+            }
+          }
+
+          ctx.drawImage(
+            currentSprite,
+            this.currentFrame * this.frameWidth, 0,
+            this.frameWidth, this.frameHeight,
+            this.x, this.y,
+            this.width, this.height
+          );
+        }
+      } else if (this.sprite && this.sprite.complete) {
+        // Draw enemy sprite
         ctx.drawImage(
           this.sprite,
           this.currentFrame * this.frameWidth, 0,

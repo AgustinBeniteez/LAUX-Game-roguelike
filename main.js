@@ -445,6 +445,15 @@ window.addEventListener('keydown', e => {
 window.addEventListener('keyup', e => {
   const key = e.key.toLowerCase();
   keys[key] = false;
+  
+  // Cuando se suelta una tecla de movimiento, verificar si el jugador está quieto
+  if (!keys['arrowup'] && !keys[gameControls.up] &&
+      !keys['arrowdown'] && !keys[gameControls.down] &&
+      !keys['arrowleft'] && !keys[gameControls.left] &&
+      !keys['arrowright'] && !keys[gameControls.right]) {
+    player.isMoving = false;
+    player.currentFrame = 0; // Volver al primer frame del sprite
+  }
 });
 
 
@@ -485,10 +494,46 @@ function gameLoop(time) {
   if (!engine.isPaused && !player.isDead) {
     // Mover el jugador y ajustar la cámara
     const moveSpeed = 200 * dt;
-    if (keys['arrowright'] || keys[gameControls.right]) player.x += moveSpeed;
-    if (keys['arrowleft'] || keys[gameControls.left]) player.x -= moveSpeed;
-    if (keys['arrowup'] || keys[gameControls.up]) player.y -= moveSpeed;
-    if (keys['arrowdown'] || keys[gameControls.down]) player.y += moveSpeed;
+    let moveX = 0;
+    let moveY = 0;
+    
+    if (keys['arrowright'] || keys[gameControls.right]) {
+      moveX += 1;
+      player.currentDirection = 'right';
+      player.isMoving = true;
+    }
+    if (keys['arrowleft'] || keys[gameControls.left]) {
+      moveX -= 1;
+      player.currentDirection = 'left';
+      player.isMoving = true;
+    }
+    if (keys['arrowup'] || keys[gameControls.up]) {
+      moveY -= 1;
+      player.currentDirection = 'up';
+      player.isMoving = true;
+    }
+    if (keys['arrowdown'] || keys[gameControls.down]) {
+      moveY += 1;
+      player.currentDirection = 'down';
+      player.isMoving = true;
+    }
+
+    // Establecer el estado de movimiento
+    if (moveX === 0 && moveY === 0) {
+      player.isMoving = false;
+    } else {
+      player.isMoving = true;
+    }
+    
+    // Actualizar la animación continuamente
+    player.frameTimer += dt * player.animationSpeed;
+    if (player.frameTimer >= 1/player.fps) {
+      player.frameTimer = 0;
+      player.currentFrame = (player.currentFrame + 1) % player.totalFrames;
+    }
+    
+    player.x += moveX * moveSpeed;
+    player.y += moveY * moveSpeed;
     
     // Mantener al jugador dentro de los límites del mapa
     player.x = Math.max(0, Math.min(player.x, engine.map.getMapWidth()));

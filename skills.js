@@ -2,9 +2,9 @@ class SkillSystem {
     constructor() {
         this.equippedSkills = new Array(5).fill(null);
         this.skillLevels = new Array(5).fill(1); // Nivel de cada habilidad equipada
-        this.maxEquippedSkills = 1; // Inicialmente solo 1 slot disponible
+        this.maxEquippedSkills = 5; // Todos los slots disponibles desde el inicio
         this.lastAutoFireTime = new Array(5).fill(0); // Tiempo del último disparo automático
-        this.maxSkillLevel = 5; // Nivel máximo de cada habilidad
+        this.maxSkillLevel = 10; // Nivel máximo de cada habilidad
         this.skills = [
             {
                 name: 'Proyectil de Fuego',
@@ -81,7 +81,7 @@ class SkillSystem {
 
                     // Equip the new skill
                     this.equippedSkills[slotIndex] = selectedSkill;
-                    this.skillLevels[slotIndex] = 1;
+                    this.skillLevels[slotIndex] = 1; // Inicializar nivel de habilidad a 1
                     this.updateSkillIcon(slotIndex);
                     this.updateHUDSlots();
                 }
@@ -130,12 +130,12 @@ class SkillSystem {
             const skillBox = document.createElement('div');
             skillBox.id = `skill-slot-${i}`;
             skillBox.className = 'skill-box';
-            skillBox.style.cssText = 'width: 50px; height: 50px; border: 2px solid #fff; border-radius: 5px; position: relative; overflow: hidden;';
+            skillBox.style.cssText = 'width: 50px; height: 50px; border: 2px solid #fff; border-radius: 5px; position: relative; overflow: hidden; margin: 0 5px; box-shadow: 0 0 10px rgba(255, 255, 255, 0.7); background: rgba(0, 0, 0, 0.3);';
             
-            if (i >= this.maxEquippedSkills) {
-                skillBox.style.opacity = '0.5';
-                skillBox.style.border = '2px solid #666';
-            }
+            // Todos los slots tienen el mismo estilo
+            skillBox.style.opacity = '1';
+            skillBox.style.border = '2px solid #fff';
+            skillBox.style.boxShadow = '0 0 5px rgba(255, 255, 255, 0.5)';
             
             const skillIcon = document.createElement('div');
             skillIcon.className = 'skill-icon';
@@ -143,7 +143,7 @@ class SkillSystem {
             
             const cooldownOverlay = document.createElement('div');
             cooldownOverlay.className = 'cooldown-overlay';
-            cooldownOverlay.style.cssText = 'position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; background: rgb(45 45 45 / 69%); transform-origin: bottom; transform: scaleY(0); transition: transform 0.1s linear;';
+            cooldownOverlay.style.cssText = 'position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); transform-origin: bottom; transform: scaleY(0); transition: transform 0.1s linear; pointer-events: none;';
             
             const levelIndicator = document.createElement('div');
             levelIndicator.className = 'level-indicator';
@@ -151,12 +151,30 @@ class SkillSystem {
             levelIndicator.textContent = `Lv${this.skillLevels[i]}`;
             skillBox.appendChild(levelIndicator);
             
+            // Agregar botón de mejora para cada slot
+            const upgradeButton = document.createElement('button');
+            upgradeButton.className = 'upgrade-button';
+            upgradeButton.style.cssText = 'position: absolute; bottom: 2px; right: 2px; background: gold; color: black; border: none; border-radius: 3px; padding: 2px 4px; font-size: 10px; cursor: pointer; display: none;';
+            upgradeButton.textContent = '+';
+            upgradeButton.onclick = () => this.upgradeSkill(i);
+            skillBox.appendChild(upgradeButton);
+            
+            // Mostrar botón de mejora si hay una habilidad equipada y no está al nivel máximo
+            if (this.equippedSkills[i] && this.skillLevels[i] < this.maxSkillLevel) {
+                upgradeButton.style.display = 'block';
+            }
+            
             skillBox.appendChild(skillIcon);
             skillBox.appendChild(cooldownOverlay);
             skillsBar.appendChild(skillBox);
             
             if (this.equippedSkills[i]) {
                 this.updateSkillIcon(i);
+                // Mostrar botón de mejora si hay una habilidad equipada y no está al nivel máximo
+                const upgradeButton = skillBox.querySelector('.upgrade-button');
+                if (upgradeButton && this.skillLevels[i] < this.maxSkillLevel) {
+                    upgradeButton.style.display = 'block';
+                }
             }
         }
         
@@ -165,26 +183,41 @@ class SkillSystem {
     upgradeSkill(index) {
         if (!this.equippedSkills[index] || this.skillLevels[index] >= this.maxSkillLevel) return;
         
-        const skill = this.equippedSkills[index];
+        // Crear una copia de la habilidad base si no existe
+        if (!this.equippedSkills[index].baseStats) {
+            this.equippedSkills[index].baseStats = {
+                damage: this.equippedSkills[index].damage,
+                cooldown: this.equippedSkills[index].cooldown
+            };
+        }
+        
         this.skillLevels[index]++;
+        const level = this.skillLevels[index];
         
-        // Mejorar estadísticas de la habilidad
-        skill.damage = Math.floor(skill.damage * 1.2); // Aumentar daño en 20%
-        skill.cooldown = Math.max(0.5, skill.cooldown * 0.9); // Reducir cooldown en 10% con mínimo de 0.5s
+        // Calcular las estadísticas basadas en el nivel actual
+        const baseStats = this.equippedSkills[index].baseStats;
+        this.equippedSkills[index].damage = Math.floor(baseStats.damage * (1 + (level - 1) * 0.2)); // +20% por nivel
+        this.equippedSkills[index].cooldown = Math.max(0.5, baseStats.cooldown * Math.pow(0.9, level - 1)); // -10% por nivel
         
-        // Actualizar el indicador de nivel
+        // Actualizar el indicador de nivel solo para este slot
         const skillBox = document.querySelector(`#skill-slot-${index}`);
         if (skillBox) {
             const levelIndicator = skillBox.querySelector('.level-indicator');
             if (levelIndicator) {
                 levelIndicator.textContent = `Lv${this.skillLevels[index]}`;
             }
+            
+            // Ocultar botón de mejora si alcanza el nivel máximo
+            const upgradeButton = skillBox.querySelector('.upgrade-button');
+            if (upgradeButton && this.skillLevels[index] >= this.maxSkillLevel) {
+                upgradeButton.style.display = 'none';
+            }
         }
     }
 
     useSkill(index, targetX, targetY) {
         const skill = this.equippedSkills[index];
-        if (!skill || this.cooldowns[index] > 0 || index >= this.maxEquippedSkills) return false;
+        if (!skill || this.cooldowns[index] > 0) return false;
 
         // Crear el proyectil
         const player = engine.entities.find(e => !e.isEnemy && !e.isDead);

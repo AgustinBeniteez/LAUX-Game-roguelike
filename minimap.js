@@ -45,17 +45,19 @@ class Minimap {
                 this.ctx.fillStyle = '#5abdef';
                 this.ctx.arc(x, y, 3, 0, Math.PI * 2);
                 this.ctx.fill();
+            } else if (entity.isBoss) {
+                const x = entity.x * scaleX;
+                const y = entity.y * scaleY;
+                this.ctx.beginPath();
+                this.ctx.fillStyle = '#e8c32c';
+                this.ctx.arc(x, y, 8, 0, Math.PI * 2);
+                this.ctx.fill();
             } else if (entity.isEnemy) {
                 const x = entity.x * scaleX;
                 const y = entity.y * scaleY;
                 this.ctx.beginPath();
-                if (entity.isBoss) {
-                    this.ctx.fillStyle = '#e8c32c';
-                    this.ctx.arc(x, y, 6, 0, Math.PI * 2);
-                } else {
-                    this.ctx.fillStyle = '#ff0000';
-                    this.ctx.arc(x, y, 3, 0, Math.PI * 2);
-                }
+                this.ctx.fillStyle = '#ff0000';
+                this.ctx.arc(x, y, 3, 0, Math.PI * 2);
                 this.ctx.fill();
             }
         });
