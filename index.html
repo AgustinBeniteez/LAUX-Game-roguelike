@@ -193,6 +193,13 @@
     const skinCards = document.querySelectorAll('.skin-card');
     const continueBtn = document.querySelector('.continue-btn');
     let selectedSkin = null;
+
+    const skinSprites = {
+      default: 'sprites/player_sprite.png',
+      barita: 'sprites/player_sprite_skin1.png',
+      azul: 'sprites/player_sprite_skin2.png',
+      amarillo: 'sprites/player_sprite_skin3.png'
+    };
     
     // Cargar y dibujar el sprite en el canvas
     const canvas = document.getElementById('selectedSkinPreview');
@@ -264,12 +271,6 @@
   </script>
     <script>
       selectedSkin = localStorage.getItem('selectedSkin') || 'default';
-      const skinSprites = {
-        default: 'sprites/player_sprite.png',
-        barita: 'sprites/player_sprite_skin1.png',
-        azul: 'sprites/player_sprite_skin2.png',
-        amarillo: 'sprites/player_sprite_skin3.png'
-      };
       document.getElementById('selectedSkinPreview').src = skinSprites[selectedSkin];
     </script>
   </section>

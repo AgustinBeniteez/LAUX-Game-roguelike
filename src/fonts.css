@@ -1,6 +1,6 @@
 @font-face {
     font-family: 'Mineglyph';
-    src: url('/src/mineglyph-faithful.woff2') format('woff2');
+    src: url('../src/mineglyph-faithful.woff2') format('woff2');
     font-weight: normal;
     font-style: normal;
 }
