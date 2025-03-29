@@ -349,6 +349,10 @@
       <select id="languageSelect">
         <option value="es">Español</option>
         <option value="en">English</option>
+        <option value="fr">Français</option>
+        <option value="ja">日本語</option>
+        <option value="pt">Português</option>
+        <option value="ko">한국어</option>
       </select>
     </div>
     
@@ -518,7 +522,12 @@
     
     // Inicializar las teclas
     updateKeyDisplays();
-    let currentLang = localStorage.getItem('language') || 'es';
+    function getBrowserLanguage() {
+      const lang = navigator.language.split('-')[0];
+      const supportedLangs = ['es', 'en', 'fr', 'ja', 'pt', 'ko'];
+      return supportedLangs.includes(lang) ? lang : 'es';
+    }
+    let currentLang = localStorage.getItem('language') || getBrowserLanguage();
 
     // Load saved configurations
     document.getElementById('soundVolume').value = localStorage.getItem('soundVolume') || '70';

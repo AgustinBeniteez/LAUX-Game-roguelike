@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title id="pageTitle">404 - Página no encontrada - LAUX GAME</title>
+    <script>
+        const currentLang = localStorage.getItem('language') || 'es';
+        document.documentElement.lang = currentLang;
+    </script>
+    <link rel="shortcut icon" href="sprites/laux_logo.webp" type="image/x-icon">
+    <link href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css' rel='stylesheet'/>
+    <link rel="stylesheet" href="custom_cursor.css">
+    <link rel="stylesheet" href="src/fonts.css">
+    <style>
+        body {
+            margin: 0;
+            background: #222;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Mineglyph', sans-serif;
+            color: white;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .logo {
+            width: 200px;
+            height: 200px;
+            margin-bottom: 30px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        h1 {
+            font-size: 4em;
+            margin: 0;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+        }
+
+        p {
+            font-size: 1.5em;
+            margin: 20px 0;
+            color: #aaa;
+        }
+
+        .back-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid white;
+            color: white;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Mineglyph', sans-serif;
+            text-decoration: none;
+            margin-top: 30px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+            transform: scale(1.05);
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <canvas class="particles" id="particles"></canvas>
+    <img src="sprites/laux_logo.webp" alt="LAUX GAME Logo" class="logo">
+    <h1 id="errorTitle">404</h1>
+    <p id="errorMessage"></p>
+    <a href="index.html" class="back-button" id="backButton"></a>
+
+    <script>
+        async function loadTranslations() {
+            try {
+                const response = await fetch('translations.json');
+                const translations = await response.json();
+                const lang = localStorage.getItem('language') || 'es';
+                
+                document.getElementById('pageTitle').textContent = `${translations[lang]['404Title']} - LAUX GAME`;
+                document.getElementById('errorTitle').textContent = translations[lang]['404Title'];
+                document.getElementById('errorMessage').textContent = translations[lang]['404Message'];
+                document.getElementById('backButton').textContent = translations[lang]['404Button'];
+            } catch (error) {
+                console.error('Error loading translations:', error);
+            }
+        }
+
+        loadTranslations();
+    </script>
+
+    <script>
+        // Efecto de partículas en el fondo
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const particles = [];
+        const particleCount = 50;
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 3 + 1;
+                this.speedX = Math.random() * 3 - 1.5;
+                this.speedY = Math.random() * 3 - 1.5;
+                this.opacity = Math.random() * 0.5 + 0.3;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+            }
+
+            draw() {
+                ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function init() {
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+
+        init();
+        animate();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>
