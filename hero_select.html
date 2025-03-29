@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LAUX GAME - Selección de Héroe</title>
+  <div id="version-display" style="position: fixed; bottom: 10px; left: 10px; color: rgba(255, 255, 255, 0.7); font-family: 'Mineglyph', sans-serif; font-size: 14px;"></div>
+  <script type="module">
+    import { VERSION } from './version.js';
+    document.getElementById('version-display').textContent = VERSION;
+  </script>
+  <link rel="shortcut icon" href="sprites/laux_logo.webp" type="image/x-icon">
+  <link rel="stylesheet" href="custom_cursor.css">
+  <link rel="stylesheet" href="src/fonts.css">
+  <style>
+    body { 
+      margin: 0; 
+      background: linear-gradient(
+        113.65deg,
+        rgba(40, 40, 40, 1) 0%,
+        rgba(98, 11, 56, 1) 100%
+      );
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      font-family: 'Mineglyph', sans-serif;
+    }
+    .title {
+      color: white;
+      font-size: 48px;
+      margin-bottom: 40px;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    }
+    .hero-selection {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    .hero-card {
+      border-radius: 10px;
+      padding: 20px;
+      width: 250px;
+      height: 400px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: url('sprites/card_sprite.png') no-repeat center;
+      background-size: cover;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-card:hover {
+      transform: scale(1.1);
+    }
+    .hero-card.selected {
+      background-image: url('sprites/card_selected_sprite.png');
+    }
+    .hero-icon {
+      width: 128px;
+      height: 128px;
+      margin-bottom: 20px;
+      image-rendering: pixelated;
+    }
+    .hero-name {
+      color: white;
+      font-size: 24px;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+    .hero-stats {
+      color: #ddd;
+      font-size: 16px;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    .hero-abilities {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .ability-icon {
+      width: 48px;
+      height: 48px;
+      border: 2px solid #fff;
+      border-radius: 8px;
+      padding: 5px;
+      background: rgba(0, 0, 0, 0.3);
+    }
+    .ability-key {
+      color: #fff;
+      font-size: 12px;
+      text-align: center;
+      margin-top: 5px;
+    }
+    .continue-btn {
+      background: #4caf4f4b;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      padding: 15px 30px;
+      font-size: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: none;
+      font-family: 'Mineglyph', sans-serif;
+    }
+    .continue-btn:hover {
+      background: #4cb453ab;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <h1 class="title" data-translate="chooseHero">Elige tu Héroe</h1>
+  <div class="hero-selection">
+    <div class="hero-card" data-hero="warrior">
+      <img class="hero-icon" src="sprites/player_sprite_skin1.png">
+      <div class="hero-name" data-translate="warrior">Guerrero</div>
+      <div class="hero-stats">
+        <div data-translate="health">Vida: 150</div>
+        <div data-translate="speed">Velocidad: 200</div>
+      </div>
+      <div class="hero-abilities">
+        <div>
+          <img class="ability-icon" src="sprites/proyectil_sprite_1.png">
+          <div class="ability-key">E</div>
+        </div>
+        <div>
+          <img class="ability-icon" src="sprites/proyectil_sprite_2.png">
+          <div class="ability-key">R</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-card" data-hero="mage">
+      <img class="hero-icon" src="sprites/player_sprite_skin2.png">
+      <div class="hero-name" data-translate="mage">Mago</div>
+      <div class="hero-stats">
+        <div data-translate="health">Vida: 100</div>
+        <div data-translate="speed">Velocidad: 220</div>
+      </div>
+      <div class="hero-abilities">
+        <div>
+          <img class="ability-icon" src="sprites/proyectil_sprite_3.png">
+          <div class="ability-key">E</div>
+        </div>
+        <div>
+          <img class="ability-icon" src="sprites/proyectil_sprite_4.png">
+          <div class="ability-key">R</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-card" data-hero="ranger">
+      <img class="hero-icon" src="sprites/player_sprite_skin3.png">
+      <div class="hero-name" data-translate="ranger">Arquero</div>
+      <div class="hero-stats">
+        <div data-translate="health">Vida: 120</div>
+        <div data-translate="speed">Velocidad: 250</div>
+      </div>
+      <div class="hero-abilities">
+        <div>
+          <img class="ability-icon" src="sprites/frezee.png">
+          <div class="ability-key">E</div>
+        </div>
+        <div>
+          <img class="ability-icon" src="sprites/proyectil_sprite_leaves.png">
+          <div class="ability-key">R</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <button id="continue" class="continue-btn" data-translate="continue">Continuar</button>
+
+  <script>
+    let selectedHero = null;
+    const cards = document.querySelectorAll('.hero-card');
+    const continueBtn = document.getElementById('continue');
+
+    const heroStats = {
+      warrior: {
+        health: 150,
+        speed: 200,
+        abilities: [
+          { name: 'Golpe Poderoso', key: 'E', icon: 'sprites/proyectil_sprite_1.png', damage: 40, cooldown: 5 },
+          { name: 'Torbellino', key: 'R', icon: 'sprites/proyectil_sprite_2.png', damage: 60, cooldown: 8 }
+        ]
+      },
+      mage: {
+        health: 100,
+        speed: 220,
+        abilities: [
+          { name: 'Bola de Fuego', key: 'E', icon: 'sprites/proyectil_sprite_3.png', damage: 50, cooldown: 4 },
+          { name: 'Rayo Arcano', key: 'R', icon: 'sprites/proyectil_sprite_4.png', damage: 70, cooldown: 7 }
+        ]
+      },
+      ranger: {
+        health: 120,
+        speed: 250,
+        abilities: [
+          { name: 'Flecha Congelante', key: 'E', icon: 'sprites/frezee.png', damage: 30, cooldown: 3 },
+          { name: 'Lluvia de Flechas', key: 'R', icon: 'sprites/proyectil_sprite_leaves.png', damage: 45, cooldown: 6 }
+        ]
+      }
+    };
+
+    cards.forEach(card => {
+      card.addEventListener('click', () => {
+        cards.forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        selectedHero = card.dataset.hero;
+        continueBtn.style.display = 'block';
+      });
+    });
+
+    continueBtn.addEventListener('click', () => {
+      if (selectedHero) {
+        const currentLanguage = localStorage.getItem('language');
+        localStorage.clear();
+        if (currentLanguage) localStorage.setItem('language', currentLanguage);
+
+        const heroData = heroStats[selectedHero];
+        const playerData = {
+          class: selectedHero,
+          health: heroData.health,
+          speed: heroData.speed,
+          level: 1,
+          experience: 0,
+          mana: 100,
+          maxMana: 100,
+          stamina: 100,
+          maxStamina: 100,
+          abilities: heroData.abilities,
+          inventory: []
+        };
+        
+        localStorage.setItem('playerData', JSON.stringify(playerData));
+        window.location.href = 'character_select.html';
+      }
+    });
+
+    async function loadTranslations() {
+      try {
+        const response = await fetch('translations.json');
+        const translations = await response.json();
+        const currentLang = localStorage.getItem('language') || 'es';
+        
+        const elements = document.querySelectorAll('[data-translate]');
+        elements.forEach(element => {
+          const key = element.getAttribute('data-translate');
+          if (translations[currentLang] && translations[currentLang][key]) {
+            element.textContent = translations[currentLang][key];
+          }
+        });
+      } catch (error) {
+        console.error('Error loading translations:', error);
+      }
+    }
+
+    loadTranslations();
+  </script>
+</body>
+</html>

@@ -73,13 +73,21 @@ player.experience = 0;
 player.level = playerData.level;
 
 // Actualizar la barra de experiencia
-function updateExpBar() {
+function updateHUD() {
+    // Actualizar barra de experiencia
     const expBar = document.getElementById('exp-bar');
-    const levelText = document.getElementById('level-text');
-    if (expBar && levelText) {
-        const expForNextLevel = 100;
+    if (expBar) {
+        const expForNextLevel = 5 + (player.level - 1) * 4;
         expBar.style.width = `${(player.experience / expForNextLevel) * 100}%`;
-        levelText.textContent = `Level ${player.level}`;
+    }
+
+    // Actualizar barra de vida
+    const healthBar = document.getElementById('health-bar');
+    const healthText = document.getElementById('health-text');
+    if (healthBar && healthText) {
+        const healthPercentage = (player.health / player.maxHealth) * 100;
+        healthBar.style.width = `${healthPercentage}%`;
+        healthText.textContent = `${Math.round(player.health)}/${player.maxHealth}`;
     }
 }
 
@@ -107,12 +115,13 @@ if (player.inventory.length === 0 && playerData.selectedSkill && playerData.skil
 }
 player.equippedWeapon = playerData.equippedWeapon;
 
-// Update HUD values
-document.getElementById('mana-value').textContent = player.mana;
-document.getElementById('stamina-value').textContent = player.stamina;
-// Show/hide mana and stamina based on class
-document.getElementById('mana-container').style.display = player.class === 'wizard' ? 'block' : 'none';
-document.getElementById('stamina-container').style.display = player.class === 'warrior' ? 'block' : 'none';
+// Actualizar HUD inicial
+updateHUD();
+
+// Actualizar HUD cada frame
+engine.onUpdate = function() {
+    updateHUD();
+};
 
 engine.addEntity(player);
 
@@ -248,8 +257,20 @@ function spawnEnemy(isBoss = false) {
 // Función para actualizar los contadores del HUD
 function updateWaveHUD() {
   document.getElementById('wave-value').textContent = currentWave;
-  document.getElementById('next-wave-timer').textContent = 
-    isWaveActive ? `${Math.ceil(waveTimer)}s` : `${Math.ceil(nextWaveTimer)}s`;
+  const timeInSeconds = isWaveActive ? Math.ceil(waveTimer) : Math.ceil(nextWaveTimer);
+  const minutes = Math.floor(timeInSeconds / 60);
+  const seconds = timeInSeconds % 60;
+  const formattedTime = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  document.getElementById('next-wave-timer').textContent = formattedTime;
+
+  // Actualizar la barra de progreso
+  const progressBar = document.getElementById('wave-progress');
+  if (progressBar) {
+    const totalTime = isWaveActive ? 120 : 30; // 120s para oleada, 30s entre oleadas
+    const currentTime = isWaveActive ? waveTimer : nextWaveTimer;
+    const progress = Math.max(0, Math.min(1, currentTime / totalTime));
+    progressBar.style.transform = `scaleX(${progress})`;
+  }
 }
 
 // Función para gestionar las oleadas

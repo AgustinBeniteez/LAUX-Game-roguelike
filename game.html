@@ -16,6 +16,190 @@
     // Load saved language
     const currentLang = localStorage.getItem('language') || 'es';
     document.documentElement.lang = currentLang;
+
+    // Sistema de apuntado y habilidades
+    let isAimingE = false;
+    let isAimingR = false;
+    let aimIndicator = null;
+    let lastECastTime = 0;
+    let lastRCastTime = 0;
+
+    document.addEventListener('keydown', (e) => {
+      const playerData = JSON.parse(localStorage.getItem('playerData'));
+      const abilities = playerData?.skillStats?.abilities;
+      if (!abilities) return;
+
+      if (e.key.toLowerCase() === 'e' && !isAimingE) {
+        const currentTime = Date.now();
+        if (currentTime - lastECastTime >= abilities.e.cooldown * 1000) {
+          isAimingE = true;
+          showAimIndicator();
+        }
+      } else if (e.key.toLowerCase() === 'r' && !isAimingR) {
+        const currentTime = Date.now();
+        if (currentTime - lastRCastTime >= abilities.r.cooldown * 1000) {
+          isAimingR = true;
+          showAimIndicator();
+        }
+      }
+    });
+
+    document.addEventListener('keyup', (e) => {
+      if (e.key.toLowerCase() === 'e' && isAimingE) {
+        isAimingE = false;
+        const playerData = JSON.parse(localStorage.getItem('playerData'));
+        const ability = playerData?.skillStats?.abilities?.e;
+        if (ability) {
+          lastECastTime = Date.now();
+          launchProjectile(ability);
+        }
+        hideAimIndicator();
+      } else if (e.key.toLowerCase() === 'r' && isAimingR) {
+        isAimingR = false;
+        const playerData = JSON.parse(localStorage.getItem('playerData'));
+        const ability = playerData?.skillStats?.abilities?.r;
+        if (ability) {
+          lastRCastTime = Date.now();
+          launchProjectile(ability);
+        }
+        hideAimIndicator();
+      }
+    });
+
+    function showAimIndicator() {
+      if (!aimIndicator) {
+        aimIndicator = {
+          visible: true,
+          angle: 0,
+          length: 100
+        };
+      }
+      aimIndicator.visible = true;
+      updateAimIndicator(event);
+    }
+
+    function hideAimIndicator() {
+      if (aimIndicator) {
+        aimIndicator.visible = false;
+      }
+    }
+
+    function updateAimIndicator(event) {
+      if (!aimIndicator || !isAimingE) return;
+
+      const player = engine.entities.find(e => !e.isEnemy);
+      if (!player) return;
+
+      const rect = gameCanvas.getBoundingClientRect();
+      const scaleX = gameCanvas.width / rect.width;
+      const scaleY = gameCanvas.height / rect.height;
+
+      const mouseX = (event.clientX - rect.left) * scaleX + engine.cameraX;
+      const mouseY = (event.clientY - rect.top) * scaleY + engine.cameraY;
+
+      const dx = mouseX - player.x;
+      const dy = mouseY - player.y;
+      const angle = Math.atan2(dy, dx);
+      aimIndicator.angle = angle;
+
+      // Dibujar el indicador en el canvas
+      if (aimIndicator.visible) {
+        const ctx = gameCanvas.getContext('2d');
+        ctx.save();
+        ctx.strokeStyle = 'cyan';
+        ctx.fillStyle = 'cyan';
+        ctx.lineWidth = 2;
+        ctx.shadowColor = 'cyan';
+        ctx.shadowBlur = 10;
+
+        // Calcular el punto final de la flecha
+        const startX = player.x - engine.cameraX;
+        const startY = player.y - engine.cameraY;
+        const endX = player.x + Math.cos(angle) * aimIndicator.length - engine.cameraX;
+        const endY = player.y + Math.sin(angle) * aimIndicator.length - engine.cameraY;
+
+        // Dibujar la línea principal
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(endX, endY);
+        ctx.stroke();
+
+        // Dibujar la punta de la flecha
+        const headLength = 15;
+        const headAngle = Math.PI / 6; // 30 grados
+
+        const angle1 = angle - headAngle;
+        const angle2 = angle + headAngle;
+
+        const head1X = endX - headLength * Math.cos(angle1);
+        const head1Y = endY - headLength * Math.sin(angle1);
+        const head2X = endX - headLength * Math.cos(angle2);
+        const head2Y = endY - headLength * Math.sin(angle2);
+
+        ctx.beginPath();
+        ctx.moveTo(endX, endY);
+        ctx.lineTo(head1X, head1Y);
+        ctx.lineTo(head2X, head2Y);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.restore();
+      }
+    }
+
+    document.addEventListener('mousemove', updateAimIndicator);
+
+    function launchProjectile(ability) {
+      const player = engine.entities.find(e => !e.isEnemy);
+      if (!player) return;
+
+      const rect = gameCanvas.getBoundingClientRect();
+      const scaleX = gameCanvas.width / rect.width;
+      const scaleY = gameCanvas.height / rect.height;
+
+      const mouseX = (event.clientX - rect.left) * scaleX;
+      const mouseY = (event.clientY - rect.top) * scaleY;
+
+      const projectile = new Projectile(
+        player.x,
+        player.y,
+        mouseX,
+        mouseY,
+        player.skillStats.projectileType,
+        ability.damage,
+        player.skillStats.speed
+      );
+
+      engine.addEntity(projectile);
+
+      // Actualizar la interfaz de cooldown
+      const skillType = isAimingE ? 'e' : 'r';
+      const cooldownOverlay = document.getElementById(`skill-${skillType}-cooldown`);
+      const cooldownTimer = document.getElementById(`skill-${skillType}-timer`);
+      
+      if (cooldownOverlay && cooldownTimer) {
+        cooldownOverlay.style.transform = 'scaleY(1)';
+        const startTime = Date.now();
+        const cooldownDuration = ability.cooldown * 1000;
+
+        const updateCooldown = () => {
+          const currentTime = Date.now();
+          const elapsed = currentTime - startTime;
+          const remaining = Math.max(0, cooldownDuration - elapsed);
+          const progress = remaining / cooldownDuration;
+
+          cooldownOverlay.style.transform = `scaleY(${progress})`;
+          cooldownTimer.textContent = Math.ceil(remaining / 1000);
+          cooldownTimer.style.display = remaining > 0 ? 'block' : 'none';
+
+          if (remaining > 0) {
+            requestAnimationFrame(updateCooldown);
+          }
+        };
+
+        updateCooldown();
+      }
+    }
   </script>
   <style>
     body { 
@@ -49,9 +233,7 @@
       font-family: 'Mineglyph', sans-serif;
       font-size: 18px;
     }
-    .stat-container {
-      margin-bottom: 10px;
-    }
+
     .stat-label {
       font-weight: bold;
       color: #ffd700;
@@ -136,55 +318,52 @@
 <body>
   <canvas id="gameCanvas"></canvas>
   <div id="hud">
-    <div id="skills-bar" style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; background: rgba(0, 0, 0, 0.7); padding: 10px; border-radius: 10px;">
-      <div class="skill-box" style="width: 50px; height: 50px; border: 2px solid #fff; border-radius: 5px; position: relative; overflow: hidden;">
-        <div class="skill-icon" id="selected-skill-icon" style="width: 100%; height: 100%; background-size: contain; background-repeat: no-repeat; background-position: center;"></div>
-        <div class="cooldown-overlay" style="position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; background: rgb(45 45 45 / 69%); transform-origin: bottom; transform: scaleY(0); transition: transform 0.1s linear;"></div>
+    <div id="skills-container" style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px; align-items: center;">
+      <!-- Habilidades activables -->
+      <div id="active-skills" style="display: flex; gap: 10px; background: rgba(0, 0, 0, 0.7); padding: 10px; border-radius: 10px;">
+        <div class="skill-box" style="width: 50px; height: 50px; border: 2px solid #fff; border-radius: 5px; position: relative; overflow: hidden;">
+          <div class="skill-icon" id="skill-e-icon" style="width: 100%; height: 100%; background-size: contain; background-repeat: no-repeat; background-position: center;"></div>
+          <div class="cooldown-overlay" id="skill-e-cooldown" style="position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; background: rgb(45 45 45 / 69%); transform-origin: bottom; transform: scaleY(0); transition: transform 0.1s linear;"></div>
+          <div class="key-bind" style="position: absolute; bottom: 2px; right: 2px; background: rgba(0, 0, 0, 0.7); padding: 2px 4px; border-radius: 3px; font-size: 12px; color: white;">E</div>
+          <div class="cooldown-timer" id="skill-e-timer" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 16px; text-shadow: 1px 1px 2px black; display: none;"></div>
+        </div>
+        <div class="skill-box" style="width: 50px; height: 50px; border: 2px solid #fff; border-radius: 5px; position: relative; overflow: hidden;">
+          <div class="skill-icon" id="skill-r-icon" style="width: 100%; height: 100%; background-size: contain; background-repeat: no-repeat; background-position: center;"></div>
+          <div class="cooldown-overlay" id="skill-r-cooldown" style="position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; background: rgb(45 45 45 / 69%); transform-origin: bottom; transform: scaleY(0); transition: transform 0.1s linear;"></div>
+          <div class="key-bind" style="position: absolute; bottom: 2px; right: 2px; background: rgba(0, 0, 0, 0.7); padding: 2px 4px; border-radius: 3px; font-size: 12px; color: white;">R</div>
+          <div class="cooldown-timer" id="skill-r-timer" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 16px; text-shadow: 1px 1px 2px black; display: none;"></div>
+        </div>
+      </div>
+      <!-- Habilidades automáticas -->
+      <div id="skills-bar" style="display: flex; gap: 10px; background: rgba(0, 0, 0, 0.7); padding: 10px; border-radius: 10px;">
+        <div class="skill-box" style="width: 50px; height: 50px; border: 2px solid #fff; border-radius: 5px; position: relative; overflow: hidden;">
+          <div class="skill-icon" id="selected-skill-icon" style="width: 100%; height: 100%; background-size: contain; background-repeat: no-repeat; background-position: center;"></div>
+          <div class="cooldown-overlay" style="position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; background: rgb(45 45 45 / 69%); transform-origin: bottom; transform: scaleY(0); transition: transform 0.1s linear;"></div>
+        </div>
       </div>
     </div>
-    <div id="wave-info" style="position: absolute; top: 20px; right: 20px; background: rgba(0, 0, 0, 0.7); padding: 15px; border-radius: 10px; color: white;">
-      <div class="stat-container">
-        <span class="stat-label" data-translate="wave"><i class="fa-brands fa-unsplash"></i> Oleada:</span>
-        <span class="stat-value" id="wave-value">1</span>
-      </div>
-      <div class="stat-container">
-        <span class="stat-label" data-translate="nextWave"><i class="fa-solid fa-clock"></i> Siguiente oleada:</span>
-        <span class="stat-value" id="next-wave-timer">30s</span>
-      </div>
+    <div id="wave-info" style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); text-align: center; color: white; background-color: #0c0c0ca6; width: 200px; border-radius: 0px 0px 10px 10px;">
+    <div id="next-wave-timer" style="font-size: 48px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); margin-bottom: 10px;">30s</div>
+    <div id="wave-progress-container" style="width: 200px; height: 10px; background: rgba(0, 0, 0, 0.5); border-radius: 5px; overflow: hidden; margin-bottom: 10px;">
+    <div id="wave-progress" style="width: 100%; height: 100%; background: #3498db; transform-origin: left; transition: transform 0.5s linear;"></div>
+    </div>
+    <span data-translate="wave"></span>
+    <span id="wave-value">1</span>
+    </div>
+    
+    <div class="exp-bar-container" style="position: absolute; bottom: 130px; left: 50%; transform: translateX(-50%); width: 530px; height: 10px; background: rgba(0, 0, 0, 0.7); border-radius: 5px; overflow: visible;">
+    <div style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); color: white; font-size: 14px; text-shadow: 1px 1px 2px black;" id="level-display">Level 1</div>
+    <div id="exp-bar" style="width: 0%; height: 100%; background: #3bc2ab; border-radius: 5px; transition: width 0.3s ease;"></div>
+    </div>
+    <div class="health-bar-container" style="position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%); width: 530px; height: 25px; background: rgba(0, 0, 0, 0.7); border-radius: 5px; overflow: visible;">
+    <div id="health-bar" style="width: 100%; height: 100%; background: #2ecc71; border-radius: 5px; transition: width 0.3s ease;"></div>
+    <div id="health-text" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 12px; text-shadow: 1px 1px 2px black;">100/100</div>
     </div>
 
-    <div class="stat-container">
-      <span class="stat-label" data-translate="health">Vida:</span>
-      <span class="stat-value" id="health-value">100</span>
+    
+
     </div>
-    <div class="stat-container">
-      <span class="stat-label" data-translate="speed">Velocidad:</span>
-      <span class="stat-value" id="speed-value">200</span>
-    </div>
-    <div class="stat-container" id="mana-container">
-      <span class="stat-label" data-translate="mana">Mana:</span>
-      <span class="stat-value" id="mana-value">0</span>
-    </div>
-    <div class="stat-container" id="stamina-container">
-      <span class="stat-label" data-translate="stamina">Stamina:</span>
-      <span class="stat-value" id="stamina-value">0</span>
-    </div>
-    <div class="stat-container">
-      <span class="stat-label" data-translate="skill">Habilidad:</span>
-      <span class="stat-value" id="skill-value">-</span>
-    </div>
-    <div class="stat-container coordinates">
-      <span class="stat-label" data-translate="position">Posición:</span>
-      <span class="stat-value" id="position-value">X: 0, Y: 0</span>
-    </div>
-    <div class="stat-container" id="fps-container" style="display: none;">
-      <span class="stat-label">FPS:</span>
-      <span class="stat-value" id="fps-value">0</span>
-    </div>
-    <div class="exp-bar-container" style="position: absolute; bottom: 95px; left: 50%; transform: translateX(-50%); width: 300px; height: 10px; background: rgba(0, 0, 0, 0.7); border-radius: 5px; overflow: visible;">
-      <div style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); color: white; font-size: 14px; text-shadow: 1px 1px 2px black;" id="level-display">Level 1</div>
-      <div id="exp-bar" style="width: 0%; height: 100%; background: #3bc2ab; border-radius: 5px; transition: width 0.3s ease;"></div>
-    </div>
+
   </div>
   <div id="pauseMenu">
     <h1>LAUX GAME</h1>

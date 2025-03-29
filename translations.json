@@ -1,6 +1,7 @@
 {
   "fr": {
     "home": "Accueil",
+    "wave": "Vague",
     "controls": "Contrôles",
     "title": "LAUX GAME",
     "404Title": "Erreur 404",
@@ -71,6 +72,7 @@
   },
   "ja": {
     "home": "ホーム",
+    "wave": "波",
     "controls": "操作",
     "title": "LAUX GAME",
     "404Title": "エラー 404",
@@ -141,6 +143,7 @@
   },
   "pt": {
     "home": "Início",
+    "wave": "Aceno",
     "controls": "Controles",
     "title": "LAUX GAME",
     "404Title": "Erro 404",
@@ -211,6 +214,7 @@
   },
   "ko": {
     "home": "홈",
+    "wave": "파도",
     "controls": "조작",
     "title": "LAUX GAME",
     "404Title": "오류 404",
@@ -281,6 +285,7 @@
   },
   "es": {
     "home": "Inicio",
+    "wave": "Oleada",
     "controls": "Controles",
     "title": "LAUX GAME",
     "404Title": "Error 404",
@@ -351,6 +356,7 @@
   },
   "en": {
     "title": "LAUX GAME",
+    "wave": "Wave",
     "404Title": "Error 404",
     "404Message": "Oops! Looks like you got lost in the game",
     "404Button": "Back to Main Menu",

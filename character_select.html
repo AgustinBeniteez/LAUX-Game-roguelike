@@ -147,20 +147,77 @@
 
     continueBtn.addEventListener('click', () => {
       if (selectedSkill) {
-        // Guardar el idioma actual
         const currentLanguage = localStorage.getItem('language');
-        // Limpiar todo el localStorage
-        localStorage.clear();
-        // Restaurar el idioma
-        if (currentLanguage) localStorage.setItem('language', currentLanguage);
-
+        const savedPlayerData = JSON.parse(localStorage.getItem('playerData'));
+        
         const skillStats = {
-          fire: { name: 'Fuego', damage: 20, speed: 400, icon: 'sprites/proyectil_sprite_1.png', projectileType: 'fire', cooldown: 2.0, projectileSprite: 'sprites/proyectil_sprite_1.png' },
-          ice: { name: 'Hielo', damage: 24, speed: 400, icon: 'sprites/frezee.png', projectileType: 'ice', cooldown: 3.0, projectileSprite: 'sprites/frezee.png' },
-          energy: { name: 'Energía', damage: 28, speed: 400, icon: 'sprites/proyectil_sprite_3.png', projectileType: 'energy', cooldown: 4.0, projectileSprite: 'sprites/proyectil_sprite_3.png' },
-          shock: { name: 'Choque', damage: 32, speed: 400, icon: 'sprites/proyectil_sprite_4.png', projectileType: 'shock', cooldown: 5.0, projectileSprite: 'sprites/proyectil_sprite_4.png' },
-          dark: { name: 'Oscuridad', damage: 36, speed: 400, icon: 'sprites/proyectil_sprite_leaves.png', projectileType: 'leaves', cooldown: 6.0, projectileSprite: 'sprites/proyectil_sprite_leaves.png' }
+          fire: {
+            name: 'Fuego',
+            damage: 20,
+            speed: 400,
+            icon: 'sprites/proyectil_sprite_1.png',
+            projectileType: 'fire',
+            cooldown: 2.0,
+            projectileSprite: 'sprites/proyectil_sprite_1.png',
+            abilities: {
+              e: { name: 'Bola de Fuego', damage: 40, cooldown: 5, description: 'Lanza una poderosa bola de fuego que causa daño y quema a los enemigos' },
+              r: { name: 'Explosión Ígnea', damage: 80, cooldown: 12, description: 'Crea una explosión masiva que daña y quema a todos los enemigos cercanos' }
+            }
+          },
+          ice: {
+            name: 'Hielo',
+            damage: 24,
+            speed: 400,
+            icon: 'sprites/frezee.png',
+            projectileType: 'ice',
+            cooldown: 3.0,
+            projectileSprite: 'sprites/frezee.png',
+            abilities: {
+              e: { name: 'Lanza de Hielo', damage: 45, cooldown: 6, description: 'Dispara una lanza de hielo que atraviesa y congela a los enemigos' },
+              r: { name: 'Tormenta Glacial', damage: 90, cooldown: 15, description: 'Invoca una tormenta de hielo que ralentiza y daña masivamente a los enemigos' }
+            }
+          },
+          energy: {
+            name: 'Energía',
+            damage: 28,
+            speed: 400,
+            icon: 'sprites/proyectil_sprite_3.png',
+            projectileType: 'energy',
+            cooldown: 4.0,
+            projectileSprite: 'sprites/proyectil_sprite_3.png',
+            abilities: {
+              e: { name: 'Pulso Energético', damage: 50, cooldown: 7, description: 'Emite un pulso de energía que daña y empuja a los enemigos' },
+              r: { name: 'Nova de Energía', damage: 100, cooldown: 14, description: 'Libera una explosión de energía pura que causa daño masivo en área' }
+            }
+          },
+          shock: {
+            name: 'Choque',
+            damage: 32,
+            speed: 400,
+            icon: 'sprites/proyectil_sprite_4.png',
+            projectileType: 'shock',
+            cooldown: 5.0,
+            projectileSprite: 'sprites/proyectil_sprite_4.png',
+            abilities: {
+              e: { name: 'Relámpago Encadenado', damage: 55, cooldown: 8, description: 'Lanza un relámpago que salta entre enemigos causando daño' },
+              r: { name: 'Tormenta Eléctrica', damage: 110, cooldown: 16, description: 'Invoca una tormenta eléctrica que electrocuta a todos los enemigos en pantalla' }
+            }
+          },
+          dark: {
+            name: 'Oscuridad',
+            damage: 36,
+            speed: 400,
+            icon: 'sprites/proyectil_sprite_leaves.png',
+            projectileType: 'leaves',
+            cooldown: 6.0,
+            projectileSprite: 'sprites/proyectil_sprite_leaves.png',
+            abilities: {
+              e: { name: 'Vórtice Oscuro', damage: 60, cooldown: 9, description: 'Crea un vórtice que atrae y daña a los enemigos cercanos' },
+              r: { name: 'Implosión Sombría', damage: 120, cooldown: 18, description: 'Genera una implosión masiva que absorbe la vida de todos los enemigos' }
+            }
+          }
         };
+        
         const selectedSkillData = skillStats[selectedSkill];
         const skillItem = {
           type: 'skill',
@@ -170,23 +227,23 @@
           icon: selectedSkillData.icon,
           projectileType: selectedSkillData.projectileType,
           cooldown: selectedSkillData.cooldown,
-          projectileSprite: selectedSkillData.projectileSprite
+          projectileSprite: selectedSkillData.projectileSprite,
+          abilities: {
+            e: selectedSkillData.abilities.e,
+            r: selectedSkillData.abilities.r
+          }
         };
 
+        localStorage.clear();
+        if (currentLanguage) localStorage.setItem('language', currentLanguage);
+
         const playerData = {
-          class: 'wizard',
-          health: 100,
-          speed: 250,
-          level: 1,
-          experience: 0,
-          mana: 100,
-          maxMana: 100,
-          stamina: 0,
-          maxStamina: 0,
+          ...savedPlayerData,
           inventory: [skillItem],
           selectedSkill: selectedSkill,
           skillStats: selectedSkillData
         };
+        
         localStorage.setItem('playerData', JSON.stringify(playerData));
         window.location.href = 'game.html';
       }

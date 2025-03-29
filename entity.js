@@ -377,10 +377,13 @@ class Entity {
           this.target.health = Math.max(0, this.target.health - this.damageRate * dt);
           // Visual feedback when taking damage
           if (this.target.health < this.target.maxHealth) {
-            document.getElementById('health-value').style.color = '#ff4444';
-            setTimeout(() => {
-              document.getElementById('health-value').style.color = '';
-            }, 100);
+            const healthValueElement = document.getElementById('health-value');
+            if (healthValueElement) {
+              healthValueElement.style.color = '#ff4444';
+              setTimeout(() => {
+                healthValueElement.style.color = '';
+              }, 100);
+            }
           }
         }
       }
