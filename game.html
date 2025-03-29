@@ -147,29 +147,7 @@
         <span class="stat-value" id="next-wave-timer">30s</span>
       </div>
     </div>
-    <div id="skill-selection" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 5; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8);">
-      <h1 class="title" style="color: white; font-size: 48px; margin-bottom: 40px; text-shadow: 0 0 10px rgba(255, 255, 255, 0.5); text-align: center;">Elige tu habilidad</h1>
-      <div style="display: flex; justify-content: center; align-items: center; height: calc(100% - 120px); gap: 20px;">
-        <div class="skill-card" data-skill="0" style="image-rendering: pixelated; width: 200px; height: 350px; background: url('sprites/card_sprite.png') no-repeat center; background-size: contain; cursor: pointer; transition: transform 0.3s; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
-          <img class="skill-icon" src="sprites/proyectil_sprite_1.png" style="width: 64px; height: 64px; margin-bottom: 10px;">
-          <div class="class-name" style="color: white; font-size: 24px; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); z-index: 1;">Fuego</div>
-          <div class="class-desc" style="color: #fff; font-size: 14px; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); z-index: 1;">Daño básico y rápido</div>
-        </div>
-        <div class="skill-card" data-skill="1" style="image-rendering: pixelated; width: 200px; height: 350px; background: url('sprites/card_sprite.png') no-repeat center; background-size: contain; cursor: pointer; transition: transform 0.3s; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
-          <img class="skill-icon" src="sprites/proyectil_sprite_2.png" style="width: 64px; height: 64px; margin-bottom: 10px;">
-          <div class="class-name" style="color: white; font-size: 24px; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); z-index: 1;">Hielo</div>
-          <div class="class-desc" style="color: #fff; font-size: 14px; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); z-index: 1;">Ralentiza a los enemigos</div>
-        </div>
-        <div class="skill-card" data-skill="2" style="image-rendering: pixelated; width: 200px; height: 350px; background: url('sprites/card_sprite.png') no-repeat center; background-size: contain; cursor: pointer; transition: transform 0.3s; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
-          <img class="skill-icon" src="sprites/proyectil_sprite_3.png" style="width: 64px; height: 64px; margin-bottom: 10px;">
-          <div class="class-name" style="color: white; font-size: 24px; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); z-index: 1;">Energía</div>
-          <div class="class-desc" style="color: #fff; font-size: 14px; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); z-index: 1;">Daño en área</div>
-        </div>
-      </div>
-      <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); color: white; font-size: 24px;">
-        Tiempo restante: <span id="weapon-selection-timer">30</span>s
-      </div>
-    </div>
+
     <div class="stat-container">
       <span class="stat-label" data-translate="health">Vida:</span>
       <span class="stat-value" id="health-value">100</span>
@@ -279,21 +257,9 @@
         });
       }
 
-      const skillSelectionContainer = document.querySelector('#skill-selection div[style*="display: flex"]');
-      const skillSelectionTimer = document.getElementById('weapon-selection-timer');
-      let timeLeft = 30;
-      let currentSkill = null;
-      let timerInterval = null;
-      
       // Asegurarse de que el sistema de habilidades esté inicializado
       if (!window.skillSystem) {
         window.skillSystem = new SkillSystem();
-      }
-
-      // Verificar si el jugador ya tiene una habilidad
-      if (window.skillSystem.equippedSkills[0]) {
-        document.getElementById('skill-selection').style.display = 'none';
-        return;
       }
 
       // Cargar la habilidad guardada del localStorage
@@ -304,85 +270,8 @@
           const savedSkill = playerData.inventory[0];
           window.skillSystem.equippedSkills[0] = savedSkill;
           window.skillSystem.updateSkillIcon(0);
-          document.getElementById('skill-selection').style.display = 'none';
-          return;
         }
       }
-      
-      // Limpiar el contenedor de cartas
-      skillSelectionContainer.innerHTML = '';
-      
-      // Mostrar el tiempo inicial
-      skillSelectionTimer.textContent = timeLeft;
-      
-      // Obtener habilidades aleatorias del sistema de habilidades
-      const availableSkills = skillSystem.skills;
-      const numSkillsToShow = 3;
-      const selectedSkills = [];
-      
-      while (selectedSkills.length < numSkillsToShow && availableSkills.length > 0) {
-        const randomIndex = Math.floor(Math.random() * availableSkills.length);
-        selectedSkills.push(availableSkills[randomIndex]);
-        availableSkills.splice(randomIndex, 1);
-      }
-      
-      // Crear cartas para las habilidades seleccionadas
-      selectedSkills.forEach((skill, index) => {
-        const card = document.createElement('div');
-        card.className = 'skill-card';
-        card.setAttribute('data-skill', index);
-        card.style.cssText = 'image-rendering: pixelated; width: 200px; height: 350px; background: url(\'sprites/card_sprite.png\') no-repeat center; background-size: contain; cursor: pointer; transition: transform 0.3s; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;';
-        
-        card.innerHTML = `
-          <img class="skill-icon" src="${skill.icon}" style="width: 64px; height: 64px; margin-bottom: 10px;">
-          <div class="class-name" style="color: white; font-size: 24px; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); z-index: 1;">${skill.name}</div>
-          <div class="class-desc" style="color: #fff; font-size: 14px; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); z-index: 1;">Daño: ${skill.damage}</div>
-        `;
-        
-        card.addEventListener('click', () => {
-          // Asignar la habilidad seleccionada al primer slot
-          const selectedSkill = selectedSkills[index];
-          skillSystem.equippedSkills[0] = selectedSkill;
-          skillSystem.updateSkillIcon(0);
-          
-          const event = new CustomEvent('weaponSelected', {
-            detail: { weaponIndex: index }
-          });
-          document.dispatchEvent(event);
-          document.getElementById('skill-selection').style.display = 'none';
-        });
-        
-        card.addEventListener('mouseover', () => {
-          card.style.transform = 'scale(1.1)';
-        });
-        
-        card.addEventListener('mouseout', () => {
-          card.style.transform = 'scale(1)';
-        });
-        
-        skillSelectionContainer.appendChild(card);
-      });
-      
-      const updateTimer = () => {
-        if (timeLeft > 0) {
-          timeLeft--;
-          skillSelectionTimer.textContent = timeLeft;
-          setTimeout(updateTimer, 1000);
-        } else {
-          // Si se acaba el tiempo, seleccionar una habilidad aleatoria
-          const skillCards = document.querySelectorAll('.skill-card');
-          if (skillCards.length > 0) {
-            const randomSkill = Math.floor(Math.random() * skillCards.length);
-            skillCards[randomSkill].click();
-          }
-          document.getElementById('skill-selection').style.display = 'none';
-        }
-      };
-
-      // Iniciar el temporizador
-      timeLeft = 30;
-      skillSelectionTimer.textContent = timeLeft;
-      updateTimer();
 
       const levelDisplay = document.getElementById('level-display');
       const updateLevelDisplay = () => {

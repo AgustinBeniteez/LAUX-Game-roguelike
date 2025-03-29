@@ -88,7 +88,7 @@ class SkillSystem {
 
                 // Resume the game after selection
                 engine.isPaused = false;
-                document.getElementById('skill-selection').style.display = 'none';
+                // La selección de habilidades ha sido desactivada
             }
         });
     }

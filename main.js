@@ -1,5 +1,5 @@
 const assetManager = new AssetManager();
-const engine = new Engine('gameCanvas', 800, 600);
+const engine = new Engine('gameCanvas', 1000, 500);
 
 // Load game state and player data
 const gameState = JSON.parse(localStorage.getItem('gameState')) || {
@@ -12,7 +12,7 @@ const gameState = JSON.parse(localStorage.getItem('gameState')) || {
 };
 
 const playerData = JSON.parse(localStorage.getItem('playerData')) || {
-  class: 'warrior',
+  class: 'mage',
   health: 120,
   speed: 120,
   level: 1,
@@ -26,25 +26,30 @@ let skillSelectionActive = false;
 function showSkillSelection() {
   skillSelectionActive = true;
   engine.isPaused = true;
-  document.getElementById('skill-selection').style.display = 'block';
-
-  // Manejar la selección de habilidades
-  const skillCards = document.querySelectorAll('.skill-card');
-  skillCards.forEach(card => {
-    const skillIndex = parseInt(card.dataset.skill);
-    const skillLevel = skillSystem.skills[skillIndex].level || 1;
-    const levelIndicator = document.createElement('div');
-    levelIndicator.className = 'skill-level';
-    levelIndicator.textContent = `Lv${skillLevel}`;
-    card.appendChild(levelIndicator);
-
-    card.onclick = () => {
-      document.dispatchEvent(new CustomEvent('weaponSelected', { detail: { weaponIndex: skillIndex } }));
-      document.getElementById('skill-selection').style.display = 'none';
-      engine.isPaused = false;
-      skillSelectionActive = false;
-    };
-  });
+  
+  // Mostrar botones de mejora de habilidades
+  const skillsBar = document.getElementById('skills-bar');
+  if (!skillsBar) return;
+  
+  const skillBoxes = skillsBar.getElementsByClassName('skill-box');
+  for (let i = 0; i < skillBoxes.length; i++) {
+    const skill = window.skillSystem.equippedSkills[i];
+    if (skill) {
+      const upgradeButton = document.createElement('button');
+      upgradeButton.className = 'upgrade-button';
+      upgradeButton.style.cssText = '    position: absolute; top: 0px;background: rgb(49 197 192);color: white;border: none;padding: 11px 10px;cursor: pointer;';
+      upgradeButton.textContent = ' LVL +1';
+      
+      upgradeButton.addEventListener('click', () => {
+        window.skillSystem.upgradeSkill(i);
+        upgradeButton.remove();
+        engine.isPaused = false;
+        skillSelectionActive = false;
+      });
+      
+      skillBoxes[i].appendChild(upgradeButton);
+    }
+  }
 }
 
 const player = new Entity(100, 100);
@@ -301,16 +306,36 @@ function waveManager(dt) {
         }
       });
       enemiesInWave = 0;
+      currentWave++; // Incrementar el número de oleada
       
       // Mostrar menú de selección de cartas
-      const skillSelection = document.getElementById('skill-selection');
-      skillSelection.style.display = 'block';
+      const skillSelection = document.createElement('div');
+      skillSelection.id = 'skill-selection';
+      skillSelection.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; gap: 20px; z-index: 1000;';
       
-      // Forzar el fin de la ronda actual
-      nextWaveTimer = 0;
+      // Crear 3 cartas de habilidades aleatorias
+      const availableSkills = window.skillSystem.skills.filter(skill => !window.skillSystem.equippedSkills.includes(skill));
+      for (let i = 0; i < 3; i++) {
+        const randomSkill = availableSkills[Math.floor(Math.random() * availableSkills.length)];
+        if (randomSkill) {
+          const card = document.createElement('div');
+          card.className = 'skill-card';
+          card.style.cssText = 'width: 150px; height: 200px; background: rgba(0, 0, 0, 0.8); border: 2px solid #4CAF50; border-radius: 10px; padding: 10px; cursor: pointer; color: white; text-align: center;';
+          card.innerHTML = `
+            <img src="${randomSkill.icon}" style="width: 64px; height: 64px; margin-bottom: 10px;">
+            <h3>${randomSkill.name}</h3>
+            <p>Daño: ${randomSkill.damage}</p>
+            <p>Velocidad: ${randomSkill.speed}</p>
+          `;
+          skillSelection.appendChild(card);
+        }
+      }
+      
+      document.body.appendChild(skillSelection);
+      nextWaveTimer = 30; // Establecer temporizador a 30 segundos
       
       // Manejar selección de habilidad
-      const selectSkill = (index) => {
+      const selectSkill = (index, isAutoSelected = false) => {
         const selectedSkill = skillSystem.skills[index];
         if (selectedSkill) {
           // Encontrar el siguiente slot vacío
@@ -324,28 +349,42 @@ function waveManager(dt) {
         skillSelection.style.display = 'none';
         if (timer) clearInterval(timer);
         isWaveActive = false;
-        nextWaveTimer = 0; // Forzar el inicio inmediato de la siguiente ronda
+        nextWaveTimer = isAutoSelected ? 30 : 5; // 5 segundos si fue selección manual, 30 si fue automática
         engine.isPaused = false;
       };
       
       // Iniciar temporizador de selección
-      let timeLeft = 0; // Forzar selección inmediata
+      let timeLeft = 30; // 30 segundos para seleccionar
       const timerElement = document.getElementById('weapon-selection-timer');
       const nextWaveTimerElement = document.getElementById('next-wave-timer');
-      let timer = null;
-      
-      const startTimer = () => {
-        if (timer) clearInterval(timer);
-        timeLeft = 0;
-        timerElement.textContent = Math.ceil(timeLeft);
-        nextWaveTimerElement.textContent = `${Math.ceil(timeLeft)}s`;
+      let timer = setInterval(() => {
+        timeLeft--;
         
-        // Seleccionar habilidad aleatoria inmediatamente
-        const randomSkill = Math.floor(Math.random() * 3);
-        selectSkill(randomSkill);
-      };
+        // Verificar que los elementos existan antes de actualizar
+        if (timerElement) {
+          timerElement.textContent = Math.ceil(timeLeft);
+        }
+        if (nextWaveTimerElement) {
+          nextWaveTimerElement.textContent = `${Math.ceil(timeLeft)}s`;
+        }
+        
+        // Si se acaba el tiempo, seleccionar habilidad aleatoria
+        if (timeLeft <= 0) {
+          const randomSkill = Math.floor(Math.random() * 3);
+          selectSkill(randomSkill, true); // true indica que fue selección automática
+          clearInterval(timer);
+        }
+      }, 1000);
       
-      startTimer();
+      // Agregar eventos de clic a las cartas
+      document.querySelectorAll('.skill-card').forEach((card, index) => {
+        card.onclick = () => {
+          document.querySelectorAll('.skill-card').forEach(c => c.classList.remove('selected'));
+          card.classList.add('selected');
+          selectSkill(index, false); // false indica que fue selección manual
+          clearInterval(timer);
+        };
+      });
       
       // Agregar eventos de clic a las cartas
       document.querySelectorAll('.skill-card').forEach((card, index) => {

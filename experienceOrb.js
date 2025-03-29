@@ -55,7 +55,8 @@ class ExperienceOrb extends Entity {
                 }
                 
                 // Verificar niveles de experiencia
-                const expForNextLevel = 100 * player.level; // Incrementa el requisito de experiencia con el nivel
+                const expForNextLevel = 5 * this.expValue * Math.pow(2, player.level - 1); // 5 orbes nivel 1, 10 nivel 2, 20 nivel 3, etc.
+                const expNeeded = expForNextLevel * 25; // Multiplicamos por 25 ya que cada orbe da 25 de experiencia
                 if (player.experience >= expForNextLevel) {
                     player.experience -= expForNextLevel;
                     player.level += 1;
