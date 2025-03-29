@@ -1,24 +1,60 @@
 # LAUX Game
 
-LAUX Game es un juego roguelike de acción y aventura donde los jugadores pueden elegir diferentes personajes y habilidades para enfrentarse a oleadas de enemigos. El juego combina elementos de RPG con combate dinámico y progresión de personaje.
+LAUX Game is an action-adventure roguelike game where players can choose different characters and abilities to face waves of enemies. The game combines RPG elements with dynamic combat and character progression.
 
-## Características Principales
+## System Requirements
 
-- Múltiples personajes y apariencias para elegir
-- Sistema de habilidades único con diferentes elementos (Fuego, Hielo, Energía, etc.)
-- Progresión de personaje con sistema de experiencia y niveles
-- Interfaz de usuario intuitiva y personalizable
-- Soporte multiidioma (Español e Inglés)
-- Sistema de guardado de progreso
+- Modern web browser with HTML5 and JavaScript support
+- Internet connection for loading resources
+- Minimum recommended screen resolution: 1280x720
 
-## Controles
+## How to Play
 
-- Movimiento: Teclas de dirección (Arriba, Abajo, Izquierda, Derecha)
-- Pausa: ESC
-- Habilidades: Se asignan automáticamente al seleccionar
+Simply access the game through your web browser to start playing.
 
-## Versión Actual
+## Main Features
 
-Versión: v1.0.3.3
+- Multiple characters and appearances to choose from
+- Unique skill system with different elements (Fire, Ice, Energy, etc.)
+- Character progression with experience and leveling system
+- Intuitive and customizable user interface
+- Multi-language support (Spanish and English)
+- Progress save system
+- Dynamic combat with different types of enemies
+- Progressive difficulty wave system
 
-Esta versión incluye mejoras en la jugabilidad, corrección de errores y optimización del rendimiento.
+## Controls
+
+- Movement: Direction keys (Up, Down, Left, Right)
+- Pause: ESC
+- Abilities: Automatically assigned upon selection
+- Interaction: Left mouse click
+
+## Contribution
+
+If you want to contribute to the game's development:
+
+1. Fork the repository
+2. Create a branch for your feature (`git checkout -b feature/NewFeature`)
+3. Make your changes and commit (`git commit -am 'Add new feature'`)
+4. Push the changes to your fork (`git push origin feature/NewFeature`)
+5. Create a Pull Request
+
+## Current Version
+
+- Version: v1.0.3.5
+
+This version includes gameplay improvements, bug fixes, and performance optimization.
+
+## License
+
+This project is under the MIT License - see the LICENSE file for more details.
+
+## Credits
+
+Developed by the LAUX Game team.
+Owner:
+- [Agustin Benitez](https://agustinbeniteez.github.io) - [GitHub](https://github.com/Agustinbeniteez)
+
+Contributors:
+<!-- - [nadie de momento](https://github.com/nadie-de-momento) -->

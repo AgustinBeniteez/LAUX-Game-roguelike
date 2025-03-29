@@ -1,5 +1,7 @@
 {
   "fr": {
+    "home": "Accueil",
+    "controls": "Contrôles",
     "title": "LAUX GAME",
     "404Title": "Erreur 404",
     "404Message": "Oups ! Il semble que vous vous soyez perdu dans le jeu",
@@ -68,6 +70,8 @@
     "leavesDescription": "Crée un vortex de feuilles qui tourne autour du joueur"
   },
   "ja": {
+    "home": "ホーム",
+    "controls": "操作",
     "title": "LAUX GAME",
     "404Title": "エラー 404",
     "404Message": "おっと！ゲーム内で迷子になってしまったようです",
@@ -136,6 +140,8 @@
     "leavesDescription": "プレイヤーの周りを回る葉の渦を作成"
   },
   "pt": {
+    "home": "Início",
+    "controls": "Controles",
     "title": "LAUX GAME",
     "404Title": "Erro 404",
     "404Message": "Ops! Parece que você se perdeu no jogo",
@@ -204,6 +210,8 @@
     "leavesDescription": "Cria um vórtice de folhas que gira em torno do jogador"
   },
   "ko": {
+    "home": "홈",
+    "controls": "조작",
     "title": "LAUX GAME",
     "404Title": "오류 404",
     "404Message": "앗! 게임에서 길을 잃은 것 같습니다",
@@ -272,6 +280,8 @@
     "leavesDescription": "플레이어 주위를 회전하는 잎사귀 소용돌이를 생성"
   },
   "es": {
+    "home": "Inicio",
+    "controls": "Controles",
     "title": "LAUX GAME",
     "404Title": "Error 404",
     "404Message": "¡Vaya! Parece que te has perdido en el juego",
