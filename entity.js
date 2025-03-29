@@ -87,6 +87,8 @@ class Entity {
       this.spriteUp.src = 'sprites/player_sprite_up.png';
       this.spriteDown = new Image();
       this.spriteDown.src = 'sprites/player_sprite_down.png';
+      this.spriteHorizontal = new Image();
+      this.spriteHorizontal.src = 'sprites/player_sprite_horizontal.png';
       this.currentDirection = 'right';
       this.isMoving = false;
       this.animationSpeed = 0.15;
@@ -502,10 +504,15 @@ class Entity {
 
       if (!this.isEnemy && !this.isDead) {
         let currentSprite = this.sprite;
-        if (this.currentDirection === 'up' && this.spriteUp.complete) {
-          currentSprite = this.spriteUp;
-        } else if (this.currentDirection === 'down' && this.spriteDown.complete) {
-          currentSprite = this.spriteDown;
+        // Solo cambiar el sprite si el jugador está en movimiento
+        if (this.isMoving) {
+          if (this.currentDirection === 'up' && this.spriteUp.complete) {
+            currentSprite = this.spriteUp;
+          } else if (this.currentDirection === 'down' && this.spriteDown.complete) {
+            currentSprite = this.spriteDown;
+          } else if ((this.currentDirection === 'left' || this.currentDirection === 'right') && this.spriteHorizontal.complete) {
+            currentSprite = this.spriteHorizontal;
+          }
         }
 
         if (currentSprite && currentSprite.complete) {
