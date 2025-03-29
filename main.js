@@ -37,7 +37,7 @@ function showSkillSelection() {
     if (skill) {
       const upgradeButton = document.createElement('button');
       upgradeButton.className = 'upgrade-button';
-      upgradeButton.style.cssText = '    position: absolute; top: 0px;background: rgb(49 197 192);color: white;border: none;padding: 11px 10px;cursor: pointer;';
+      upgradeButton.style.cssText = 'position: absolute;top: 0px;background: rgb(29 117 192);color: white;border: none;padding: 11px 10px;cursor: pointer;';
       upgradeButton.textContent = ' LVL +1';
       
       upgradeButton.addEventListener('click', () => {
@@ -256,13 +256,16 @@ function updateWaveHUD() {
 // Actualizar la experiencia y nivel del jugador
 function updatePlayerExperience() {
   const expBar = document.getElementById('exp-bar');
-  if (expBar) {
+  const levelText = document.getElementById('level-text');
+  if (expBar && levelText) {
     const expForNextLevel = 100;
     expBar.style.width = `${(player.experience / expForNextLevel) * 100}%`;
+    levelText.textContent = `Level ${player.level}`;
     
     if (player.experience >= expForNextLevel) {
       player.experience -= expForNextLevel;
       player.level++;
+      levelText.textContent = `Level ${player.level}`;
       showSkillSelection();
     }
   }
@@ -338,11 +341,15 @@ function waveManager(dt) {
       const selectSkill = (index, isAutoSelected = false) => {
         const selectedSkill = skillSystem.skills[index];
         if (selectedSkill) {
-          // Encontrar el siguiente slot vacío
-          const emptySlotIndex = skillSystem.equippedSkills.findIndex(slot => slot === null);
-          if (emptySlotIndex !== -1) {
-            skillSystem.equippedSkills[emptySlotIndex] = selectedSkill;
-            skillSystem.updateSkillIcon(emptySlotIndex);
+          // Empezar a buscar desde el slot 2
+          let slotIndex = 1; // Índice 1 corresponde al slot 2
+          while (slotIndex < skillSystem.equippedSkills.length) {
+            if (!skillSystem.equippedSkills[slotIndex]) {
+              skillSystem.equippedSkills[slotIndex] = selectedSkill;
+              skillSystem.updateSkillIcon(slotIndex);
+              break;
+            }
+            slotIndex++;
           }
         }
         

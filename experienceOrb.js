@@ -77,8 +77,8 @@ class ExperienceOrb extends Entity {
                         if (skill) {
                             const upgradeButton = document.createElement('button');
                             upgradeButton.className = 'upgrade-button';
-                            upgradeButton.style.cssText = 'position: absolute; top: -25px; left: 50%; transform: translateX(-50%); background: #4CAF50; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px;';
-                            upgradeButton.textContent = '¡Subes de nivel! +1';
+                            upgradeButton.style.cssText = 'position: absolute; top: 0px; background: rgb(49 197 192); color: white; border: none; padding: 11px 10px; cursor: pointer;';
+                            upgradeButton.textContent = 'LVL +1';
                             
                             upgradeButton.addEventListener('click', () => {
                                 window.skillSystem.upgradeSkill(i);
