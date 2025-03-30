@@ -53,25 +53,17 @@
   }
 
 
-  @keyframes gradientAnimation1 {
-    0% {
-      background-position: 0% 50%;
-    }
-    100% {
-      background-position: 0% 50%;
-    }
-  }
   body {
       margin: 0;
-      background: linear-gradient(
-        113.65deg,
-        rgba(40, 40, 40, 1) 0%,
-        rgba(98, 11, 56, 1) 100%
-      );
-      background-size: 200% 200%;
-      animation: gradientAnimation1 10s ease infinite;
+      background: url('src/background_homegame.gif'), url('src/background_homegame.png'),rgb(60, 117, 119);
+      background-size: cover, cover;
+      background-position: center, center;
+      background-repeat: no-repeat, no-repeat;
+      background-attachment: fixed, fixed;
+      image-rendering: pixelated;
       overflow: hidden;
       height: 100vh;
+      width: 100%;
       display: flex;
       align-items: flex-start;
       flex-direction: row;
@@ -86,10 +78,10 @@
   }
 
     .game-title {
-      color: rgb(206, 111, 206);
+      color: rgb(255 255 255);
       font-size: 6rem;
       margin-bottom: 40px;
-      text-shadow: 0 0 10px rgba(253, 78, 201, 0.5);
+      text-shadow: 0 0 10px rgb(255 255 255 / 50%);
     }
     .menu-container {
       display: flex;
@@ -99,6 +91,7 @@
     }
     .menu-button {
       background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(5px);
       border: 2px solid rgba(255, 255, 255, 0.3);
       color: white;
       border-radius: 5px;

@@ -55,11 +55,16 @@
 
     body { 
       margin: 0; 
-      background: linear-gradient(
+      background: url('src/background_homegame.png'), linear-gradient(
         113.65deg,
-        rgba(40, 40, 40, 1) 0%,
-        rgba(98, 11, 56, 1) 100%
+        rgba(40, 40, 40, 0.9) 0%,
+        rgba(98, 11, 56, 0.9) 100%
       );
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
       background-size: cover; 
       overflow: hidden;
       width: 100vw;
@@ -84,7 +89,7 @@
     .settings-nav button {
       background: rgba(255, 255, 255, 0.1);
       border: 1px solid rgba(255, 255, 255, 0.2);
-      color: #666;
+      color: rgba(255, 255, 255, 0.7);
       width: 150px;
       height: 40px;
       border-radius: 8px;
@@ -93,6 +98,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
+      font-family: 'Mineglyph', sans-serif;
       padding: 0 15px;
     }
     .settings-nav button:hover {

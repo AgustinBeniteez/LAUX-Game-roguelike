@@ -12,6 +12,11 @@
   <link rel="shortcut icon" href="sprites/laux_logo.webp" type="image/x-icon">
   <link rel="stylesheet" href="custom_cursor.css">
   <link rel="stylesheet" href="src/fonts.css">
+  <script src="engine.js"></script>
+  <script src="entity.js"></script>
+  <script src="mainproyectil.js"></script>
+  <script src="floatingNumber.js"></script>
+  <script src="experienceOrb.js"></script>
   <style>
     body { 
       margin: 0; 
@@ -41,20 +46,21 @@
       margin-bottom: 30px;
     }
     .hero-card {
-      border-radius: 10px;
-      padding: 20px;
-      width: 250px;
-      height: 400px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      background: url('sprites/card_sprite.png') no-repeat center;
-      background-size: cover;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      position: relative;
-      overflow: hidden;
-    }
+    border-radius: 10px;
+    padding: 20px;
+    width: 250px;
+    height: 400px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: url(sprites/card_sprite.png) no-repeat center;
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    image-rendering: pixelated;
+}
     .hero-card:hover {
       transform: scale(1.1);
     }
@@ -107,17 +113,28 @@
       font-size: 20px;
       cursor: pointer;
       transition: all 0.3s ease;
-      display: none;
+      display: block;
+      opacity: 0.5;
+      pointer-events: none;
       font-family: 'Mineglyph', sans-serif;
     }
-    .continue-btn:hover {
+    .continue-btn.active {
+      opacity: 1;
+      pointer-events: auto;
+      background: #4caf4f4b;
+    }
+    .continue-btn.active:hover {
       background: #4cb453ab;
       transform: scale(1.05);
     }
   </style>
 </head>
 <body>
+  <canvas id="gameCanvas" style="position: fixed; top: 0; left: 0; z-index: -1;"></canvas>
   <h1 class="title" data-translate="chooseHero">Elige tu Héroe</h1>
+  <div class="timer-container">
+    <div id="timer" style="color: white; font-size: 20px; margin-bottom: 20px;">Selección automática en: 30s</div>
+  </div>
   <div class="hero-selection">
     <div class="hero-card" data-hero="warrior">
       <img class="hero-icon" src="sprites/player_sprite_skin1.png">
@@ -177,9 +194,42 @@
   <button id="continue" class="continue-btn" data-translate="continue">Continuar</button>
 
   <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Configurar el canvas
+      const canvas = document.getElementById('gameCanvas');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      // Inicializar el motor del juego
+      const engine = new Engine('gameCanvas');
+      engine.start();
+    });
+
     let selectedHero = null;
     const cards = document.querySelectorAll('.hero-card');
     const continueBtn = document.getElementById('continue');
+    let timer = 30;
+    let timerInterval;
+
+    function startTimer() {
+      const timerElement = document.getElementById('timer');
+      timerInterval = setInterval(() => {
+        timer--;
+        timerElement.textContent = `Selección automática en: ${timer}s`;
+        if (timer <= 0) {
+          clearInterval(timerInterval);
+          if (!selectedHero) {
+            const availableHeroes = ['warrior', 'mage', 'ranger'];
+            const randomHero = availableHeroes[Math.floor(Math.random() * availableHeroes.length)];
+            const randomCard = document.querySelector(`[data-hero="${randomHero}"]`);
+            randomCard.click();
+            setTimeout(() => continueBtn.click(), 500);
+          }
+        }
+      }, 1000);
+    }
+
+    startTimer();
 
     const heroStats = {
       warrior: {
@@ -208,12 +258,46 @@
       }
     };
 
+    // Función para manejar el disparo de habilidades
+    function handleSkillShot(event) {
+      if (!selectedHero || !heroStats[selectedHero]) return;
+      
+      const key = event.key.toLowerCase();
+      if (key !== 'e' && key !== 'r') return;
+
+      const rect = document.querySelector('.hero-selection').getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      
+      const abilities = heroStats[selectedHero].abilities;
+      const skillIndex = key === 'e' ? 0 : 1;
+      const ability = abilities[skillIndex];
+      
+      const skillType = `mainproyectil_${selectedHero}_${key}`;
+      const projectile = new MainProjectile(
+        centerX,
+        centerY,
+        event.clientX,
+        event.clientY,
+        skillType,
+        ability.damage
+      );
+      
+      engine.addEntity(projectile);
+    }
+
+    // Agregar listener para las teclas E y R
+    document.addEventListener('keydown', handleSkillShot);
+
+
     cards.forEach(card => {
       card.addEventListener('click', () => {
+        console.log('Card clicked:', card.dataset.hero);
         cards.forEach(c => c.classList.remove('selected'));
         card.classList.add('selected');
         selectedHero = card.dataset.hero;
-        continueBtn.style.display = 'block';
+        console.log('Selected hero:', selectedHero);
+        continueBtn.classList.toggle('active', true);
       });
     });
 
@@ -224,6 +308,64 @@
         if (currentLanguage) localStorage.setItem('language', currentLanguage);
 
         const heroData = heroStats[selectedHero];
+        const skillStats = {
+          warrior: {
+            name: 'Fuego',
+            damage: 20,
+            speed: 400,
+            icon: 'sprites/proyectil_sprite_1.png',
+            projectileType: 'fire',
+            cooldown: 2.0,
+            projectileSprite: 'sprites/proyectil_sprite_1.png',
+            abilities: {
+              e: { name: 'Golpe Poderoso', damage: 40, cooldown: 5, description: 'Lanza un poderoso golpe que causa daño y aturde a los enemigos' },
+              r: { name: 'Torbellino', damage: 80, cooldown: 12, description: 'Crea un torbellino que daña a todos los enemigos cercanos' }
+            }
+          },
+          mage: {
+            name: 'Energía',
+            damage: 28,
+            speed: 400,
+            icon: 'sprites/proyectil_sprite_3.png',
+            projectileType: 'energy',
+            cooldown: 4.0,
+            projectileSprite: 'sprites/proyectil_sprite_3.png',
+            abilities: {
+              e: { name: 'Bola de Fuego', damage: 50, cooldown: 7, description: 'Lanza una bola de energía que daña y empuja a los enemigos' },
+              r: { name: 'Rayo Arcano', damage: 100, cooldown: 14, description: 'Libera un poderoso rayo que causa daño masivo en área' }
+            }
+          },
+          ranger: {
+            name: 'Hielo',
+            damage: 24,
+            speed: 400,
+            icon: 'sprites/frezee.png',
+            projectileType: 'ice',
+            cooldown: 3.0,
+            projectileSprite: 'sprites/frezee.png',
+            abilities: {
+              e: { name: 'Flecha Congelante', damage: 45, cooldown: 6, description: 'Dispara una flecha de hielo que congela a los enemigos' },
+              r: { name: 'Lluvia de Flechas', damage: 90, cooldown: 15, description: 'Invoca una lluvia de flechas que daña masivamente a los enemigos' }
+            }
+          }
+        };
+
+        const selectedSkillData = skillStats[selectedHero];
+        const skillItem = {
+          type: 'skill',
+          name: selectedSkillData.name,
+          damage: selectedSkillData.damage,
+          speed: selectedSkillData.speed,
+          icon: selectedSkillData.icon,
+          projectileType: selectedSkillData.projectileType,
+          cooldown: selectedSkillData.cooldown,
+          projectileSprite: selectedSkillData.projectileSprite,
+          abilities: {
+            e: selectedSkillData.abilities.e,
+            r: selectedSkillData.abilities.r
+          }
+        };
+
         const playerData = {
           class: selectedHero,
           health: heroData.health,
@@ -235,11 +377,11 @@
           stamina: 100,
           maxStamina: 100,
           abilities: heroData.abilities,
-          inventory: []
+          inventory: [skillItem]
         };
         
         localStorage.setItem('playerData', JSON.stringify(playerData));
-        window.location.href = 'character_select.html';
+        window.location.href = 'game.html';
       }
     });
 

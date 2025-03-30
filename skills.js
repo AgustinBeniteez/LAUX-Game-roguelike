@@ -1,5 +1,6 @@
 class SkillSystem {
-    constructor() {
+    constructor(engineInstance) {
+        this.engine = engineInstance;
         this.equippedSkills = new Array(5).fill(null);
         this.skillLevels = new Array(5).fill(1); // Nivel de cada habilidad equipada
         this.maxEquippedSkills = 5; // Todos los slots disponibles desde el inicio

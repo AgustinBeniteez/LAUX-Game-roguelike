@@ -22,6 +22,7 @@ const playerData = JSON.parse(localStorage.getItem('playerData')) || {
 };
 
 let skillSelectionActive = false;
+window.skillSystem = new SkillSystem(engine);
 
 function showSkillSelection() {
   skillSelectionActive = true;

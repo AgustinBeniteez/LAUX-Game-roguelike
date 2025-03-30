@@ -26,18 +26,18 @@
 
     document.addEventListener('keydown', (e) => {
       const playerData = JSON.parse(localStorage.getItem('playerData'));
-      const abilities = playerData?.skillStats?.abilities;
+      const abilities = playerData?.abilities;
       if (!abilities) return;
 
       if (e.key.toLowerCase() === 'e' && !isAimingE) {
         const currentTime = Date.now();
-        if (currentTime - lastECastTime >= abilities.e.cooldown * 1000) {
+        if (currentTime - lastECastTime >= abilities[0].cooldown * 1000) {
           isAimingE = true;
           showAimIndicator();
         }
       } else if (e.key.toLowerCase() === 'r' && !isAimingR) {
         const currentTime = Date.now();
-        if (currentTime - lastRCastTime >= abilities.r.cooldown * 1000) {
+        if (currentTime - lastRCastTime >= abilities[1].cooldown * 1000) {
           isAimingR = true;
           showAimIndicator();
         }
@@ -48,7 +48,7 @@
       if (e.key.toLowerCase() === 'e' && isAimingE) {
         isAimingE = false;
         const playerData = JSON.parse(localStorage.getItem('playerData'));
-        const ability = playerData?.skillStats?.abilities?.e;
+        const ability = playerData?.abilities?.[0];
         if (ability) {
           lastECastTime = Date.now();
           launchProjectile(ability);
@@ -57,7 +57,7 @@
       } else if (e.key.toLowerCase() === 'r' && isAimingR) {
         isAimingR = false;
         const playerData = JSON.parse(localStorage.getItem('playerData'));
-        const ability = playerData?.skillStats?.abilities?.r;
+        const ability = playerData?.abilities?.[1];
         if (ability) {
           lastRCastTime = Date.now();
           launchProjectile(ability);
@@ -160,21 +160,22 @@
       const mouseX = (event.clientX - rect.left) * scaleX;
       const mouseY = (event.clientY - rect.top) * scaleY;
 
+      const skillType = `mainproyectil_${player.class}_${isAimingE ? 'e' : 'r'}`;
       const projectile = new Projectile(
         player.x,
         player.y,
         mouseX,
         mouseY,
-        player.skillStats.projectileType,
+        skillType,
         ability.damage,
-        player.skillStats.speed
+        player.speed
       );
 
       engine.addEntity(projectile);
 
       // Actualizar la interfaz de cooldown
-      const skillType = isAimingE ? 'e' : 'r';
-      const cooldownOverlay = document.getElementById(`skill-${skillType}-cooldown`);
+      const skillKey = isAimingE ? 'e' : 'r';
+      const cooldownOverlay = document.getElementById(`skill-${skillKey}-cooldown`);
       const cooldownTimer = document.getElementById(`skill-${skillType}-timer`);
       
       if (cooldownOverlay && cooldownTimer) {
