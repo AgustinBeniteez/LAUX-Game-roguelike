@@ -214,6 +214,23 @@
       justify-content: center;
       position: relative;
     }
+    .skill-box[data-tooltip]:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 120%;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.95);
+      color: white;
+      border-radius: 6px;
+      font-size: 14px;
+      white-space: pre;
+      z-index: 99999;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
+      line-height: 1.4;
+    }
     canvas {
         image-rendering: pixelated;
         image-rendering: crisp-edges;
@@ -322,13 +339,13 @@
     <div id="skills-container" style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px; align-items: center;">
       <!-- Habilidades activables -->
       <div id="active-skills" style="display: flex; gap: 10px; background: rgba(0, 0, 0, 0.7); padding: 10px; border-radius: 10px;">
-        <div class="skill-box" style="width: 50px; height: 50px; border: 2px solid #fff; border-radius: 5px; position: relative; overflow: hidden;">
+        <div class="skill-box" style="width: 50px; height: 50px; border: 2px solid #fff; border-radius: 5px; position: relative; overflow: visible; cursor: pointer;" data-tooltip="⚔️ Habilidad Principal [E]&#10;💥 Daño: 24&#10;⏱️ Cooldown: 3.8s&#10;🎯 Proyectiles: 1&#10;❄️ Efecto: Ralentización">
           <div class="skill-icon" id="skill-e-icon" style="width: 100%; height: 100%; background-size: contain; background-repeat: no-repeat; background-position: center;"></div>
           <div class="cooldown-overlay" id="skill-e-cooldown" style="position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; background: rgb(45 45 45 / 69%); transform-origin: bottom; transform: scaleY(0); transition: transform 0.1s linear;"></div>
           <div class="key-bind" style="position: absolute; bottom: 2px; right: 2px; background: rgba(0, 0, 0, 0.7); padding: 2px 4px; border-radius: 3px; font-size: 12px; color: white;">E</div>
           <div class="cooldown-timer" id="skill-e-timer" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 16px; text-shadow: 1px 1px 2px black; display: none;"></div>
         </div>
-        <div class="skill-box" style="width: 50px; height: 50px; border: 2px solid #fff; border-radius: 5px; position: relative; overflow: hidden;">
+        <div class="skill-box" style="width: 50px; height: 50px; border: 2px solid #fff; border-radius: 5px; position: relative; overflow: visible; cursor: pointer;" data-tooltip="⚔️ Habilidad Secundaria [R]&#10;💥 Daño: 35&#10;⏱️ Cooldown: 5s&#10;🎯 Proyectiles: 2&#10;🔥 Efecto: Daño en área">
           <div class="skill-icon" id="skill-r-icon" style="width: 100%; height: 100%; background-size: contain; background-repeat: no-repeat; background-position: center;"></div>
           <div class="cooldown-overlay" id="skill-r-cooldown" style="position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; background: rgb(45 45 45 / 69%); transform-origin: bottom; transform: scaleY(0); transition: transform 0.1s linear;"></div>
           <div class="key-bind" style="position: absolute; bottom: 2px; right: 2px; background: rgba(0, 0, 0, 0.7); padding: 2px 4px; border-radius: 3px; font-size: 12px; color: white;">R</div>
@@ -477,52 +494,39 @@
   <script src="main.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // Cargar configuraciones guardadas
-      const damageNumbers = localStorage.getItem('damageNumbers') || 'on';
-      const showFPS = localStorage.getItem('showFPS') || 'off';
-      const brightness = localStorage.getItem('brightness') || '100';
-      const performance = localStorage.getItem('performance') || 'off';
+      // Actualizar tooltips de habilidades con datos del jugador
+      function updateSkillTooltips() {
+        const playerData = JSON.parse(localStorage.getItem('playerData'));
+        const abilities = playerData?.abilities;
+        if (!abilities) return;
 
-      // Aplicar configuración de números de daño
-      if (damageNumbers === 'off') {
-        window.damageNumbersEnabled = false;
-      } else {
-        window.damageNumbersEnabled = true;
-      }
-      
-      // Aplicar configuraciones
-      document.body.style.filter = `brightness(${brightness}%)`;
-      if (performance === 'on') {
-        // Aplicar configuraciones de rendimiento
-        document.querySelectorAll('.skill-card').forEach(card => {
-          card.style.transition = 'none';
-        });
-      }
+        const skillE = document.querySelector('#active-skills .skill-box:first-child');
+        const skillR = document.querySelector('#active-skills .skill-box:last-child');
 
-      // Asegurarse de que el sistema de habilidades esté inicializado
-      if (!window.skillSystem) {
-        window.skillSystem = new SkillSystem();
-      }
+        if (skillE && abilities[0]) {
+          skillE.setAttribute('data-tooltip', 
+            `⚔️ Habilidad Principal [E]\n` +
+            `💥 Daño: ${abilities[0].damage}\n` +
+            `⏱️ Cooldown: ${abilities[0].cooldown}s\n` +
+            `🎯 Proyectiles: ${abilities[0].projectiles || 1}\n` +
+            `❄️ Efecto: ${abilities[0].effect || 'Ralentización'}`
+          );
+        }
 
-      // Cargar la habilidad guardada del localStorage
-      const savedPlayerData = localStorage.getItem('playerData');
-      if (savedPlayerData) {
-        const playerData = JSON.parse(savedPlayerData);
-        if (playerData.inventory && playerData.inventory.length > 0) {
-          const savedSkill = playerData.inventory[0];
-          window.skillSystem.equippedSkills[0] = savedSkill;
-          window.skillSystem.updateSkillIcon(0);
+        if (skillR && abilities[1]) {
+          skillR.setAttribute('data-tooltip', 
+            `⚔️ Habilidad Secundaria [R]\n` +
+            `💥 Daño: ${abilities[1].damage}\n` +
+            `⏱️ Cooldown: ${abilities[1].cooldown}s\n` +
+            `🎯 Proyectiles: ${abilities[1].projectiles || 2}\n` +
+            `🔥 Efecto: ${abilities[1].effect || 'Daño en área'}`
+          );
         }
       }
 
-      const levelDisplay = document.getElementById('level-display');
-      const updateLevelDisplay = () => {
-        const playerLevel = player.level; // Retrieve player's level from the player object
-        levelDisplay.textContent = `Level ${playerLevel}`;
-      };
-
-      // Example: Update level display when player's level changes
-      updateLevelDisplay();
+      // Actualizar tooltips inicialmente y cuando cambien los datos del jugador
+      updateSkillTooltips();
+      window.addEventListener('playerDataUpdated', updateSkillTooltips);
     });
   </script>
 </body>
