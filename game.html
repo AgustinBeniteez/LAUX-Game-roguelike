@@ -217,7 +217,7 @@
     .skill-box[data-tooltip]:hover::after {
       content: attr(data-tooltip);
       position: absolute;
-      bottom: 120%;
+      bottom: 225%;
       left: 50%;
       transform: translateX(-50%);
       padding: 12px;
@@ -226,7 +226,7 @@
       border-radius: 6px;
       font-size: 14px;
       white-space: pre;
-      z-index: 99999;
+      z-index: 999999;
       border: 1px solid rgba(255, 255, 255, 0.4);
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
       line-height: 1.4;
@@ -369,12 +369,13 @@
     <span id="wave-value">1</span>
     </div>
     
-    <div class="exp-bar-container" style="position: absolute; bottom: 130px; left: 50%; transform: translateX(-50%); width: 530px; height: 10px; background: rgba(0, 0, 0, 0.7); border-radius: 5px; overflow: visible;">
+    <div class="exp-bar-container" style="position: absolute; bottom: 130px; left: 50%; transform: translateX(-50%); width: 530px; height: 10px; background: rgba(0, 0, 0, 0.7); border-radius: 5px; overflow: visible; z-index: 10;">
     <div style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); color: white; font-size: 14px; text-shadow: 1px 1px 2px black;" id="level-display">Level 1</div>
     <div id="exp-bar" style="width: 0%; height: 100%; background: #3bc2ab; border-radius: 5px; transition: width 0.3s ease;"></div>
     </div>
-    <div class="health-bar-container" style="position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%); width: 530px; height: 25px; background: rgba(0, 0, 0, 0.7); border-radius: 5px; overflow: visible;">
-    <div id="health-bar" style="width: 100%; height: 100%; background: #2ecc71; border-radius: 5px; transition: width 0.3s ease;"></div>
+    <div class="health-bar-container" style="position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%); width: 530px; height: 25px; background: #222; border-radius: 5px; overflow: visible; z-index: 10;">
+    <div id="health-bar-damage" style="width: 100%; height: 100%; background: #4d0707b7; border-radius: 5px; position: absolute; transition: width 0.5s ease;"></div>
+    <div id="health-bar" style="width: 100%; height: 100%; background: #2ecc71; border-radius: 5px; transition: width 0.3s ease; position: relative;"></div>
     <div id="health-text" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 12px; text-shadow: 1px 1px 2px black;">100/100</div>
     </div>
 
@@ -494,6 +495,21 @@
   <script src="main.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      // Función para actualizar la barra de vida y mostrar el daño
+      window.updateHealthBar = function(currentHealth, maxHealth) {
+        const healthBar = document.getElementById('health-bar');
+        const healthBarDamage = document.getElementById('health-bar-damage');
+        const healthText = document.getElementById('health-text');
+        
+        const healthPercent = (currentHealth / maxHealth) * 100;
+        healthBar.style.width = healthPercent + '%';
+        healthText.textContent = `${Math.ceil(currentHealth)}/${maxHealth}`;
+        
+        // Mostrar el daño en rojo
+        healthBarDamage.style.width = healthPercent + '%';
+        healthBarDamage.style.transition = 'width 0.3s ease';
+      };
+
       // Actualizar tooltips de habilidades con datos del jugador
       function updateSkillTooltips() {
         const playerData = JSON.parse(localStorage.getItem('playerData'));
