@@ -379,7 +379,12 @@
     <div id="health-text" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 12px; text-shadow: 1px 1px 2px black;">100/100</div>
     </div>
 
-    
+    <div id="boss-health-container" style="display: none; position: absolute; top: 20px; left: 20px; width: 400px; background: rgba(0, 0, 0, 0.8); border: 2px solid #ffd700; border-radius: 5px; padding: 5px; z-index: 10;">
+      <div id="boss-name" style="color: #ffd700; font-size: 18px; margin-bottom: 5px; text-align: center; text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);">BOSS</div>
+      <div style="width: 100%; height: 20px; background: #222; border-radius: 3px; overflow: hidden;">
+        <div id="boss-health-bar" style="width: 100%; height: 100%; background: #ff0000; transition: width 0.3s ease;"></div>
+      </div>
+    </div>
 
     </div>
 

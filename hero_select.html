@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LAUX GAME - Selección de Héroe</title>
-  <div id="version-display" style="position: fixed; bottom: 10px; left: 10px; color: rgba(255, 255, 255, 0.7); font-family: 'Mineglyph', sans-serif; font-size: 14px;"></div>
+  <title data-translate="title">LAUX GAME</title>
+  <div id="version-display" style="position: fixed; bottom: 10px; left: 10px; color: rgba(0, 0, 0, 0.7); font-family: 'Mineglyph', sans-serif; font-size: 14px;"></div>
   <script type="module">
     import { VERSION } from './version.js';
     document.getElementById('version-display').textContent = VERSION;
@@ -20,11 +20,11 @@
   <style>
     body { 
       margin: 0; 
-      background: linear-gradient(
-        113.65deg,
-        rgba(40, 40, 40, 1) 0%,
-        rgba(98, 11, 56, 1) 100%
-      );
+      background-image: url('src/background_select_class.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      image-rendering: pixelated;
       overflow: hidden;
       width: 100vw;
       height: 100vh;
@@ -74,13 +74,13 @@
       image-rendering: pixelated;
     }
     .hero-name {
-      color: white;
+      color: #000000;
       font-size: 24px;
       margin-bottom: 10px;
       text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     }
     .hero-stats {
-      color: #ddd;
+      color: #000000;
       font-size: 16px;
       text-align: center;
       margin-bottom: 15px;
@@ -93,19 +93,20 @@
     .ability-icon {
       width: 48px;
       height: 48px;
-      border: 2px solid #fff;
+      border: 3px solid #c5a471;
       border-radius: 8px;
       padding: 5px;
       background: rgba(0, 0, 0, 0.3);
     }
     .ability-key {
-      color: #fff;
+      color: #000000;
       font-size: 12px;
       text-align: center;
       margin-top: 5px;
     }
     .continue-btn {
-      background: #4caf4f4b;
+      background: #e4b841e7;
+
       border: none;
       border-radius: 5px;
       color: white;
@@ -121,27 +122,29 @@
     .continue-btn.active {
       opacity: 1;
       pointer-events: auto;
-      background: #4caf4f4b;
+      background: #d8af28f6;
+      border: solid 2px #ffffff;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
     }
     .continue-btn.active:hover {
-      background: #4cb453ab;
+      background: #d8a250ab;
       transform: scale(1.05);
     }
   </style>
 </head>
 <body>
   <canvas id="gameCanvas" style="position: fixed; top: 0; left: 0; z-index: -1;"></canvas>
-  <h1 class="title" data-translate="chooseHero">Elige tu Héroe</h1>
+  <h1 class="title" data-translate="chooseHero">Elige tus habilidades principales</h1>
   <div class="timer-container">
-    <div id="timer" style="color: white; font-size: 20px; margin-bottom: 20px;">Selección automática en: 30s</div>
+    <div id="timer" style="color: white; font-size: 20px; margin-bottom: 20px;" data-translate="autoSelect">Selección automática en: 30s</div>
   </div>
   <div class="hero-selection">
-    <div class="hero-card" data-hero="warrior">
-      <img class="hero-icon" src="sprites/player_sprite_skin1.png">
-      <div class="hero-name" data-translate="warrior">Guerrero</div>
+    <div class="hero-card" data-hero="guardian">
+      <img class="hero-icon" src="src/Guardian_icon_fondo.png">
+      <div class="hero-name" data-translate="guardian">Guardian</div>
       <div class="hero-stats">
-        <div data-translate="health">Vida: 150</div>
-        <div data-translate="speed">Velocidad: 200</div>
+        <div><span data-translate="health">Vida</span>: 150</div>
+        <div><span data-translate="speed">Velocidad</span>: 200</div>
       </div>
       <div class="hero-abilities">
         <div>
@@ -154,12 +157,12 @@
         </div>
       </div>
     </div>
-    <div class="hero-card" data-hero="mage">
-      <img class="hero-icon" src="sprites/player_sprite_skin2.png">
-      <div class="hero-name" data-translate="mage">Mago</div>
+    <div class="hero-card" data-hero="sentinel">
+      <img class="hero-icon" src="src/Sentinel_icon_fondo.png">
+      <div class="hero-name" data-translate="sentinel">Centinela</div>
       <div class="hero-stats">
-        <div data-translate="health">Vida: 100</div>
-        <div data-translate="speed">Velocidad: 220</div>
+        <div><span data-translate="health">Vida</span>: 100</div>
+        <div><span data-translate="speed">Velocidad</span>: 220</div>
       </div>
       <div class="hero-abilities">
         <div>
@@ -172,12 +175,12 @@
         </div>
       </div>
     </div>
-    <div class="hero-card" data-hero="ranger">
-      <img class="hero-icon" src="sprites/player_sprite_skin3.png">
-      <div class="hero-name" data-translate="ranger">Arquero</div>
+    <div class="hero-card" data-hero="arcane">
+      <img class="hero-icon" src="src/Arcane_icon_fondo.png">
+      <div class="hero-name" data-translate="arcane">Arcano</div>
       <div class="hero-stats">
-        <div data-translate="health">Vida: 120</div>
-        <div data-translate="speed">Velocidad: 250</div>
+        <div><span data-translate="health">Vida</span>: 120</div>
+        <div><span data-translate="speed">Velocidad</span>: 250</div>
       </div>
       <div class="hero-abilities">
         <div>
@@ -219,7 +222,7 @@
         if (timer <= 0) {
           clearInterval(timerInterval);
           if (!selectedHero) {
-            const availableHeroes = ['warrior', 'mage', 'ranger'];
+            const availableHeroes = ['guardian', 'sentinel', 'arcane'];
             const randomHero = availableHeroes[Math.floor(Math.random() * availableHeroes.length)];
             const randomCard = document.querySelector(`[data-hero="${randomHero}"]`);
             randomCard.click();
@@ -232,7 +235,7 @@
     startTimer();
 
     const heroStats = {
-      warrior: {
+      guardian: {
         health: 150,
         speed: 200,
         abilities: [
@@ -240,7 +243,7 @@
           { name: 'Torbellino', key: 'R', icon: 'sprites/proyectil_sprite_2.png', damage: 60, cooldown: 8 }
         ]
       },
-      mage: {
+      sentinel: {
         health: 100,
         speed: 220,
         abilities: [
@@ -248,7 +251,7 @@
           { name: 'Rayo Arcano', key: 'R', icon: 'sprites/proyectil_sprite_4.png', damage: 70, cooldown: 7 }
         ]
       },
-      ranger: {
+      arcane: {
         health: 120,
         speed: 250,
         abilities: [
@@ -309,7 +312,7 @@
 
         const heroData = heroStats[selectedHero];
         const skillStats = {
-          warrior: {
+          guardian: {
             name: 'Fuego',
             damage: 20,
             speed: 400,
@@ -322,7 +325,7 @@
               r: { name: 'Torbellino', damage: 80, cooldown: 12, description: 'Crea un torbellino que daña a todos los enemigos cercanos' }
             }
           },
-          mage: {
+          sentinel: {
             name: 'Energía',
             damage: 28,
             speed: 400,
@@ -335,7 +338,7 @@
               r: { name: 'Rayo Arcano', damage: 100, cooldown: 14, description: 'Libera un poderoso rayo que causa daño masivo en área' }
             }
           },
-          ranger: {
+          arcane: {
             name: 'Hielo',
             damage: 24,
             speed: 400,
@@ -395,7 +398,11 @@
         elements.forEach(element => {
           const key = element.getAttribute('data-translate');
           if (translations[currentLang] && translations[currentLang][key]) {
-            element.textContent = translations[currentLang][key];
+            if (element.id === 'timer') {
+              element.textContent = `${translations[currentLang][key]}: ${timer}s`;
+            } else {
+              element.textContent = translations[currentLang][key];
+            }
           }
         });
       } catch (error) {
@@ -404,6 +411,15 @@
     }
 
     loadTranslations();
+    
+    // Actualizar traducciones cuando cambie el idioma
+    window.addEventListener('languagechange', loadTranslations);
+    
+    // Actualizar el timer con la traducción correcta
+    function updateTimer() {
+      const timerElement = document.getElementById('timer');
+      loadTranslations();
+    }
   </script>
 </body>
 </html>

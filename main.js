@@ -169,10 +169,11 @@ setInterval(saveGame, 30000);
 let currentWave = gameState.currentWave || 1;
 let enemiesInWave = 0;
 let maxEnemiesInWave = 5;
-let waveTimer = gameState.waveTimer || 120; // 2 minutos por oleada
+let waveTimer = gameState.waveTimer || 120; // 1:10 minutos por oleada
 let nextWaveTimer = gameState.nextWaveTimer || 30; // 30 segundos entre oleadas
 let isWaveActive = gameState.isWaveActive;
 let isBossSpawned = gameState.isBossSpawned;
+let maxLiveEnemies = 12; // Límite de enemigos vivos simultáneamente
 
 // Restaurar enemigos guardados
 if (gameState.entities && gameState.entities.length > 0) {
@@ -198,6 +199,12 @@ if (gameState.entities && gameState.entities.length > 0) {
 
 // Función para generar enemigos aleatorios
 function spawnEnemy(isBoss = false) {
+  if (player.isDead) return;
+
+  // Verificar el límite de enemigos vivos
+  const currentEnemies = engine.entities.filter(e => e.isEnemy && !e.isDead).length;
+  if (!isBoss && currentEnemies >= maxLiveEnemies) return;
+
   // Generar posición en los bordes del mapa
   const mapWidth = engine.map.getMapWidth();
   const mapHeight = engine.map.getMapHeight();
@@ -217,13 +224,18 @@ function spawnEnemy(isBoss = false) {
   const enemy = new Entity(enemyX, enemyY, null, true);
   
   if (isBoss) {
-    enemy.width = 300;
-    enemy.height = 300;
-    enemy.health = 800;
-    enemy.maxHealth = 800;
-    enemy.speed = 70;
-    enemy.damageRate = 35;
-    enemy.loadSprite('sprites/plant_enemy_boss_sprite.png', 32, 32, 4);
+    // Configurar el jefe champiñón para la primera fase
+    enemy.bossType = 'mushroomBoss';
+    enemy.isBoss = true;
+    enemy.width = 200;
+    enemy.height = 200;
+    enemy.health = 1000; // Reducido para la primera fase
+    enemy.maxHealth = 1000;
+    enemy.speed = 60; // Ajustado para la primera fase
+    enemy.damageRate = 30; // Reducido para la primera fase
+    enemy.loadSprite('sprites/boss_champi_sprite.png', 32, 32, 4);
+    enemy.lastSpawnTime = 0;
+    enemy.spawnCooldown = 7.0; // Aumentado el tiempo entre spawns para la primera fase
   } else {
     // Enemigo tipo 3 (desde fase 3)
     if (currentWave >= 3 && Math.random() < 0.3) {
@@ -298,13 +310,32 @@ function waveManager(dt) {
     waveTimer -= dt;
     updatePlayerExperience();
     
+    // Generar orbes de experiencia cuando mueren los enemigos
+    engine.entities.forEach(entity => {
+      if (entity.isEnemy && entity.health <= 0) {
+        entity.isDead = true;
+        if (entity.isBoss) {
+          // Generar 10 orbes de experiencia para el jefe
+          for (let i = 0; i < 10; i++) {
+            const randomOffsetX = (Math.random() - 0.5) * 100;
+            const randomOffsetY = (Math.random() - 0.5) * 100;
+            const expOrb = new ExperienceOrb(entity.x + randomOffsetX, entity.y + randomOffsetY);
+            engine.addEntity(expOrb);
+          }
+        } else {
+          const expOrb = new ExperienceOrb(entity.x, entity.y);
+          engine.addEntity(expOrb);
+        }
+      }
+    });
+    
     // Generar enemigos durante la oleada
     if (enemiesInWave < maxEnemiesInWave && Math.random() < 0.1) {
       spawnEnemy();
     }
     
-    // Generar jefe cuando queden 50 segundos
-    if (!isBossSpawned && waveTimer <= 50) {
+    // Generar jefe cuando queden 70 segundos (1:10)
+    if (!isBossSpawned && waveTimer <= 70) {
       spawnEnemy(true);
       isBossSpawned = true;
     }
@@ -331,7 +362,6 @@ function waveManager(dt) {
         }
       });
       enemiesInWave = 0;
-      currentWave++; // Incrementar el número de oleada
       
       // Mostrar menú de selección de cartas
       const skillSelection = document.createElement('div');
@@ -430,7 +460,7 @@ function waveManager(dt) {
     
     // Iniciar nueva oleada
     if (nextWaveTimer <= 0) {
-      currentWave++;
+      currentWave++; // Incrementar el número de oleada aquí, después de la fase de selección
       maxEnemiesInWave = Math.min(5 + currentWave * 2, 20);
       waveTimer = 120;
       enemiesInWave = 0;

@@ -2,8 +2,8 @@ class Entity {
     constructor(x, y, spriteSrc = null, isEnemy = false, bossType = null) {
       this.x = x;
       this.y = y;
-      this.width = 100;
-      this.height = 100;
+      this.width = bossType ? 150 : 100;
+      this.height = bossType ? 150 : 100;
       this.sprite = null;
       this.frameWidth = 0;
       this.frameHeight = 0;
@@ -19,6 +19,16 @@ class Entity {
       this.bossType = bossType;
       this.experience = 0;
       this.statusEffects = {}; // Almacena efectos de estado activos
+      
+      // Mostrar la barra de vida del jefe si es un jefe
+      if (this.isBoss) {
+        const bossHealthContainer = document.getElementById('boss-health-container');
+        const bossName = document.getElementById('boss-name');
+        if (bossHealthContainer && bossName) {
+          bossHealthContainer.style.display = 'block';
+          bossName.textContent = this.getBossName();
+        }
+      }
       
       // Configuración de jefes
       if (this.isBoss) {
@@ -49,6 +59,17 @@ class Entity {
             this.width = 130;
             this.height = 130;
             this.spritePath = 'sprites/plant_enemy_4_sprite.png';
+            break;
+          case 'mushroomBoss':
+            this.speed = 50;
+            this.health = 1500;
+            this.maxHealth = 1500;
+            this.damageRate = 40;
+            this.width = 300;
+            this.height = 300;
+            this.spritePath = 'sprites/boss_champi_sprite.png';
+            this.lastSpawnTime = 0;
+            this.spawnCooldown = 5.0; // Tiempo entre generación de mini champiñones
             break;
         }
         if (spriteSrc === null) {
@@ -135,9 +156,59 @@ class Entity {
       });
     }
 
+    getBossName() {
+      switch(this.bossType) {
+        case 'plantBoss':
+          return 'BOSS PLANTA';
+        case 'crystalBoss':
+          return 'BOSS CRISTAL';
+        case 'shadowBoss':
+          return 'BOSS SOMBRA';
+        case 'mushroomBoss':
+          return 'BOSS CHAMPIÑÓN';
+        default:
+          return 'BOSS';
+      }
+    }
+
     update(dt) {
       // Actualizar efectos de estado
       this.updateStatusEffects();
+
+      // Actualizar barra de vida del jefe si es un jefe
+      if (this.isBoss) {
+        const bossHealthBar = document.getElementById('boss-health-bar');
+        if (bossHealthBar) {
+          const healthPercentage = (this.health / this.maxHealth) * 100;
+          bossHealthBar.style.width = `${healthPercentage}%`;
+        }
+      }
+
+      // Lógica para generar mini champiñones si es el jefe champiñón
+      if (this.isBoss && this.bossType === 'mushroomBoss' && !this.isDead) {
+        const currentTime = Date.now() / 1000;
+        if (currentTime - this.lastSpawnTime >= this.spawnCooldown) {
+          // Generar mini champiñones alrededor del jefe
+          for (let i = 0; i < 3; i++) {
+            const angle = (Math.PI * 2 / 3) * i;
+            const spawnDistance = 100;
+            const miniX = this.x + Math.cos(angle) * spawnDistance;
+            const miniY = this.y + Math.sin(angle) * spawnDistance;
+
+            const miniEnemy = new Entity(miniX, miniY, null, true);
+            miniEnemy.health = 25;
+            miniEnemy.maxHealth = 25;
+            miniEnemy.speed = 120;
+            miniEnemy.damageRate = 10;
+            miniEnemy.width = 35;
+            miniEnemy.height = 35;
+            miniEnemy.loadSprite('sprites/mini_champi_sprite.png', 16, 16, 4);
+            miniEnemy.target = this.target;
+            engine.addEntity(miniEnemy);
+          }
+          this.lastSpawnTime = currentTime;
+        }
+      }
       
       // Auto-shooting for all equipped skills
       if (!this.isDead && !engine.isPaused) {
@@ -488,20 +559,19 @@ class Entity {
       // Render health bar for enemies
       if (this.isEnemy && !this.isDead) {
         const healthBarWidth = this.width;
-        const healthBarHeight = 5;
+        const healthBarHeight = this.isBoss ? 10 : 5;
         const healthBarY = this.y - healthBarHeight - 5;
         
         // Background of health bar
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        ctx.fillStyle = '#333';
         ctx.beginPath();
-        ctx.roundRect(this.x, healthBarY, healthBarWidth, healthBarHeight, 3);
+        ctx.roundRect(this.x, healthBarY, healthBarWidth, healthBarHeight, this.isBoss ? 5 : 3);
         ctx.fill();
         
         // Health bar
-        const healthPercentage = this.health / this.maxHealth;
-        ctx.fillStyle = `rgb(${255 * (1 - healthPercentage)}, ${255 * healthPercentage}, 0)`;
+        ctx.fillStyle = '#ff0000';
         ctx.beginPath();
-        ctx.roundRect(this.x, healthBarY, healthBarWidth * healthPercentage, healthBarHeight, 3);
+        ctx.rect(this.x, healthBarY, (this.health / this.maxHealth) * healthBarWidth, healthBarHeight);
         ctx.fill();
       }
 

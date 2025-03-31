@@ -155,6 +155,26 @@ class Engine {
         this.lastFrame = now;
       }
 
+      // Actualizar barra de vida del jefe
+      const boss = this.entities.find(e => e.isBoss && !e.isDead);
+      if (boss) {
+        const bossContainer = document.getElementById('boss-health-container');
+        const bossHealthBar = document.getElementById('boss-health-bar');
+        const bossName = document.getElementById('boss-name');
+        
+        if (bossContainer && bossHealthBar && bossName) {
+          bossContainer.style.display = 'block';
+          bossHealthBar.style.width = `${(boss.health / boss.maxHealth) * 100}%`;
+          bossHealthBar.style.backgroundColor = '#ff0000';
+          bossName.textContent = boss.getBossName();
+        }
+      } else {
+        const bossContainer = document.getElementById('boss-health-container');
+        if (bossContainer) {
+          bossContainer.style.display = 'none';
+        }
+      }
+
       const player = this.entities.find(e => !e.isEnemy);
       if (player) {
         // Mantener al jugador en el centro de la pantalla
