@@ -6,6 +6,8 @@ class SkillSystem {
         this.maxEquippedSkills = 5; // Todos los slots disponibles desde el inicio
         this.lastAutoFireTime = new Array(5).fill(0); // Tiempo del último disparo automático
         this.maxSkillLevel = 10; // Nivel máximo de cada habilidad
+        this.skillPoints = 0; // Puntos disponibles para mejorar habilidades
+        this.skillPoints = 0; // Puntos disponibles para mejorar habilidades
         this.skills = [
             {
                 name: 'Proyectil de Fuego',
@@ -126,6 +128,12 @@ class SkillSystem {
         const skillsBar = document.getElementById('skills-bar');
         skillsBar.innerHTML = '';
 
+        // Mostrar puntos de habilidad disponibles
+        const pointsDisplay = document.createElement('div');
+        pointsDisplay.style.cssText = 'position: absolute; top: -30px; left: 50%; transform: translateX(-50%); color: #ffd700; font-size: 16px; text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);';
+        pointsDisplay.textContent = `Puntos de Habilidad: ${this.skillPoints}`;
+        skillsBar.appendChild(pointsDisplay);
+
         // Crear el tooltip
         const tooltip = document.createElement('div');
         tooltip.style.cssText = 'display: none; position: absolute; background: rgba(0, 0, 0, 0.9); color: white; padding: 10px; border-radius: 5px; font-size: 14px; z-index: 1000; pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.3); box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); font-family: "Mineglyph", sans-serif; max-width: 250px;';
@@ -165,8 +173,8 @@ class SkillSystem {
             upgradeButton.onclick = () => this.upgradeSkill(i);
             skillBox.appendChild(upgradeButton);
             
-            // Mostrar botón de mejora si hay una habilidad equipada y no está al nivel máximo
-            if (this.equippedSkills[i] && this.skillLevels[i] < this.maxSkillLevel) {
+            // Mostrar botón de mejora si hay una habilidad equipada, no está al nivel máximo y hay puntos disponibles
+            if (this.equippedSkills[i] && this.skillLevels[i] < this.maxSkillLevel && this.skillPoints > 0) {
                 upgradeButton.style.display = 'block';
             }
             
@@ -245,7 +253,7 @@ class SkillSystem {
     }
 
     upgradeSkill(index) {
-        if (!this.equippedSkills[index] || this.skillLevels[index] >= this.maxSkillLevel) return;
+        if (!this.equippedSkills[index] || this.skillLevels[index] >= this.maxSkillLevel || this.skillPoints <= 0) return;
         
         // Crear una copia de la habilidad base si no existe
         if (!this.equippedSkills[index].baseStats) {
@@ -255,6 +263,9 @@ class SkillSystem {
                 orbitalRadius: this.equippedSkills[index].orbitalRadius || 60
             };
         }
+        
+        // Reducir puntos de habilidad disponibles
+        this.skillPoints--;
         
         this.skillLevels[index]++;
         const level = this.skillLevels[index];

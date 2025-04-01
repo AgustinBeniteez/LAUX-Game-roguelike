@@ -75,9 +75,9 @@ class ExperienceOrb extends Entity {
                     const skillsBar = document.getElementById('skills-bar');
                     const skillBoxes = skillsBar.getElementsByClassName('skill-box');
                     
-                    // Crear botones de mejora solo para slots con habilidades equipadas
+                    // Crear botones de mejora solo para las habilidades E y R (slots 0 y 1)
                     Array.from(skillBoxes).forEach((skillBox, index) => {
-                        if (window.skillSystem.equippedSkills[index] !== null && window.skillSystem.equippedSkills[index] !== undefined) {
+                        if (index <= 1 && window.skillSystem.equippedSkills[index] !== null && window.skillSystem.equippedSkills[index] !== undefined) {
                             const upgradeButton = document.createElement('button');
                             upgradeButton.className = 'upgrade-button';
                             upgradeButton.style.cssText = 'position: absolute; top: 0px; right: 0px; background: rgb(49 197 192); color: white; border: none; padding: 11px 10px; cursor: pointer; font-size: 12px; border-radius: 0 0 0 5px; z-index: 10;';

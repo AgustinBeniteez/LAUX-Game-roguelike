@@ -18,7 +18,9 @@ class Entity {
       this.isBoss = bossType !== null;
       this.bossType = bossType;
       this.experience = 0;
+      this.level = 1;
       this.statusEffects = {}; // Almacena efectos de estado activos
+      this.skillPoints = 0; // Puntos de habilidad disponibles
       
       // Mostrar la barra de vida del jefe si es un jefe
       if (this.isBoss) {
@@ -276,6 +278,15 @@ class Entity {
           // Crear orbe de experiencia cuando muere un enemigo
           const expOrb = new ExperienceOrb(this.x, this.y);
           engine.addEntity(expOrb);
+          
+          // Otorgar puntos de habilidad al subir de nivel
+          const oldLevel = Math.floor(this.experience / 100) + 1;
+          const newLevel = Math.floor((this.experience + expOrb.value) / 100) + 1;
+          if (newLevel > oldLevel) {
+            this.skillPoints++;
+            skillSystem.skillPoints++;
+            skillSystem.updateHUDSlots(); // Actualizar la interfaz para mostrar los nuevos puntos
+          }
           
           // Marcar como muerto y eliminar el enemigo
           this.isDead = true;
