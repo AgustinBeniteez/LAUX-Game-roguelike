@@ -145,13 +145,30 @@ class Engine {
     }
   
     render() {
-      // Mostrar FPS si está activado
+      // Mostrar FPS y uso de memoria si está activado
       if (localStorage.getItem('showFPS') === 'on') {
         const now = performance.now();
         const fps = Math.round(1000 / (now - this.lastFrame));
+        let memoryText = 'RAM: No disponible';
+        
+        try {
+          if (performance.memory && performance.memory.usedJSHeapSize) {
+            const usedMB = Math.round(performance.memory.usedJSHeapSize / 1048576);
+            const totalMB = Math.round(performance.memory.jsHeapSizeLimit / 1048576);
+            memoryText = `RAM: ${usedMB}MB / ${totalMB}MB`;
+          }
+        } catch (e) {
+          console.log('No se pudo acceder a la información de memoria');
+        }
+        
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        this.ctx.fillRect(5, 5, 200, 50);
+        
         this.ctx.fillStyle = 'white';
         this.ctx.font = '16px Mineglyph';
-        this.ctx.fillText(`FPS: ${fps}`, 10, 20);
+        this.ctx.fillText(`FPS: ${fps}`, 10, 25);
+        this.ctx.fillText(memoryText, 10, 45);
+        
         this.lastFrame = now;
       }
 
