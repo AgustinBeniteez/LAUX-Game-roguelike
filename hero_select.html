@@ -148,11 +148,11 @@
       </div>
       <div class="hero-abilities">
         <div>
-          <img class="ability-icon" src="sprites/proyectil_sprite_1.png">
+          <img class="ability-icon" src="sprites/main_skills/sprite_main_skill_E_Guardian.png">
           <div class="ability-key">E</div>
         </div>
         <div>
-          <img class="ability-icon" src="sprites/proyectil_sprite_2.png">
+          <img class="ability-icon" src="sprites/main_skills/sprite_main_skill_R_Guardian.png">
           <div class="ability-key">R</div>
         </div>
       </div>
@@ -166,11 +166,11 @@
       </div>
       <div class="hero-abilities">
         <div>
-          <img class="ability-icon" src="sprites/proyectil_sprite_3.png">
+          <img class="ability-icon" src="sprites/main_skills/sprite_main_skill_E_Sentinel.png">
           <div class="ability-key">E</div>
         </div>
         <div>
-          <img class="ability-icon" src="sprites/proyectil_sprite_4.png">
+          <img class="ability-icon" src="sprites/main_skills/sprite_main_skill_R_Sentinel.png">
           <div class="ability-key">R</div>
         </div>
       </div>
@@ -184,11 +184,11 @@
       </div>
       <div class="hero-abilities">
         <div>
-          <img class="ability-icon" src="sprites/frezee.png">
+          <img class="ability-icon" src="sprites/main_skills/sprite_main_skill_E_Arcane.png">
           <div class="ability-key">E</div>
         </div>
         <div>
-          <img class="ability-icon" src="sprites/proyectil_sprite_leaves.png">
+          <img class="ability-icon" src="sprites/main_skills/sprite_main_skill_R_Arcane.png">
           <div class="ability-key">R</div>
         </div>
       </div>
@@ -234,29 +234,64 @@
 
     startTimer();
 
+    const projectileConfig = {
+      mainproyectil_arcane_e: {
+        name: 'Bola de Daño',
+        sprite: 'sprites/main_skills/sprite_main_skill_E_Arcane.png',
+        damage: 30 * 1.3,
+        areaEffect: true
+      },
+      mainproyectil_guardian_e: {
+        name: 'Bola de Cristal',
+        sprite: 'sprites/main_skills/sprite_main_skill_E_Guardian.png',
+        damage: 40 * 1.4
+      },
+      mainproyectil_sentinel_e: {
+        name: 'Estrella de Daño',
+        sprite: 'sprites/main_skills/sprite_main_skill_E_Sentinel.png',
+        damage: 50 * 1.5
+      },
+      mainproyectil_arcane_r: {
+        name: 'Teletransporte Arcano',
+        sprite: 'sprites/main_skills/sprite_main_skill_R_Arcane.png',
+        isNotProjectile: true,
+        isTeleport: true
+      },
+      mainproyectil_guardian_r: {
+        name: 'Escudo Protector',
+        sprite: 'sprites/main_skills/sprite_main_skill_R_Guardian.png',
+        isNotProjectile: true
+      },
+      mainproyectil_sentinel_r: {
+        name: 'Teletransporte',
+        sprite: 'sprites/main_skills/sprite_main_skill_R_Sentinel.png',
+        isNotProjectile: true
+      }
+    };
+
     const heroStats = {
       guardian: {
         health: 150,
         speed: 200,
         abilities: [
-          { name: 'Golpe Poderoso', key: 'E', icon: 'sprites/proyectil_sprite_1.png', damage: 40, cooldown: 5 },
-          { name: 'Torbellino', key: 'R', icon: 'sprites/proyectil_sprite_2.png', damage: 60, cooldown: 8 }
+          { name: projectileConfig.mainproyectil_guardian_e.name, key: 'E', icon: projectileConfig.mainproyectil_guardian_e.sprite, damage: projectileConfig.mainproyectil_guardian_e.damage, cooldown: 9 },
+          { name: projectileConfig.mainproyectil_guardian_r.name, key: 'R', icon: projectileConfig.mainproyectil_guardian_r.sprite, damage: 0, cooldown: 18 }
         ]
       },
       sentinel: {
         health: 100,
         speed: 220,
         abilities: [
-          { name: 'Bola de Fuego', key: 'E', icon: 'sprites/proyectil_sprite_3.png', damage: 50, cooldown: 4 },
-          { name: 'Rayo Arcano', key: 'R', icon: 'sprites/proyectil_sprite_4.png', damage: 70, cooldown: 7 }
+          { name: projectileConfig.mainproyectil_sentinel_e.name, key: 'E', icon: projectileConfig.mainproyectil_sentinel_e.sprite, damage: projectileConfig.mainproyectil_sentinel_e.damage, cooldown: 8 },
+          { name: projectileConfig.mainproyectil_sentinel_r.name, key: 'R', icon: projectileConfig.mainproyectil_sentinel_r.sprite, damage: 0, cooldown: 17 }
         ]
       },
       arcane: {
         health: 120,
         speed: 250,
         abilities: [
-          { name: 'Flecha Congelante', key: 'E', icon: 'sprites/frezee.png', damage: 30, cooldown: 3 },
-          { name: 'Lluvia de Flechas', key: 'R', icon: 'sprites/proyectil_sprite_leaves.png', damage: 45, cooldown: 6 }
+          { name: projectileConfig.mainproyectil_arcane_e.name, key: 'E', icon: projectileConfig.mainproyectil_arcane_e.sprite, damage: projectileConfig.mainproyectil_arcane_e.damage, cooldown: 6 },
+          { name: projectileConfig.mainproyectil_arcane_r.name, key: 'R', icon: projectileConfig.mainproyectil_arcane_r.sprite, damage: 0, cooldown: 16 }
         ]
       }
     };
@@ -313,42 +348,42 @@
         const heroData = heroStats[selectedHero];
         const skillStats = {
           guardian: {
-            name: 'Fuego',
+            name: 'Guardián',
             damage: 20,
             speed: 400,
-            icon: 'sprites/proyectil_sprite_1.png',
-            projectileType: 'fire',
+            icon: 'sprites/main_skills/sprite_main_skill_E_Guardian.png',
+            projectileType: 'area',
             cooldown: 2.0,
-            projectileSprite: 'sprites/proyectil_sprite_1.png',
+            projectileSprite: 'sprites/main_skills/sprite_main_skill_E_Guardian.png',
             abilities: {
-              e: { name: 'Golpe Poderoso', damage: 40, cooldown: 5, description: 'Lanza un poderoso golpe que causa daño y aturde a los enemigos' },
-              r: { name: 'Torbellino', damage: 80, cooldown: 12, description: 'Crea un torbellino que daña a todos los enemigos cercanos' }
+              e: { name: 'Bola de Daño', damage: 40, cooldown: 5, description: 'Lanza una bola que causa daño en área a los enemigos' },
+              r: { name: 'Clon Guardián', damage: 0, cooldown: 12, description: 'Crea un clon que distrae a los enemigos y te vuelve invisible temporalmente' }
             }
           },
           sentinel: {
-            name: 'Energía',
+            name: 'Centinela',
             damage: 28,
             speed: 400,
-            icon: 'sprites/proyectil_sprite_3.png',
-            projectileType: 'energy',
+            icon: 'sprites/main_skills/sprite_main_skill_E_Sentinel.png',
+            projectileType: 'crystal',
             cooldown: 4.0,
-            projectileSprite: 'sprites/proyectil_sprite_3.png',
+            projectileSprite: 'sprites/main_skills/sprite_main_skill_E_Sentinel.png',
             abilities: {
-              e: { name: 'Bola de Fuego', damage: 50, cooldown: 7, description: 'Lanza una bola de energía que daña y empuja a los enemigos' },
-              r: { name: 'Rayo Arcano', damage: 100, cooldown: 14, description: 'Libera un poderoso rayo que causa daño masivo en área' }
+              e: { name: 'Bola de Cristal', damage: 50, cooldown: 7, description: 'Lanza una bola de cristal que causa daño a los enemigos' },
+              r: { name: 'Escudo de Cristal', damage: 0, cooldown: 14, description: 'Genera un escudo de cristal que aumenta tu vida temporalmente' }
             }
           },
           arcane: {
-            name: 'Hielo',
+            name: 'Arcano',
             damage: 24,
             speed: 400,
-            icon: 'sprites/frezee.png',
-            projectileType: 'ice',
+            icon: 'sprites/main_skills/sprite_main_skill_E_Arcane.png',
+            projectileType: 'star',
             cooldown: 3.0,
-            projectileSprite: 'sprites/frezee.png',
+            projectileSprite: 'sprites/main_skills/sprite_main_skill_E_Arcane.png',
             abilities: {
-              e: { name: 'Flecha Congelante', damage: 45, cooldown: 6, description: 'Dispara una flecha de hielo que congela a los enemigos' },
-              r: { name: 'Lluvia de Flechas', damage: 90, cooldown: 15, description: 'Invoca una lluvia de flechas que daña masivamente a los enemigos' }
+              e: { name: 'Estrella de Daño', damage: 45, cooldown: 6, description: 'Lanza una estrella mágica que causa daño a los enemigos' },
+              r: { name: 'Teletransporte Rúnico', damage: 0, cooldown: 15, description: 'Te teletransporta a una nueva ubicación' }
             }
           }
         };

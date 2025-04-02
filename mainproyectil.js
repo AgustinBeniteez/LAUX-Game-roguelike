@@ -9,35 +9,37 @@ class MainProjectile extends Entity {
         
         // Configuración de proyectiles según el tipo
         const projectileConfig = {
-            mainproyectil_warrior_e: {
-                name: 'Golpe Poderoso',
-                sprite: 'sprites/proyectil_sprite_1.png',
-                damage: damage * 1.2
+            mainproyectil_arcane_e: {
+                name: 'Bola de Daño',
+                sprite: 'sprites/main_skills/sprite_main_skill_E_Arcane.png',
+                damage: damage * 1.3,
+                areaEffect: true
             },
-            mainproyectil_warrior_r: {
-                name: 'Torbellino',
-                sprite: 'sprites/proyectil_sprite_2.png',
+            mainproyectil_guardian_e: {
+                name: 'Bola de Cristal',
+                sprite: 'sprites/main_skills/sprite_main_skill_E_Guardian.png',
+                damage: damage * 1.4
+            },
+            mainproyectil_sentinel_e: {
+                name: 'Estrella de Daño',
+                sprite: 'sprites/main_skills/sprite_main_skill_E_Sentinel.png',
                 damage: damage * 1.5
             },
-            mainproyectil_mage_e: {
-                name: 'Bola de Fuego',
-                sprite: 'sprites/proyectil_sprite_3.png',
-                damage: damage * 1.3
+            mainproyectil_arcane_r: {
+                name: 'Teletransporte Arcano',
+                sprite: 'sprites/main_skills/sprite_main_skill_R_Arcane.png',
+                isNotProjectile: true,
+                isTeleport: true
             },
-            mainproyectil_mage_r: {
-                name: 'Rayo Arcano',
-                sprite: 'sprites/proyectil_sprite_4.png',
-                damage: damage * 1.6
+            mainproyectil_guardian_r: {
+                name: 'Escudo Protector',
+                sprite: 'sprites/main_skills/sprite_main_skill_R_Guardian.png',
+                isNotProjectile: true
             },
-            mainproyectil_ranger_e: {
-                name: 'Flecha Congelante',
-                sprite: 'sprites/frezee.png',
-                damage: damage * 1.1
-            },
-            mainproyectil_ranger_r: {
-                name: 'Lluvia de Flechas',
-                sprite: 'sprites/proyectil_sprite_leaves.png',
-                damage: damage
+            mainproyectil_sentinel_r: {
+                name: 'Teletransporte',
+                sprite: 'sprites/main_skills/sprite_main_skill_R_Sentinel.png',
+                isNotProjectile: true
             }
         };
 
@@ -48,7 +50,29 @@ class MainProjectile extends Entity {
             this.loadSprite(config.sprite, 32, 32, 1);
         }
 
-        // Calcular dirección hacia el cursor
+        // Manejar teletransporte para Arcane R
+        if (config && config.isTeleport) {
+            const player = engine.entities.find(e => !e.isEnemy);
+            if (player) {
+                // Primero realizamos el teletransporte
+                player.x = targetX;
+                player.y = targetY;
+                
+                
+                // Luego eliminamos la entidad del proyectil
+                setTimeout(() => {
+                    const index = engine.entities.indexOf(this);
+                    if (index > -1) {
+                        engine.entities.splice(index, 1);
+                    }
+                }, 50);
+                
+                // Evitamos que se cree el tooltip y se inicialicen las velocidades
+                return;
+            }
+        }
+
+        // Calcular dirección hacia el cursor para proyectiles normales
         const dx = targetX - x;
         const dy = targetY - y;
         const distance = Math.sqrt(dx * dx + dy * dy);

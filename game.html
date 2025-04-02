@@ -162,11 +162,11 @@
       const mouseY = (event.clientY - rect.top) * scaleY;
 
       const skillType = `mainproyectil_${player.class}_${isAimingE ? 'e' : 'r'}`;
-      const projectile = new Projectile(
+      const projectile = new MainProjectile(
         player.x,
         player.y,
-        mouseX,
-        mouseY,
+        mouseX + engine.cameraX,
+        mouseY + engine.cameraY,
         skillType,
         ability.damage,
         player.speed
