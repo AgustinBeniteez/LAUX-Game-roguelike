@@ -493,6 +493,20 @@ let keys = {};
 window.addEventListener('keydown', e => {
   const key = e.key.toLowerCase();
   keys[key] = true;
+
+  // Manejo de habilidades con la tecla E
+  if (key === 'e' && player) {
+    const skillType = `mainproyectil_${player.class}_e`;
+    const projectile = new MainProjectile(
+      player.x,
+      player.y,
+      mouse.x,
+      mouse.y,
+      skillType,
+      player.damage || 10
+    );
+    engine.addEntity(projectile);
+  }
 });
 window.addEventListener('keyup', e => {
   const key = e.key.toLowerCase();

@@ -1,2 +1,2 @@
 // Versión actual del juego
-export const VERSION = 'v1.0.4.5';
+export const VERSION = 'v1.0.4.6';
