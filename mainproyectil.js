@@ -4,7 +4,7 @@ window.MainProjectile = window.MainProjectile = class MainProjectile extends Ent
         this.skillType = skillType;
         this.damage = damage;
         this.speed = speed;
-        this.lifetime = 2;
+        this.lifetime = config && config.lifetime ? config.lifetime : 2;
         this.timeAlive = 0;
         
         // Configuración de proyectiles según el tipo
@@ -32,9 +32,11 @@ window.MainProjectile = window.MainProjectile = class MainProjectile extends Ent
                 isTeleport: true
             },
             mainproyectil_guardian_r: {
-                name: 'Escudo Protector',
+                name: 'Guardián Perseguidor',
                 sprite: 'sprites/main_skills/sprite_main_skill_R_Guardian.png',
-                isNotProjectile: true
+                damage: damage * 1.8,
+                isHunter: true,
+                lifetime: 3
             },
             mainproyectil_sentinel_r: {
                 name: 'Escudo Protector',
@@ -56,19 +58,54 @@ window.MainProjectile = window.MainProjectile = class MainProjectile extends Ent
             this.damage = damage;
         }
 
-        // Manejar habilidades especiales (teletransporte y escudo)
-        if (config && (config.isTeleport || config.isShield)) {
+        // Manejar habilidades especiales (teletransporte, escudo y perseguidor)
+        if (config && (config.isTeleport || config.isShield || config.isHunter)) {
             const player = engine.entities.find(e => !e.isEnemy);
             if (player) {
                 if (config.isTeleport) {
-                    // Realizar teletransporte
+                    // Realizar teletransporte al punto donde se hizo clic
                     player.x = targetX;
                     player.y = targetY;
+                    // Actualizar la posición de la cámara inmediatamente
+                    engine.cameraX = player.x - engine.gameWidth / 2;
+                    engine.cameraY = player.y - engine.gameHeight / 2;
+                    // Forzar un nuevo renderizado del mapa
+                    engine.map.render(engine.ctx, engine.cameraX, engine.cameraY);
+                } else if (config.isHunter) {
+                    // El proyectil perseguidor no se elimina inmediatamente
+                    this.isHunter = true;
+                    return;
                 } else if (config.isShield) {
                     // Aplicar escudo
                     if (!player.shield) player.shield = 0;
                     player.shield += config.shieldAmount;
-                    // Crear efecto visual del escudo
+
+                    // Actualizar la barra de vida para mostrar el escudo
+                    const healthBar = document.getElementById('health-bar');
+                    if (healthBar) {
+                        // Crear o actualizar la barra de escudo
+                        let shieldBar = document.getElementById('shield-bar');
+                        if (!shieldBar) {
+                            shieldBar = document.createElement('div');
+                            shieldBar.id = 'shield-bar';
+                            shieldBar.style.cssText = `
+                                position: absolute;
+                                top: 0;
+                                right: 0;
+                                height: 100%;
+                                background: rgba(255, 255, 255, 0.7);
+                                border-radius: 0 5px 5px 0;
+                                transition: width 0.3s ease;
+                            `;
+                            healthBar.parentElement.appendChild(shieldBar);
+                        }
+                        // Calcular y actualizar el ancho de la barra de escudo
+                        const maxHealth = player.maxHealth || 100;
+                        const shieldPercentage = (player.shield / maxHealth) * 100;
+                        shieldBar.style.width = `${shieldPercentage}%`;
+                    }
+
+                    // Efecto visual temporal
                     const shieldEffect = document.createElement('div');
                     shieldEffect.style.position = 'absolute';
                     shieldEffect.style.width = '100%';
@@ -92,7 +129,7 @@ window.MainProjectile = window.MainProjectile = class MainProjectile extends Ent
 
         // Encontrar el enemigo más cercano
         const enemies = engine.entities.filter(e => e.isEnemy && !e.isDead);
-        if (enemies.length > 0) {
+        if (enemies.length > 0 && (this.isHunter || !config || !config.isNotProjectile)) {
             let closestEnemy = enemies[0];
             let closestDistance = Math.sqrt(
                 Math.pow(closestEnemy.x - x, 2) + 
@@ -188,8 +225,53 @@ window.MainProjectile = window.MainProjectile = class MainProjectile extends Ent
     update(dt) {
         if (engine.isPaused) return;
 
+        // Actualizar dirección si es un proyectil perseguidor
+        if (this.isHunter) {
+            const enemies = engine.entities.filter(e => e.isEnemy && !e.isDead);
+            if (enemies.length > 0) {
+                let closestEnemy = enemies[0];
+                let closestDistance = Math.sqrt(
+                    Math.pow(closestEnemy.x - this.x, 2) + 
+                    Math.pow(closestEnemy.y - this.y, 2)
+                );
+                
+                enemies.forEach(enemy => {
+                    const distance = Math.sqrt(
+                        Math.pow(enemy.x - this.x, 2) + 
+                        Math.pow(enemy.y - this.y, 2)
+                    );
+                    if (distance < closestDistance) {
+                        closestDistance = distance;
+                        closestEnemy = enemy;
+                    }
+                });
+                
+                // Actualizar velocidad hacia el enemigo más cercano
+                const dx = closestEnemy.x - this.x;
+                const dy = closestEnemy.y - this.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                this.velocityX = (dx / distance) * this.speed;
+                this.velocityY = (dy / distance) * this.speed;
+            }
+        }
+
         this.x += this.velocityX * dt;
         this.y += this.velocityY * dt;
+
+        // Actualizar la barra de escudo si existe
+        const player = engine.entities.find(e => !e.isEnemy);
+        if (player) {
+            const shieldBar = document.getElementById('shield-bar');
+            if (shieldBar) {
+                if (player.shield <= 0) {
+                    shieldBar.remove(); // Eliminar la barra si no hay escudo
+                } else {
+                    const maxHealth = player.maxHealth || 100;
+                    const shieldPercentage = (player.shield / maxHealth) * 100;
+                    shieldBar.style.width = `${shieldPercentage}%`;
+                }
+            }
+        }
 
         this.timeAlive += dt;
         if (this.timeAlive >= this.lifetime) {

@@ -263,9 +263,11 @@
         isNotProjectile: true
       },
       mainproyectil_sentinel_r: {
-        name: 'Teletransporte',
+        name: 'Escudo Protector',
         sprite: 'sprites/main_skills/sprite_main_skill_R_Sentinel.png',
-        isNotProjectile: true
+        isNotProjectile: true,
+        isShield: true,
+        shieldAmount: 50 * 2
       }
     };
 
@@ -283,7 +285,7 @@
         speed: 220,
         abilities: [
           { name: projectileConfig.mainproyectil_sentinel_e.name, key: 'E', icon: projectileConfig.mainproyectil_sentinel_e.sprite, damage: projectileConfig.mainproyectil_sentinel_e.damage, cooldown: 8 },
-          { name: projectileConfig.mainproyectil_sentinel_r.name, key: 'R', icon: projectileConfig.mainproyectil_sentinel_r.sprite, damage: 0, cooldown: 17 }
+          { name: projectileConfig.mainproyectil_sentinel_r.name, key: 'R', icon: projectileConfig.mainproyectil_sentinel_r.sprite, damage: 0, cooldown: 17, isShield: true, shieldAmount: 50 * 2 }
         ]
       },
       arcane: {

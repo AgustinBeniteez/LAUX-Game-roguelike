@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LAUX GAME - Créditos</title>
+  <link rel="shortcut icon" href="sprites/laux_logo.webp" type="image/x-icon">
+  <link rel="stylesheet" href="custom_cursor.css">
+  <link rel="stylesheet" href="src/fonts.css">
+  <style>
+    body {
+      margin: 0;
+      background: url('src/background_homegame.gif'), url('src/background_homegame.png'), rgb(60, 117, 119);
+      background-size: cover, cover;
+      background-repeat: no-repeat, no-repeat;
+      background-attachment: fixed, fixed;
+      image-rendering: pixelated;
+      overflow: hidden;
+      height: 100vh;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Mineglyph', sans-serif;
+      color: white;
+    }
+
+    .credits-container {
+      width: 80%;
+      max-width: 800px;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .credits-content {
+      position: absolute;
+      width: 100%;
+      text-align: center;
+      animation: scrollCredits 30s linear forwards;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .menu-button {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(5px);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      padding: 15px 30px;
+      border-radius: 5px;
+      font-size: 1.2em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      font-family: 'Mineglyph', sans-serif;
+      margin-top: 20px;
+      display: inline-block;
+    }
+
+    .menu-button:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: scale(1.05);
+    }
+    @keyframes scrollCredits {
+      from { transform: translateY(100vh); }
+      to { transform: translateY(calc(-100% + 100vh)); }
+    }
+
+    .credits-content h1 {
+      font-size: 6em;
+      margin-bottom: 0.1em;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    }
+
+    .credits-content h2 {
+      font-size: 3em;
+      margin: 1em 0;
+      color: #ffd700;
+    }
+
+    .credits-content p {
+      font-size: 2.5em;
+      margin: 0.5em 0;
+    }
+
+    .back-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(5px);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      padding: 15px 30px;
+      border-radius: 5px;
+      font-size: 1.2em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      font-family: 'Mineglyph', sans-serif;
+      display: none;
+    }
+
+    .back-button:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: scale(1.05);
+    }
+    .restart-button {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(5px);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      padding: 15px 30px;
+      border-radius: 5px;
+      font-size: 1.2em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      font-family: 'Mineglyph', sans-serif;
+    }
+
+    .restart-button:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <div class="credits-container">
+    <div class="credits-content" id="credits">
+      <h1 data-translate="title">LAUX GAME</h1>
+      
+      <h2 data-translate="development">Desarrollo</h2>
+      <p>Java Script , HTML, CSS</p>
+      
+      <h2 data-translate="gameDesign">Diseño de Juego</h2>
+      <p>Agustin benitez</p>
+      
+      <h2 data-translate="artAndGraphics">Arte y Gráficos</h2>
+      <p>Agustin benitez</p>
+      <img src="src/pixelart_desarrollo.png" width="800px" alt="pixelart">
+      
+      <h2 data-translate="musicAndSound">Música y Sonido</h2>
+      <p>Agustin benitez</p>
+      
+      <h2 data-translate="programming">Programación</h2>
+      <p>Agustin benitez</p>
+      
+      <h2 data-translate="specialThanks">Agradecimientos Especiales</h2>
+      <p data-translate="allPlayers">A todos los jugadores que han hecho posible este juego</p>
+      
+      <h2>© 2024 LAUX GAME</h2>
+      <p data-translate="allRightsReserved">Todos los derechos reservados</p>
+      <a href="index.html" class="menu-button" data-translate="back">Volver al Menú</a>
+    </div>
+  </div>
+
+  <button class="restart-button" id="restartButton" data-translate="restart">Reiniciar Créditos</button>
+  <a href="index.html" class="back-button" data-translate="back">Volver al Menú</a>
+
+  <script>
+    const backButton = document.querySelector('.back-button');
+    const creditsContent = document.getElementById('credits');
+    const restartButton = document.getElementById('restartButton');
+    let hideTimeout;
+
+    function restartCredits() {
+      creditsContent.style.animation = 'none';
+      creditsContent.offsetHeight; // Trigger reflow
+      creditsContent.style.animation = 'scrollCredits 30s linear forwards';
+    }
+
+    restartButton.addEventListener('click', restartCredits);
+
+    // Mostrar el botón al terminar la animación
+    setTimeout(() => {
+      backButton.style.display = 'block';
+    }, 30000);
+
+    // Mostrar el botón al mover el cursor y configurar el temporizador para ocultarlo
+    document.addEventListener('mousemove', () => {
+      backButton.style.display = 'block';
+      clearTimeout(hideTimeout);
+      hideTimeout = setTimeout(() => {
+        backButton.style.display = 'none';
+      }, 2000);
+    });
+
+    // Cargar traducciones
+    async function loadTranslations() {
+      try {
+        const response = await fetch('translations.json');
+        const translations = await response.json();
+        const currentLang = localStorage.getItem('language') || 'es';
+        
+        const elements = document.querySelectorAll('[data-translate]');
+        elements.forEach(element => {
+          const key = element.getAttribute('data-translate');
+          if (translations[currentLang] && translations[currentLang][key]) {
+            element.textContent = translations[currentLang][key];
+          }
+        });
+      } catch (error) {
+        console.error('Error loading translations:', error);
+      }
+    }
+
+    loadTranslations();
+  </script>
+</body>
+</html>
