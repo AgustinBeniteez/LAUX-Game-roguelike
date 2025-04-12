@@ -455,16 +455,19 @@ class Entity {
           this.x += vx;
           this.y += vy;
         } else if (distance <= damageRange && this.damageRate > 0 && this.target.health > 0) {
-          // Deal damage when enemy is within damage range
-          this.target.health = Math.max(0, this.target.health - this.damageRate * dt);
-          // Visual feedback when taking damage
-          if (this.target.health < this.target.maxHealth) {
-            const healthValueElement = document.getElementById('health-value');
-            if (healthValueElement) {
-              healthValueElement.style.color = '#ff4444';
-              setTimeout(() => {
-                healthValueElement.style.color = '';
-              }, 100);
+          // No aplicar daño si el jugador está en el lobby
+          if (window.currentMapType !== 'lobby') {
+            // Deal damage when enemy is within damage range
+            this.target.health = Math.max(0, this.target.health - this.damageRate * dt);
+            // Visual feedback when taking damage
+            if (this.target.health < this.target.maxHealth) {
+              const healthValueElement = document.getElementById('health-value');
+              if (healthValueElement) {
+                healthValueElement.style.color = '#ff4444';
+                setTimeout(() => {
+                  healthValueElement.style.color = '';
+                }, 100);
+              }
             }
           }
         }
@@ -582,7 +585,7 @@ class Entity {
         // Health bar
         ctx.fillStyle = '#ff0000';
         ctx.beginPath();
-        ctx.rect(this.x, healthBarY, (this.health / this.maxHealth) * healthBarWidth, healthBarHeight);
+        ctx.roundRect(this.x, healthBarY, (this.health / this.maxHealth) * healthBarWidth, healthBarHeight, this.isBoss ? 5 : 3);
         ctx.fill();
       }
 

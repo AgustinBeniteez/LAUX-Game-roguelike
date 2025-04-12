@@ -128,11 +128,7 @@ class SkillSystem {
         const skillsBar = document.getElementById('skills-bar');
         skillsBar.innerHTML = '';
 
-        // Mostrar puntos de habilidad disponibles
-        const pointsDisplay = document.createElement('div');
-        pointsDisplay.style.cssText = 'position: absolute; top: -30px; left: 50%; transform: translateX(-50%); color: #ffd700; font-size: 16px; text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);';
-        pointsDisplay.textContent = `Puntos de Habilidad: ${this.skillPoints}`;
-        skillsBar.appendChild(pointsDisplay);
+
 
         // Crear el tooltip
         const tooltip = document.createElement('div');

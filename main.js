@@ -136,7 +136,12 @@ engine.addEntity(player);
 
 // Save game function
 function saveGame() {
-  if (player.isDead) return;
+  if (player.isDead) {
+    // Limpiar el estado del juego cuando el jugador muere
+    localStorage.removeItem('gameState');
+    localStorage.removeItem('playerData');
+    return;
+  }
 
   const currentPlayerData = {
     ...playerData,
@@ -209,9 +214,30 @@ if (gameState.entities && gameState.entities.length > 0) {
 }
 
 // Función para generar enemigos aleatorios
+// Cargar la clase TrainingDummy
+const trainingDummyScript = document.createElement('script');
+trainingDummyScript.src = 'entities/trainingDummy.js';
+document.head.appendChild(trainingDummyScript);
+
+function spawnTrainingDummies() {
+    if (window.currentMapType === 'lobby') {
+        // Posiciones fijas para los dummies en el lobby
+        const dummy1 = new TrainingDummy(300, 300);
+        const dummy2 = new TrainingDummy(500, 300);
+        engine.addEntity(dummy1);
+        engine.addEntity(dummy2);
+    }
+}
+
 function spawnEnemy(isBoss = false) {
-  // Verificar si estamos en el lobby o si el jugador está muerto
-  if (window.currentMapType === 'lobby' || player.isDead) return;
+    // Verificar si el jugador está muerto
+    if (player.isDead) return;
+    
+    // Si estamos en el lobby, solo manejamos los dummies de entrenamiento
+    if (window.currentMapType === 'lobby') {
+        spawnTrainingDummies();
+        return;
+    }
 
   // Verificar el límite de enemigos vivos
   const currentEnemies = engine.entities.filter(e => e.isEnemy && !e.isDead).length;
@@ -286,8 +312,8 @@ function updateWaveHUD() {
 
   if (!waveInfo || !progressBar) return;
 
-  // Ocultar el HUD en el lobby
-  if (currentMapType === 'lobby') {
+  // Ocultar el HUD en el lobby o si no hay enemigos
+  if (window.currentMapType === 'lobby' || (enemiesInWave === 0 && !isWaveActive)) {
     waveInfo.style.display = 'none';
     progressBar.style.display = 'none';
     return;

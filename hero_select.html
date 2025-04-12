@@ -344,8 +344,16 @@
     continueBtn.addEventListener('click', () => {
       if (selectedHero) {
         const currentLanguage = localStorage.getItem('language');
+        const existingPlayerData = JSON.parse(localStorage.getItem('playerData') || '{}');
+        const existingSkills = existingPlayerData.inventory || [];
+        const existingClass = existingPlayerData.class;
         localStorage.clear();
         if (currentLanguage) localStorage.setItem('language', currentLanguage);
+        
+        // Si el jugador está muerto y ya tenía una clase seleccionada, mantener las habilidades
+        if (existingClass === selectedHero) {
+          localStorage.setItem('playerSkills', JSON.stringify(existingSkills));
+        }
 
         const heroData = heroStats[selectedHero];
         const skillStats = {
@@ -417,8 +425,11 @@
           stamina: 100,
           maxStamina: 100,
           abilities: heroData.abilities,
-          inventory: [skillItem]
+          inventory: existingClass === selectedHero ? JSON.parse(localStorage.getItem('playerSkills') || '[]') : [skillItem]
         };
+        
+        // Limpiar las habilidades guardadas después de usarlas
+        localStorage.removeItem('playerSkills');
         
         localStorage.setItem('playerData', JSON.stringify(playerData));
         window.location.href = 'game.html';
