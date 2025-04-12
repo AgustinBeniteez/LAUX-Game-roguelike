@@ -1,28 +1,7 @@
-const MAP_TYPE_LOBBY = 'lobby';
-
-class Map {
+class Map1 {
     constructor(tileSize = 64) {
-        this.hasMapChanged = false;
-        this.centerTilePosition = {
-            x: 7,
-            y: 5
-        };
         this.tileSize = tileSize;
-        this.mapType = MAP_TYPE_LOBBY;
         this.mapData = [
-            [5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5],
-            [5, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 5],
-            [5, 3, 3, 20, 7, 7, 7, 7, 7, 7, 7, 7, 17, 3, 3, 5],
-            [5, 3, 3, 9, 2, 13, 13, 13, 13, 13, 13, 1, 8, 3, 3, 5],
-            [5, 3, 3, 9, 13, 13, 3, 3, 3, 3, 13, 16, 8, 3, 3, 5],
-            [5, 3, 3, 9, 13, 13, 3, 6, 6, 3, 13, 13, 8, 3, 3, 5],
-            [5, 3, 3, 9, 15, 13, 3, 3, 3, 3, 12, 13, 8, 3, 3, 5],
-            [5, 3, 3, 9, 2, 13, 13, 13, 13, 12, 13, 1, 8, 3, 3, 5],
-            [5, 3, 3, 19, 10, 10, 10, 10, 10, 10, 10, 10, 18, 3, 3, 5],
-            [5, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 5],
-            [5, 0, 0, 1, 2, 0, 0, 0, 0, 0, 2, 1, 0, 0, 0, 5],
-        ];
-        this.forestMapData = [
             [1, 1, 2, 1, 1, 1, 1, 1, 2, 33, 1, 2, 1, 2, 1, 2, 1, 1, 2, 1, 1, 1, 1, 32, 1, 1, 1, 1, 1, 31, 1, 33],
             [1, 2, 1, 1, 34, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 27, 26, 0, 1],
             [1, 32, 2, 0, 2, 0, 1, 0, 2, 33, 2, 2, 1, 1, 1, 33, 0, 2, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 34, 1],
@@ -47,43 +26,13 @@ class Map {
             [1, 1, 1, 2, 0, 0, 1, 2, 1, 0, 1, 1, 2, 27, 1, 0, 0, 1, 2, 1, 1, 27, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1],
             [1, 0, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 27, 1, 0, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1]
         ];
-        this.cryptMapData = [
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
-            [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-            [1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1],
-            [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
-            [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
-            [1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1],
-            [1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1],
-            [1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        ];
-        this.swampMapData = [
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            [1, 0, 0, 0, 2, 0, 0, 2, 2, 0, 0, 2, 0, 0, 0, 1],
-            [1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 1],
-            [1, 0, 0, 2, 0, 0, 2, 0, 0, 2, 0, 0, 2, 0, 0, 1],
-            [1, 2, 0, 0, 0, 2, 0, 0, 0, 0, 2, 0, 0, 0, 2, 1],
-            [1, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 1],
-            [1, 2, 0, 0, 0, 0, 2, 0, 0, 2, 0, 0, 0, 0, 2, 1],
-            [1, 0, 0, 2, 0, 2, 0, 0, 0, 0, 2, 0, 2, 0, 0, 1],
-            [1, 0, 2, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 2, 0, 1],
-            [1, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 1],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        ];
         this.tileSprites = {};
         this.loadTileSprites();
     }
 
     loadTileSprites() {
         const tilesetImage = new Image();
-        tilesetImage.src = this.mapType === 'lobby' ? 'sprites/lobby_tiles.png' :
-                          this.mapType === 'forest' ? 'sprites/tiles_cesped.png' :
-                          this.mapType === 'crypt' ? 'sprites/wall_tile.png' :
-                          this.mapType === 'swamp' ? 'sprites/floor_tile.png' :
-                          'sprites/lobby_tiles.png';
+        tilesetImage.src = 'sprites/tiles_cesped.png';
 
         tilesetImage.onload = () => {
             const tileSize = 64;
@@ -124,41 +73,6 @@ class Map {
 
     getMapHeight() {
         return this.mapData.length * this.tileSize;
-    }
-
-    changeMap(mapType, mapData) {
-        this.mapType = mapType;
-        if (mapData) {
-            this.mapData = mapData;
-        } else {
-            switch(mapType) {
-                case 'forest':
-                    this.mapData = this.forestMapData;
-                    break;
-                case 'crypt':
-                    this.mapData = this.cryptMapData;
-                    break;
-                case 'swamp':
-                    this.mapData = this.swampMapData;
-                    break;
-            }
-        }
-        this.loadTileSprites();
-        const event = new CustomEvent('mapChanged', { detail: { mapType: this.mapType } });
-        document.dispatchEvent(event);
-    }
-
-    isPlayerInCenter(player) {
-        if (this.mapType !== MAP_TYPE_LOBBY) return false;
-        const tileX = Math.floor(player.x / this.tileSize);
-        const tileY = Math.floor(player.y / this.tileSize);
-        return tileX === this.centerTilePosition.x && tileY === this.centerTilePosition.y;
-    }
-
-    checkPlayerPosition(player) {
-        if (this.isPlayerInCenter(player) && this.mapType === MAP_TYPE_LOBBY) {
-            window.abrirSelectorMap();
-        }
     }
 
     render(ctx, cameraX, cameraY) {

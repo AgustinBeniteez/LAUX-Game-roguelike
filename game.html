@@ -12,9 +12,6 @@
   <link href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css' rel='stylesheet'/>
   <link rel="stylesheet" href="custom_cursor.css">
   <link rel="stylesheet" href="src/fonts.css">
-  <script src="devMenu.js"></script>
-  <script src="src/js/entity.js"></script>
-  <script src="src/js/projectiles/mainprojectile.js"></script>
   <script>
     // Load saved language
     const currentLang = localStorage.getItem('language') || 'es';
@@ -164,11 +161,11 @@
       const mouseY = (event.clientY - rect.top) * scaleY;
 
       const skillType = `mainproyectil_${player.class}_${isAimingE ? 'e' : 'r'}`;
-      const projectile = new MainProjectile(
+      const projectile = new Projectile(
         player.x,
         player.y,
-        mouseX + engine.cameraX,
-        mouseY + engine.cameraY,
+        mouseX,
+        mouseY,
         skillType,
         ability.damage,
         player.speed
@@ -220,7 +217,7 @@
     .skill-box[data-tooltip]:hover::after {
       content: attr(data-tooltip);
       position: absolute;
-      bottom: 225%;
+      bottom: 120%;
       left: 50%;
       transform: translateX(-50%);
       padding: 12px;
@@ -229,7 +226,7 @@
       border-radius: 6px;
       font-size: 14px;
       white-space: pre;
-      z-index: 999999;
+      z-index: 99999;
       border: 1px solid rgba(255, 255, 255, 0.4);
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
       line-height: 1.4;
@@ -342,18 +339,14 @@
     <div id="skills-container" style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px; align-items: center;">
       <!-- Habilidades activables -->
       <div id="active-skills" style="display: flex; gap: 10px; background: rgba(0, 0, 0, 0.7); padding: 10px; border-radius: 10px;">
-        <div class="skill-box" style="width: 50px; height: 50px; border: 2px solid #fff; border-radius: 5px; position: relative; overflow: visible; cursor: pointer;" data-tooltip="⚔️ Habilidad Principal [E]&#10;💥 Daño: 24&#10;⏱️ Cooldown: 3.8s&#10;🎯 Proyectiles: 1&#10;❄️ Efecto: Ralentización&#10;📈 Nivel: ●○○">
+        <div class="skill-box" style="width: 50px; height: 50px; border: 2px solid #fff; border-radius: 5px; position: relative; overflow: visible; cursor: pointer;" data-tooltip="⚔️ Habilidad Principal [E]&#10;💥 Daño: 24&#10;⏱️ Cooldown: 3.8s&#10;🎯 Proyectiles: 1&#10;❄️ Efecto: Ralentización">
           <div class="skill-icon" id="skill-e-icon" style="width: 100%; height: 100%; background-size: contain; background-repeat: no-repeat; background-position: center;"></div>
-          <button class="upgrade-btn" onclick="upgradeSkill('e')" style="position: absolute; top: -10px; right: -10px; width: 20px; height: 20px; background: #ffd700; border: 1px solid #fff; border-radius: 50%; color: white; font-size: 14px; cursor: pointer; display: none; align-items: center; justify-content: center; padding: 0;">+</button>
-          <div class="skill-level" style="position: absolute; top: -2px; left: 2px; font-size: 12px; color: #ffd700;">●○○</div>
           <div class="cooldown-overlay" id="skill-e-cooldown" style="position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; background: rgb(45 45 45 / 69%); transform-origin: bottom; transform: scaleY(0); transition: transform 0.1s linear;"></div>
           <div class="key-bind" style="position: absolute; bottom: 2px; right: 2px; background: rgba(0, 0, 0, 0.7); padding: 2px 4px; border-radius: 3px; font-size: 12px; color: white;">E</div>
           <div class="cooldown-timer" id="skill-e-timer" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 16px; text-shadow: 1px 1px 2px black; display: none;"></div>
         </div>
-        <div class="skill-box" style="width: 50px; height: 50px; border: 2px solid #fff; border-radius: 5px; position: relative; overflow: visible; cursor: pointer;" data-tooltip="⚔️ Habilidad Secundaria [R]&#10;💥 Daño: 35&#10;⏱️ Cooldown: 5s&#10;🎯 Proyectiles: 2&#10;🔥 Efecto: Daño en área&#10;📈 Nivel: ●○○">
+        <div class="skill-box" style="width: 50px; height: 50px; border: 2px solid #fff; border-radius: 5px; position: relative; overflow: visible; cursor: pointer;" data-tooltip="⚔️ Habilidad Secundaria [R]&#10;💥 Daño: 35&#10;⏱️ Cooldown: 5s&#10;🎯 Proyectiles: 2&#10;🔥 Efecto: Daño en área">
           <div class="skill-icon" id="skill-r-icon" style="width: 100%; height: 100%; background-size: contain; background-repeat: no-repeat; background-position: center;"></div>
-          <button class="upgrade-btn" onclick="upgradeSkill('r')" style="position: absolute; top: -10px; right: -10px; width: 20px; height: 20px; background: #ffd700; border: 1px solid #fff; border-radius: 50%; color: white; font-size: 14px; cursor: pointer; display: none; align-items: center; justify-content: center; padding: 0;">+</button>
-          <div class="skill-level" style="position: absolute; top: -2px; left: 2px; font-size: 12px; color: #ffd700;">●○○</div>
           <div class="cooldown-overlay" id="skill-r-cooldown" style="position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; background: rgb(45 45 45 / 69%); transform-origin: bottom; transform: scaleY(0); transition: transform 0.1s linear;"></div>
           <div class="key-bind" style="position: absolute; bottom: 2px; right: 2px; background: rgba(0, 0, 0, 0.7); padding: 2px 4px; border-radius: 3px; font-size: 12px; color: white;">R</div>
           <div class="cooldown-timer" id="skill-r-timer" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 16px; text-shadow: 1px 1px 2px black; display: none;"></div>
@@ -376,22 +369,16 @@
     <span id="wave-value">1</span>
     </div>
     
-    <div class="exp-bar-container" style="position: absolute; bottom: 130px; left: 50%; transform: translateX(-50%); width: 530px; height: 10px; background: rgba(0, 0, 0, 0.7); border-radius: 5px; overflow: visible; z-index: 10;">
+    <div class="exp-bar-container" style="position: absolute; bottom: 130px; left: 50%; transform: translateX(-50%); width: 530px; height: 10px; background: rgba(0, 0, 0, 0.7); border-radius: 5px; overflow: visible;">
     <div style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); color: white; font-size: 14px; text-shadow: 1px 1px 2px black;" id="level-display">Level 1</div>
     <div id="exp-bar" style="width: 0%; height: 100%; background: #3bc2ab; border-radius: 5px; transition: width 0.3s ease;"></div>
     </div>
-    <div class="health-bar-container" style="position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%); width: 530px; height: 25px; background: #222; border-radius: 5px; overflow: visible; z-index: 10;">
-    <div id="health-bar-damage" style="width: 100%; height: 100%; background: #4d0707b7; border-radius: 5px; position: absolute; transition: width 0.5s ease;"></div>
-    <div id="health-bar" style="width: 100%; height: 100%; background: #2ecc71; border-radius: 5px; transition: width 0.3s ease; position: relative;"></div>
+    <div class="health-bar-container" style="position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%); width: 530px; height: 25px; background: rgba(0, 0, 0, 0.7); border-radius: 5px; overflow: visible;">
+    <div id="health-bar" style="width: 100%; height: 100%; background: #2ecc71; border-radius: 5px; transition: width 0.3s ease;"></div>
     <div id="health-text" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 12px; text-shadow: 1px 1px 2px black;">100/100</div>
     </div>
 
-    <div id="boss-health-container" style="display: none; position: absolute; top: 20px; left: 20px; width: 400px; background: rgba(0, 0, 0, 0.8); border: 2px solid #ffd700; border-radius: 5px; padding: 5px; z-index: 10;">
-      <div id="boss-name" style="color: #ffd700; font-size: 18px; margin-bottom: 5px; text-align: center; text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);">BOSS</div>
-      <div style="width: 100%; height: 20px; background: #222; border-radius: 3px; overflow: hidden;">
-        <div id="boss-health-bar" style="width: 100%; height: 100%; background: #ff0000; transition: width 0.3s ease;"></div>
-      </div>
-    </div>
+    
 
     </div>
 
@@ -504,116 +491,10 @@
   <script src="floatingNumber.js"></script>
   <script src="proyectiles.js"></script>
   <script src="skills.js"></script>
+  <script src="mapSelector.js"></script>
   <script src="main.js"></script>
   <script>
-    // Sistema de niveles de habilidades
-let skillLevels = {
-  e: 1,
-  r: 1
-};
-let skillPoints = 0;
-
-function updateSkillLevelDisplay(skillKey) {
-  const playerData = JSON.parse(localStorage.getItem('playerData'));
-  const skillIndex = skillKey === 'e' ? 0 : 1;
-  const ability = playerData?.abilities?.[skillIndex];
-  const skillBox = document.querySelector(`#skill-${skillKey}-icon`).parentElement;
-  const upgradeBtn = skillBox.querySelector('.upgrade-btn');
-  const skillLevel = skillBox.querySelector('.skill-level');
-  
-  if (ability && ability.level < 3) {
-    upgradeBtn.style.display = 'flex';
-    // Actualizar los puntos visuales según el nivel
-    const filledDots = '●'.repeat(ability.level);
-    const emptyDots = '○'.repeat(3 - ability.level);
-    skillLevel.textContent = filledDots + emptyDots;
-  } else {
-    upgradeBtn.style.display = 'none';
-  }
-}
-
-// Escuchar evento de subida de nivel
-document.addEventListener('levelUp', () => {
-  skillPoints++;
-  engine.isPaused = true; // Pausar el juego al subir de nivel
-  // Mostrar botones de mejora si el nivel de la habilidad es menor que 3
-  // Función para actualizar la visualización del nivel de habilidad
-  function updateSkillLevelDisplay(skillKey) {
-    const playerData = JSON.parse(localStorage.getItem('playerData'));
-    const skillIndex = skillKey === 'e' ? 0 : 1;
-    const ability = playerData?.abilities?.[skillIndex];
-    const upgradeBtn = document.querySelector(`.skill-box:nth-child(${skillIndex + 1}) .upgrade-btn`);
-    const skillLevel = document.querySelector(`.skill-box:nth-child(${skillIndex + 1}) .skill-level`);
-    
-    if (ability && ability.level < 3) {
-      upgradeBtn.style.display = 'flex';
-      // Actualizar los puntos visuales según el nivel
-      const filledDots = '●'.repeat(ability.level);
-      const emptyDots = '○'.repeat(3 - ability.level);
-      skillLevel.textContent = filledDots + emptyDots;
-    } else {
-      upgradeBtn.style.display = 'none';
-    }
-  }
-  
-  // Actualizar la visualización para ambas habilidades
-  updateSkillLevelDisplay('e');
-  updateSkillLevelDisplay('r');
-});
-
-// Función para mejorar una habilidad
-function upgradeSkill(skillKey) {
-  if (skillPoints > 0) {
-    const playerData = JSON.parse(localStorage.getItem('playerData'));
-    const skillIndex = skillKey === 'e' ? 0 : 1;
-    const ability = playerData.abilities[skillIndex];
-    
-    if (ability.level < 3) {
-      ability.level++;
-      ability.damage += 10; // Aumentar el daño
-      ability.cooldown *= 0.9; // Reducir el tiempo de cooldown
-      skillPoints--;
-      
-      localStorage.setItem('playerData', JSON.stringify(playerData));
-      updateSkillLevelDisplay(skillKey);
-      
-      // Si no quedan puntos de habilidad, reanudar el juego
-      if (skillPoints === 0) {
-        engine.isPaused = false;
-      }
-    }
-  }
-}
-
-// Escuchar cuando se reanuda el juego para ocultar los botones
-document.addEventListener('resumeGame', () => {
-  engine.isPaused = false;
-  document.querySelectorAll('.upgrade-btn').forEach(btn => btn.style.display = 'none');
-});
-
-// Inicializar los displays de nivel
-document.addEventListener('DOMContentLoaded', () => {
-  updateSkillLevelDisplay('e');
-  updateSkillLevelDisplay('r');
-});
-
-
-document.addEventListener('DOMContentLoaded', () => {
-      // Función para actualizar la barra de vida y mostrar el daño
-      window.updateHealthBar = function(currentHealth, maxHealth) {
-        const healthBar = document.getElementById('health-bar');
-        const healthBarDamage = document.getElementById('health-bar-damage');
-        const healthText = document.getElementById('health-text');
-        
-        const healthPercent = (currentHealth / maxHealth) * 100;
-        healthBar.style.width = healthPercent + '%';
-        healthText.textContent = `${Math.ceil(currentHealth)}/${maxHealth}`;
-        
-        // Mostrar el daño en rojo
-        healthBarDamage.style.width = healthPercent + '%';
-        healthBarDamage.style.transition = 'width 0.3s ease';
-      };
-
+    document.addEventListener('DOMContentLoaded', () => {
       // Actualizar tooltips de habilidades con datos del jugador
       function updateSkillTooltips() {
         const playerData = JSON.parse(localStorage.getItem('playerData'));

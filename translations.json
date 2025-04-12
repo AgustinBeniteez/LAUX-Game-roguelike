@@ -1,5 +1,6 @@
 {
   "fr": {
+    "pressToChangeMap": "Appuyez sur F pour changer de carte",
     "home": "Accueil",
     "credits": "Crédits",
     "wave": "Vague",
@@ -84,6 +85,7 @@
     "leavesDescription": "Crée un vortex de feuilles qui tourne autour du joueur"
   },
   "ja": {
+    "pressToChangeMap": "Fキーを押してマップを変更",
     "home": "ホーム",
     "credits": "クレジット",
     "wave": "波",
@@ -168,6 +170,7 @@
     "leavesDescription": "プレイヤーの周りを回る葉の渦を作成"
   },
   "pt": {
+    "pressToChangeMap": "Pressione F para mudar de mapa",
     "home": "Início",
     "credits": "Créditos",
     "wave": "Aceno",
@@ -252,6 +255,7 @@
     "leavesDescription": "Cria um vórtice de folhas que gira em torno do jogador"
   },
   "ko": {
+    "pressToChangeMap": "F키를 눌러 맵 변경",
     "home": "홈",
     "credits": "크레딧",
     "wave": "파도",
@@ -336,6 +340,7 @@
     "leavesDescription": "플레이어 주위를 회전하는 잎사귀 소용돌이를 생성"
   },
   "es": {
+    "pressToChangeMap": "Presiona F para cambiar de mapa",
     "home": "Inicio",
     "credits": "Créditos",
     "wave": "Oleada",
@@ -420,6 +425,7 @@
     "leavesDescription": "Crea un vórtice de hojas que gira alrededor del jugador"
   },
   "en": {
+    "pressToChangeMap": "Press F to change map",
     "home": "Home",
     "credits": "Credits",
     "title": "LAUX GAME",

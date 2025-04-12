@@ -1,12 +1,18 @@
 const assetManager = new AssetManager();
 const engine = new Engine('gameCanvas', 1000, 500);
 
+// Definir el tipo de mapa actual (lobby por defecto)
+window.currentMapType = 'lobby';
+
+// Inicializar el selector de mapas
+const mapSelector = new MapSelector(engine);
+
 // Load game state and player data
 const gameState = JSON.parse(localStorage.getItem('gameState')) || {
   currentWave: 1,
   waveTimer: 120,
   nextWaveTimer: 30,
-  isWaveActive: true,
+  isWaveActive: false,
   isBossSpawned: false,
   entities: []
 };
@@ -122,6 +128,8 @@ updateHUD();
 // Actualizar HUD cada frame
 engine.onUpdate = function() {
     updateHUD();
+    mapSelector.update(player);
+    engine.map.checkPlayerPosition(player);
 };
 
 engine.addEntity(player);
@@ -168,12 +176,15 @@ setInterval(saveGame, 30000);
 // Sistema de oleadas y jefes
 let currentWave = gameState.currentWave || 1;
 let enemiesInWave = 0;
-let maxEnemiesInWave = 5;
-let waveTimer = gameState.waveTimer || 120; // 1:10 minutos por oleada
+let maxEnemiesInWave = 12; // Aumentado para más enemigos por oleada
+const WAVE_DURATION = 120; // Duración fija de 2 minutos para todas las oleadas
+let waveTimer = gameState.waveTimer || WAVE_DURATION;
 let nextWaveTimer = gameState.nextWaveTimer || 30; // 30 segundos entre oleadas
 let isWaveActive = gameState.isWaveActive;
 let isBossSpawned = gameState.isBossSpawned;
-let maxLiveEnemies = 12; // Límite de enemigos vivos simultáneamente
+let maxLiveEnemies = 15; // Aumentado el límite de enemigos vivos simultáneamente
+let spawnInterval = 2; // Reducido para spawns más frecuentes
+let lastSpawnTime = 0; // Tiempo del último spawn
 
 // Restaurar enemigos guardados
 if (gameState.entities && gameState.entities.length > 0) {
@@ -199,7 +210,8 @@ if (gameState.entities && gameState.entities.length > 0) {
 
 // Función para generar enemigos aleatorios
 function spawnEnemy(isBoss = false) {
-  if (player.isDead) return;
+  // Verificar si estamos en el lobby o si el jugador está muerto
+  if (window.currentMapType === 'lobby' || player.isDead) return;
 
   // Verificar el límite de enemigos vivos
   const currentEnemies = engine.entities.filter(e => e.isEnemy && !e.isDead).length;
@@ -269,6 +281,22 @@ function spawnEnemy(isBoss = false) {
 
 // Función para actualizar los contadores del HUD
 function updateWaveHUD() {
+  const waveInfo = document.getElementById('wave-info');
+  const progressBar = document.getElementById('wave-progress');
+
+  if (!waveInfo || !progressBar) return;
+
+  // Ocultar el HUD en el lobby
+  if (currentMapType === 'lobby') {
+    waveInfo.style.display = 'none';
+    progressBar.style.display = 'none';
+    return;
+  }
+
+  // Mostrar el HUD para otros mapas
+  waveInfo.style.display = 'block';
+  progressBar.style.display = 'block';
+  
   document.getElementById('wave-value').textContent = currentWave;
   const timeInSeconds = isWaveActive ? Math.ceil(waveTimer) : Math.ceil(nextWaveTimer);
   const minutes = Math.floor(timeInSeconds / 60);
@@ -277,7 +305,6 @@ function updateWaveHUD() {
   document.getElementById('next-wave-timer').textContent = formattedTime;
 
   // Actualizar la barra de progreso
-  const progressBar = document.getElementById('wave-progress');
   if (progressBar) {
     const totalTime = isWaveActive ? 120 : 30; // 120s para oleada, 30s entre oleadas
     const currentTime = isWaveActive ? waveTimer : nextWaveTimer;
@@ -305,7 +332,34 @@ function updatePlayerExperience() {
   }
 }
 
+function resetWaveSystem() {
+  currentWave = 1;
+  waveTimer = WAVE_DURATION;
+  nextWaveTimer = 30;
+  isWaveActive = true;
+  isBossSpawned = false;
+  enemiesInWave = 0;
+  maxEnemiesInWave = 15; // Aumentado para tener más enemigos desde el inicio
+  maxLiveEnemies = 20; // Aumentado el límite de enemigos simultáneos
+  spawnInterval = 1.5; // Reducido para spawns más frecuentes
+  lastSpawnTime = 0;
+  
+  // Generar varios enemigos iniciales al cambiar de mapa
+  for (let i = 0; i < 5; i++) {
+    spawnEnemy();
+  }
+}
+
 function waveManager(dt) {
+  if (currentMapType === 'lobby') return;
+  
+  // Reiniciar sistema de oleadas si se cambia de mapa
+  if (engine.map.hasMapChanged) {
+    resetWaveSystem();
+    engine.map.hasMapChanged = false;
+    return;
+  }
+  
   if (isWaveActive) {
     waveTimer -= dt;
     updatePlayerExperience();
@@ -329,9 +383,13 @@ function waveManager(dt) {
       }
     });
     
-    // Generar enemigos durante la oleada
-    if (enemiesInWave < maxEnemiesInWave && Math.random() < 0.1) {
-      spawnEnemy();
+    // Generar enemigos durante la oleada de manera más consistente
+    if (enemiesInWave < maxEnemiesInWave) {
+      const currentTime = waveTimer;
+      if (currentTime - lastSpawnTime >= spawnInterval) {
+        spawnEnemy();
+        lastSpawnTime = currentTime;
+      }
     }
     
     // Generar jefe cuando queden 70 segundos (1:10)
@@ -461,11 +519,18 @@ function waveManager(dt) {
     // Iniciar nueva oleada
     if (nextWaveTimer <= 0) {
       currentWave++; // Incrementar el número de oleada aquí, después de la fase de selección
-      maxEnemiesInWave = Math.min(5 + currentWave * 2, 20);
+      maxEnemiesInWave = Math.min(12 + currentWave * 3, 25); // Aumentada la progresión de enemigos por oleada
       waveTimer = 120;
       enemiesInWave = 0;
       isBossSpawned = false;
       isWaveActive = true;
+      spawnInterval = Math.max(2 - (currentWave * 0.2), 1); // El intervalo de spawn se reduce con cada oleada
+      maxLiveEnemies = Math.min(15 + currentWave * 2, 30); // Aumentar el límite de enemigos vivos con cada oleada
+      
+      // Generar enemigos iniciales para la nueva oleada
+      for (let i = 0; i < Math.min(5 + currentWave, 10); i++) {
+        spawnEnemy();
+      }
     }
   }
   
