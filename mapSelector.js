@@ -166,10 +166,10 @@ class MapSelector {
         const mapWidth = this.engine.map.getMapWidth();
         const mapHeight = this.engine.map.getMapHeight();
         const centerX = Math.floor(mapWidth / 2);
-        const centerY = Math.floor(mapHeight / 2);
+        const centerY = Math.floor(mapHeight / 3);
         
         // Aumentar el área de tolerancia para una mejor detección
-        const tolerance = 256;
+        const tolerance = 200;
         
         const playerCenterX = Math.floor(player.x);
         const playerCenterY = Math.floor(player.y);
@@ -314,7 +314,7 @@ class MapSelector {
 
     setupKeyboardListener() {
         document.addEventListener('keydown', (event) => {
-            if (event.key === 'Escape' && this.isMenuOpen) {
+            if ((event.key === 'Escape' || event.key.toLowerCase() === 'f') && this.isMenuOpen) {
                 this.toggleMenu(false);
                 return;
             }

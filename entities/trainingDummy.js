@@ -51,7 +51,7 @@ class TrainingDummy extends Entity {
         
         // Número de vida
         ctx.fillStyle = '#ffffff';
-        ctx.font = '12px Arial';
+        ctx.font = '10px "Mineglyph"';
         ctx.textAlign = 'center';
         ctx.fillText(
             Math.ceil(this.health),
