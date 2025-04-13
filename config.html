@@ -461,10 +461,6 @@
       const showFPS = localStorage.getItem('showFPS') || 'off';
       document.getElementById('showFPSSelect').value = showFPS;
 
-      // Cargar configuración de números de daño
-      const damageNumbers = localStorage.getItem('damageNumbers') || 'on';
-      document.getElementById('damageNumbersSelect').checked = damageNumbers !== 'off';
-
       // Cargar volúmenes
       const soundVolume = localStorage.getItem('soundVolume') || '70';
       const musicVolume = localStorage.getItem('musicVolume') || '70';
@@ -671,7 +667,7 @@ damageNumbersCheckbox.addEventListener('change', function() {
 
     // Configuración de la navegación
     const configSections = {
-      home: ['languageSelect', 'termsSelect', 'damageNumbersSelect', 'brightnessSlider'],
+      home: ['languageSelect', 'termsSelect', 'brightnessSlider'],
       performance: ['performanceSelect', 'showFPSSelect'],
       sound: ['soundVolume', 'musicVolume'],
       controls: ['controlsContainer']

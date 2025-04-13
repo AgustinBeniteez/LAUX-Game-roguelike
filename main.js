@@ -214,11 +214,6 @@ if (gameState.entities && gameState.entities.length > 0) {
 }
 
 // Función para generar enemigos aleatorios
-// Cargar la clase TrainingDummy
-const trainingDummyScript = document.createElement('script');
-trainingDummyScript.src = 'entities/trainingDummy.js';
-document.head.appendChild(trainingDummyScript);
-
 function spawnTrainingDummies() {
     if (window.currentMapType === 'lobby') {
         // Posiciones fijas para los dummies en el lobby

@@ -45,6 +45,14 @@ class Minimap {
                 this.ctx.fillStyle = '#5abdef';
                 this.ctx.arc(x, y, 3, 0, Math.PI * 2);
                 this.ctx.fill();
+            } else if (entity.isHealingOrb) {
+                const x = entity.x * scaleX;
+                const y = entity.y * scaleY;
+                this.ctx.fillStyle = '#00FF00';
+                this.ctx.font = '10px Arial';
+                this.ctx.textAlign = 'center';
+                this.ctx.textBaseline = 'middle';
+                this.ctx.fillText('+', x, y);
             } else if (entity.isBoss) {
                 const x = entity.x * scaleX;
                 const y = entity.y * scaleY;
@@ -65,7 +73,7 @@ class Minimap {
         // Dibujar el jugador
         const player = engine.entities.find(e => !e.isEnemy);
         if (player) {
-            this.ctx.fillStyle = '#00ff00';
+            this.ctx.fillStyle = '#E679E2';
             const playerX = player.x * scaleX;
             const playerY = player.y * scaleY;
             this.ctx.beginPath();
