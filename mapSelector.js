@@ -302,12 +302,24 @@ class MapSelector {
         };
         keyIndicator.textContent = 'F';
 
-        const textBefore = document.createTextNode('Presiona ');
-        const textAfter = document.createTextNode(' para cambiar de mapa');
+        // Cargar las traduccioness
+        fetch('translations.json')
+            .then(response => response.json())
+            .then(translations => {
+                // Obtener el idioma actual del localStorage o usar 'es' por defecto
+                const currentLanguage = localStorage.getItem('language') || 'es';
+                const translation = translations[currentLanguage].pressToChangeMap;
+                
+                // Dividir la traducción en partes antes y después de 'F'
+                const [before, after] = translation.split('F');
+                
+                const textBefore = document.createTextNode(before);
+                const textAfter = document.createTextNode(after);
 
-        prompt.appendChild(textBefore);
-        prompt.appendChild(keyIndicator);
-        prompt.appendChild(textAfter);
+                prompt.appendChild(textBefore);
+                prompt.appendChild(keyIndicator);
+                prompt.appendChild(textAfter);
+            });
 
         document.body.appendChild(prompt);
     }
