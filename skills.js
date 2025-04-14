@@ -169,8 +169,10 @@ class SkillSystem {
             upgradeButton.onclick = () => this.upgradeSkill(i);
             skillBox.appendChild(upgradeButton);
             
-            // Mostrar botón de mejora si hay una habilidad equipada, no está al nivel máximo y hay puntos disponibles
-            if (this.equippedSkills[i] && this.skillLevels[i] < this.maxSkillLevel && this.skillPoints > 0) {
+            // Mostrar botón de mejora si hay una habilidad equipada y no está al nivel máximo
+            if (this.equippedSkills[i] && this.skillLevels[i] < this.maxSkillLevel) {
+                upgradeButton.style.cssText = 'position: absolute; top: 0px; right: 0px; background: rgb(49 197 192); color: white; border: none; padding: 11px 10px; cursor: pointer; font-size: 12px; border-radius: 0 0 0 5px; z-index: 10;';
+                upgradeButton.textContent = 'LvL +1';
                 upgradeButton.style.display = 'block';
             }
             
@@ -249,45 +251,63 @@ class SkillSystem {
     }
 
     upgradeSkill(index) {
-        if (!this.equippedSkills[index] || this.skillLevels[index] >= this.maxSkillLevel || this.skillPoints <= 0) return;
-        
-        // Crear una copia de la habilidad base si no existe
-        if (!this.equippedSkills[index].baseStats) {
-            this.equippedSkills[index].baseStats = {
-                damage: this.equippedSkills[index].damage,
-                cooldown: this.equippedSkills[index].cooldown,
-                orbitalRadius: this.equippedSkills[index].orbitalRadius || 60
-            };
-        }
-        
-        // Reducir puntos de habilidad disponibles
-        this.skillPoints--;
-        
-        this.skillLevels[index]++;
-        const level = this.skillLevels[index];
-        
-        // Calcular las estadísticas basadas en el nivel actual
-        const baseStats = this.equippedSkills[index].baseStats;
-        this.equippedSkills[index].damage = Math.floor(baseStats.damage * (1 + (level - 1) * 0.2)); // +20% por nivel
-        this.equippedSkills[index].cooldown = Math.max(0.5, baseStats.cooldown * Math.pow(0.9, level - 1)); // -10% por nivel
-
-        // Aumentar el radio orbital para la habilidad de hojas
-        if (this.equippedSkills[index].projectileType === 'leaves') {
-            this.equippedSkills[index].orbitalRadius = baseStats.orbitalRadius * (1 + (level - 1) * 0.15); // +15% por nivel
-        }
-        
-        // Actualizar el indicador de nivel solo para este slot
-        const skillBox = document.querySelector(`#skill-slot-${index}`);
-        if (skillBox) {
-            const levelIndicator = skillBox.querySelector('.level-indicator');
-            if (levelIndicator) {
-                levelIndicator.textContent = `Lv${this.skillLevels[index]}`;
-            }
+        if (index >= 0 && index < this.equippedSkills.length && this.equippedSkills[index]) {
+            const skill = this.equippedSkills[index];
             
-            // Ocultar botón de mejora si alcanza el nivel máximo
-            const upgradeButton = skillBox.querySelector('.upgrade-button');
-            if (upgradeButton && this.skillLevels[index] >= this.maxSkillLevel) {
-                upgradeButton.style.display = 'none';
+            // Verificar si es una habilidad principal (índices 0 y 1)
+            const isMainSkill = index <= 1;
+            
+            // Verificar si se puede mejorar la habilidad
+            if (this.skillLevels[index] < this.maxSkillLevel) {
+                // Para habilidades principales, verificar si se ha usado la mejora de nivel
+                if (isMainSkill && window.skillSystem.levelUpgradeUsed) {
+                    // Guardar el progreso para futura mejora
+                    if (!this.pendingUpgrades) this.pendingUpgrades = new Array(5).fill(false);
+                    this.pendingUpgrades[index] = true;
+                    
+                    // Mostrar mensaje de que la mejora está pendiente
+                    const skillBox = document.querySelector(`#skill-slot-${index}`);
+                    if (skillBox) {
+                        const pendingIndicator = document.createElement('div');
+                        pendingIndicator.className = 'pending-upgrade';
+                        pendingIndicator.style.cssText = 'position: absolute; top: -5px; right: -5px; width: 10px; height: 10px; background: gold; border-radius: 50%; animation: pulse 1s infinite;';
+                        skillBox.appendChild(pendingIndicator);
+                    }
+                    return;
+                }
+                
+                // Realizar la mejora
+                this.skillLevels[index]++;
+                
+                // Actualizar el indicador de nivel
+                const levelIndicator = document.querySelector(`#skill-slot-${index} .level-indicator`);
+                if (levelIndicator) {
+                    levelIndicator.textContent = `Lv${this.skillLevels[index]}`;
+                }
+                
+                // Actualizar las estadísticas de la habilidad
+                skill.damage = Math.floor(skill.damage * 1.2); // 20% más de daño por nivel
+                skill.cooldown = Math.max(skill.cooldown * 0.9, 0.5); // Reducción del cooldown hasta un mínimo de 0.5s
+                
+                // Si es una habilidad principal, marcar como usada la mejora de nivel
+                if (isMainSkill) {
+                    window.skillSystem.levelUpgradeUsed = true;
+                }
+                
+                // Limpiar el indicador de mejora pendiente si existía
+                if (this.pendingUpgrades && this.pendingUpgrades[index]) {
+                    this.pendingUpgrades[index] = false;
+                    const pendingIndicator = document.querySelector(`#skill-slot-${index} .pending-upgrade`);
+                    if (pendingIndicator) pendingIndicator.remove();
+                }
+                
+                // Ocultar el botón de mejora si se alcanza el nivel máximo
+                if (this.skillLevels[index] >= this.maxSkillLevel) {
+                    const upgradeButton = document.querySelector(`#skill-slot-${index} .upgrade-button`);
+                    if (upgradeButton) {
+                        upgradeButton.style.display = 'none';
+                    }
+                }
             }
         }
     }

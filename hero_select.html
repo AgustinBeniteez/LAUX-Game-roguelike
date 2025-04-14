@@ -135,9 +135,7 @@
 <body>
   <canvas id="gameCanvas" style="position: fixed; top: 0; left: 0; z-index: -1;"></canvas>
   <h1 class="title" data-translate="chooseHero">Elige tus habilidades principales</h1>
-  <div class="timer-container">
-    <div id="timer" style="color: white; font-size: 20px; margin-bottom: 20px;" data-translate="autoSelect">Selección automática en: 30s</div>
-  </div>
+
   <div class="hero-selection">
     <div class="hero-card" data-hero="guardian">
       <img class="hero-icon" src="src/Guardian_icon_fondo.png">
@@ -211,28 +209,6 @@
     let selectedHero = null;
     const cards = document.querySelectorAll('.hero-card');
     const continueBtn = document.getElementById('continue');
-    let timer = 30;
-    let timerInterval;
-
-    function startTimer() {
-      const timerElement = document.getElementById('timer');
-      timerInterval = setInterval(() => {
-        timer--;
-        timerElement.textContent = `Selección automática en: ${timer}s`;
-        if (timer <= 0) {
-          clearInterval(timerInterval);
-          if (!selectedHero) {
-            const availableHeroes = ['guardian', 'sentinel', 'arcane'];
-            const randomHero = availableHeroes[Math.floor(Math.random() * availableHeroes.length)];
-            const randomCard = document.querySelector(`[data-hero="${randomHero}"]`);
-            randomCard.click();
-            setTimeout(() => continueBtn.click(), 500);
-          }
-        }
-      }, 1000);
-    }
-
-    startTimer();
 
     const projectileConfig = {
       mainproyectil_arcane_e: {

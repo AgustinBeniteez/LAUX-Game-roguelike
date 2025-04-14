@@ -111,11 +111,13 @@ class MapSelector {
                     top: 50%;
                     left: 50%;
                     transform: translate(-50%, -50%);
-                    font-size: 40px;
-                    color: #E8B16D;
+                    width: 40px;
+                    height: 40px;
+                    background: url('sprites/mouse_lock.png') no-repeat center;
+                    background-size: contain;
                     z-index: 2;
+                    pointer-events: none;
                 `;
-                lock.innerHTML = '🔒';
                 imageContainer.appendChild(lock);
             }
 
@@ -154,6 +156,8 @@ class MapSelector {
             if (map.level <= this.unlockedLevels) {
                 mapContainer.style.cursor = 'pointer';
                 mapContainer.onclick = () => this.selectMap(map.type);
+            } else {
+                mapContainer.style.cursor = 'url(sprites/mouse_lock.png), auto';
             }
 
             mapMenu.appendChild(mapContainer);

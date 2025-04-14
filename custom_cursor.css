@@ -68,3 +68,11 @@ input[type="checkbox"]:active {
 .custom-checkbox input:checked ~ .checkmark {
   cursor: url('sprites/mouse_game.png'), auto;
 }
+
+/* Regla específica para mapas bloqueados */
+#map-selection-menu div[style*="filter: grayscale(100%)"] {
+  cursor: url('sprites/mouse_lock.png'), auto !important;
+}
+#map-selection-menu div[style*="filter: grayscale(100%)"]:hover {
+  cursor: url('sprites/mouse_lock.png'), auto !important;
+}

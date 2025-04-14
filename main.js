@@ -445,7 +445,7 @@ function waveManager(dt) {
       // Mostrar menú de selección de cartas
       const skillSelection = document.createElement('div');
       skillSelection.id = 'skill-selection';
-      skillSelection.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; gap: 20px; z-index: 1000;';
+      skillSelection.style.cssText = 'image-rendering: pixelated; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; gap: 20px; z-index: 1000;';
       
       // Crear 3 cartas de habilidades aleatorias
       const availableSkills = window.skillSystem.skills.filter(skill => !window.skillSystem.equippedSkills.includes(skill));
@@ -454,12 +454,20 @@ function waveManager(dt) {
         if (randomSkill) {
           const card = document.createElement('div');
           card.className = 'skill-card';
-          card.style.cssText = 'width: 150px; height: 200px; background: rgba(0, 0, 0, 0.8); border: 2px solid #4CAF50; border-radius: 10px; padding: 10px; cursor: pointer; color: white; text-align: center;';
+          card.style.cssText = 'width: 200px; background: url(sprites/card_sprite.png) no-repeat center; background-size: contain; padding: 15px; cursor: pointer; color: black; text-align: center; position: relative; font-family: "Mineglyph", sans-serif;';
+          card.addEventListener('mouseover', () => {
+            card.style.backgroundImage = 'url(sprites/card_selected_sprite.png)';
+          });
+          card.addEventListener('mouseout', () => {
+            if (!card.classList.contains('selected')) {
+              card.style.backgroundImage = 'url(sprites/card_sprite.png)';
+            }
+          });
           card.innerHTML = `
-            <img src="${randomSkill.icon}" style="width: 64px; height: 64px; margin-bottom: 10px;">
-            <h3>${randomSkill.name}</h3>
-            <p>Daño: ${randomSkill.damage}</p>
-            <p>Velocidad: ${randomSkill.speed}</p>
+            <img src="${randomSkill.icon}" style="width: 96px; height: 96px; margin: 20px auto;">
+            <h3 style="font-size: 24px; margin: 15px 0;">${randomSkill.name}</h3>
+            <p style="font-size: 18px; margin: 10px 0;">Daño: ${randomSkill.damage}</p>
+            <p style="font-size: 18px; margin: 10px 0;">Velocidad: ${randomSkill.speed}</p>
           `;
           skillSelection.appendChild(card);
         }
@@ -493,7 +501,9 @@ function waveManager(dt) {
       
       // Iniciar temporizador de selección
       let timeLeft = 30; // 30 segundos para seleccionar
-      const timerElement = document.getElementById('weapon-selection-timer');
+      const timerElement = document.createElement('div');
+      timerElement.style.cssText = 'position: absolute; top: -40px; left: 50%; transform: translateX(-50%); font-size: 32px; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); font-family: "Mineglyph", sans-serif;';
+      skillSelection.appendChild(timerElement);
       const nextWaveTimerElement = document.getElementById('next-wave-timer');
       let timer = setInterval(() => {
         timeLeft--;
@@ -509,7 +519,7 @@ function waveManager(dt) {
         // Si se acaba el tiempo, seleccionar habilidad aleatoria
         if (timeLeft <= 0) {
           const randomSkill = Math.floor(Math.random() * 3);
-          selectSkill(randomSkill, true); // true indica que fue selección automática
+          selectSkill(randomSkill, false); // Cambiado a false para que use 5s como en selección manual
           clearInterval(timer);
         }
       }, 1000);
