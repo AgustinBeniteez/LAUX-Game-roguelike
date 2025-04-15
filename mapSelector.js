@@ -6,7 +6,14 @@ class MapSelector {
             x: 7,
             y: 5
         };
-        this.unlockedLevels = 1; // Inicialmente solo el primer nivel está desbloqueado
+        // Cargar niveles desbloqueados desde localStorage
+        const savedData = localStorage.getItem('playerData');
+        if (savedData) {
+            const playerData = JSON.parse(savedData);
+            this.unlockedLevels = playerData.unlockedMaps?.includes('map2') ? 2 : 1;
+        } else {
+            this.unlockedLevels = 1; // Inicialmente solo el primer nivel está desbloqueado
+        }
         this.createMapMenu();
         this.createPromptIndicator();
         this.setupKeyboardListener();
@@ -35,7 +42,7 @@ class MapSelector {
 
         const maps = [
             { name: 'Bosque Maldito', type: 'forest', level: 1, image: 'src/background_homegame.gif' },
-            { name: 'Cripta Oscura', type: 'crypt', level: 2, image: 'src/splashart_map2.png' },
+            { name: 'Sakura', type: 'crypt', level: 2, image: 'src/splashart_map2.gif' },
             { name: 'Pantano Venenoso', type: 'swamp', level: 3, image: 'src/splashart_map3.png' }
         ];
 
@@ -232,6 +239,26 @@ class MapSelector {
             window.waveTimer = 120; // 2 minutos para la primera oleada
             window.isBossSpawned = false;
             window.spawnInterval = 2; // Reducido para spawns más frecuentes
+
+            // Verificar si completó la oleada 7 del primer mapa
+            if (mapType === 'forest' && window.currentWave > 7) {
+                // Desbloquear el segundo mapa
+                const savedData = localStorage.getItem('playerData');
+                if (savedData) {
+                    const playerData = JSON.parse(savedData);
+                    if (!playerData.unlockedMaps) {
+                        playerData.unlockedMaps = [];
+                    }
+                    if (!playerData.unlockedMaps.includes('map2')) {
+                        playerData.unlockedMaps.push('map2');
+                        localStorage.setItem('playerData', JSON.stringify(playerData));
+                        this.unlockedLevels = 2;
+                    }
+                }
+                // Redirigir al lobby
+                this.selectMap('lobby');
+                return;
+            }
         }
         // Reposicionar al jugador en el centro
         const player = this.engine.entities.find(e => !e.isEnemy);

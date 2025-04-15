@@ -307,17 +307,32 @@
         const startTime = Date.now();
         const cooldownDuration = ability.cooldown * 1000;
 
+        let pausedTime = 0;
+        let isPaused = false;
         const updateCooldown = () => {
-          const currentTime = Date.now();
-          const elapsed = currentTime - startTime;
-          const remaining = Math.max(0, cooldownDuration - elapsed);
-          const progress = remaining / cooldownDuration;
+          if (engine.isPaused && !isPaused) {
+            isPaused = true;
+            pausedTime = Date.now() - startTime;
+            return;
+          } else if (!engine.isPaused && isPaused) {
+            isPaused = false;
+            startTime = Date.now() - pausedTime;
+          }
 
-          cooldownOverlay.style.transform = `scaleY(${progress})`;
-          cooldownTimer.textContent = Math.ceil(remaining / 1000);
-          cooldownTimer.style.display = remaining > 0 ? 'block' : 'none';
+          if (!engine.isPaused) {
+            const currentTime = Date.now();
+            const elapsed = currentTime - startTime;
+            const remaining = Math.max(0, cooldownDuration - elapsed);
+            const progress = remaining / cooldownDuration;
 
-          if (remaining > 0) {
+            cooldownOverlay.style.transform = `scaleY(${progress})`;
+            cooldownTimer.textContent = Math.ceil(remaining / 1000);
+            cooldownTimer.style.display = remaining > 0 ? 'block' : 'none';
+
+            if (remaining > 0) {
+              requestAnimationFrame(updateCooldown);
+            }
+          } else {
             requestAnimationFrame(updateCooldown);
           }
         };

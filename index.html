@@ -55,7 +55,7 @@
 
   body {
       margin: 0;
-      background: url('src/background_homegame.gif'), url('src/background_homegame.png'),rgb(60, 117, 119);
+      background: url('src/background_homegame.gif'), url('src/background_homegame.png'), rgb(60, 117, 119);
       background-size: cover, cover;
       background-repeat: no-repeat, no-repeat;
       background-attachment: fixed, fixed;
@@ -192,3 +192,17 @@
   </script>
 </body>
 </html>
+
+<script>
+  // Cargar el fondo según el nivel desbloqueado
+  const savedData = localStorage.getItem('playerData');
+  if (savedData) {
+    const playerData = JSON.parse(savedData);
+    if (playerData.unlockedMaps?.includes('map2')) {
+      document.body.style.background = "url('src/splashart_map2.gif'), rgb(60, 117, 119)";
+      document.body.style.backgroundSize = 'cover';
+      document.body.style.backgroundRepeat = 'no-repeat';
+      document.body.style.backgroundAttachment = 'fixed';
+    }
+  }
+</script>

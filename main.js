@@ -225,8 +225,8 @@ function spawnTrainingDummies() {
 }
 
 function spawnEnemy(isBoss = false) {
-    // Verificar si el jugador está muerto
-    if (player.isDead) return;
+    // Verificar si el jugador está muerto o si estamos después de la oleada 7
+    if (player.isDead || currentWave > 7) return;
     
     // Si estamos en el lobby, solo manejamos los dummies de entrenamiento
     if (window.currentMapType === 'lobby') {
@@ -234,41 +234,45 @@ function spawnEnemy(isBoss = false) {
         return;
     }
 
-  // Verificar el límite de enemigos vivos
-  const currentEnemies = engine.entities.filter(e => e.isEnemy && !e.isDead).length;
-  if (!isBoss && currentEnemies >= maxLiveEnemies) return;
+    // Verificar el límite de enemigos vivos
+    const currentEnemies = engine.entities.filter(e => e.isEnemy && !e.isDead).length;
+    if (!isBoss && currentEnemies >= maxLiveEnemies) return;
 
-  // Generar posición en los bordes del mapa
-  const mapWidth = engine.map.getMapWidth();
-  const mapHeight = engine.map.getMapHeight();
-  let enemyX, enemyY;
-  
-  // Decidir aleatoriamente si aparece en borde horizontal o vertical
-  if (Math.random() < 0.5) {
-    // Borde horizontal (arriba o abajo)
-    enemyX = Math.random() * mapWidth;
-    enemyY = Math.random() < 0.5 ? 0 : mapHeight;
-  } else {
-    // Borde vertical (izquierda o derecha)
-    enemyX = Math.random() < 0.5 ? 0 : mapWidth;
-    enemyY = Math.random() * mapHeight;
-  }
+    let enemyX, enemyY;
+    const mapWidth = engine.map.getMapWidth();
+    const mapHeight = engine.map.getMapHeight();
+
+    if (isBoss && currentWave === 7) {
+        // Posicionar el jefe en el centro del mapa
+        enemyX = mapWidth / 2;
+        enemyY = mapHeight / 2;
+    } else {
+        // Generar posición en los bordes del mapa para enemigos normales
+        if (Math.random() < 0.5) {
+            enemyX = Math.random() * mapWidth;
+            enemyY = Math.random() < 0.5 ? 0 : mapHeight;
+        } else {
+            enemyX = Math.random() < 0.5 ? 0 : mapWidth;
+            enemyY = Math.random() * mapHeight;
+        }
+    }
   
   const enemy = new Entity(enemyX, enemyY, null, true);
   
   if (isBoss) {
-    // Configurar el jefe champiñón para la primera fase
-    enemy.bossType = 'mushroomBoss';
+    // Configurar el jefe final
+    enemy.bossType = currentWave === 7 ? 'finalBoss' : 'mushroomBoss';
     enemy.isBoss = true;
-    enemy.width = 200;
-    enemy.height = 200;
-    enemy.health = 1000; // Reducido para la primera fase
-    enemy.maxHealth = 1000;
-    enemy.speed = 60; // Ajustado para la primera fase
-    enemy.damageRate = 30; // Reducido para la primera fase
-    enemy.loadSprite('sprites/boss_champi_sprite.png', 32, 32, 4);
+    enemy.width = currentWave === 7 ? 400 : 200; // 4 veces más grande para el jefe final
+    enemy.height = currentWave === 7 ? 400 : 200;
+    enemy.health = currentWave === 7 ? 2000 : 1000; // Más vida para el jefe final
+    enemy.maxHealth = currentWave === 7 ? 2000 : 1000;
+    enemy.speed = currentWave === 7 ? 50 : 60; // Velocidad ajustada para el jefe final
+    enemy.damageRate = currentWave === 7 ? 40 : 30;
+    enemy.loadSprite('sprites/plant_enemy_boss_sprite.png', 32, 32, 4);
     enemy.lastSpawnTime = 0;
-    enemy.spawnCooldown = 7.0; // Aumentado el tiempo entre spawns para la primera fase
+    enemy.spawnCooldown = 7.0;
+    enemy.healthSegments = currentWave === 7 ? 4 : 1; // Segmentos de vida para el jefe final
   } else {
     // Enemigo tipo 3 (desde fase 3)
     if (currentWave >= 3 && Math.random() < 0.3) {
@@ -360,9 +364,9 @@ function resetWaveSystem() {
   isWaveActive = true;
   isBossSpawned = false;
   enemiesInWave = 0;
-  maxEnemiesInWave = 15; // Aumentado para tener más enemigos desde el inicio
-  maxLiveEnemies = 20; // Aumentado el límite de enemigos simultáneos
-  spawnInterval = 1.5; // Reducido para spawns más frecuentes
+  maxEnemiesInWave = currentWave === 7 ? 1 : 15; // Solo el jefe en la oleada 7
+  maxLiveEnemies = currentWave === 7 ? 1 : 20; // Solo el jefe en la oleada 7
+  spawnInterval = currentWave === 7 ? 0 : 1.5; // Sin spawns adicionales en oleada 7
   lastSpawnTime = 0;
   
   // Generar varios enemigos iniciales al cambiar de mapa
@@ -390,8 +394,29 @@ function waveManager(dt) {
       if (entity.isEnemy && entity.health <= 0) {
         entity.isDead = true;
         if (entity.isBoss) {
-          // Generar 10 orbes de experiencia para el jefe
-          for (let i = 0; i < 10; i++) {
+          if (entity.bossType === 'finalBoss' && currentWave === 7) {
+            // Teletransportar al jugador al lobby y desbloquear siguiente mapa
+            window.currentMapType = 'lobby';
+            engine.map.changeMap('lobby');
+            // Reiniciar el sistema de oleadas
+            currentWave = 1;
+            waveTimer = WAVE_DURATION;
+            nextWaveTimer = 30;
+            isWaveActive = false;
+            isBossSpawned = false;
+            enemiesInWave = 0;
+            // Guardar progreso de mapas desbloqueados
+            const unlockedMaps = JSON.parse(localStorage.getItem('unlockedMaps') || '[]');
+            const nextMap = window.currentMapType === 'forest' ? 'crypt' : 
+                          window.currentMapType === 'crypt' ? 'swamp' : null;
+            if (nextMap && !unlockedMaps.includes(nextMap)) {
+              unlockedMaps.push(nextMap);
+              localStorage.setItem('unlockedMaps', JSON.stringify(unlockedMaps));
+            }
+          }
+          // Generar orbes de experiencia para el jefe
+          const orbCount = entity.bossType === 'finalBoss' ? 20 : 10;
+          for (let i = 0; i < orbCount; i++) {
             const randomOffsetX = (Math.random() - 0.5) * 100;
             const randomOffsetY = (Math.random() - 0.5) * 100;
             const expOrb = new ExperienceOrb(entity.x + randomOffsetX, entity.y + randomOffsetY);
@@ -413,16 +438,29 @@ function waveManager(dt) {
       }
     }
     
-    // Generar jefe cuando queden 70 segundos (1:10)
-    if (!isBossSpawned && waveTimer <= 70) {
-      spawnEnemy(true);
-      isBossSpawned = true;
+    // Generar jefe final en la oleada 7 o jefe normal en otras oleadas
+    if (!isBossSpawned) {
+      if (currentWave === 7) {
+        spawnEnemy(true);
+        isBossSpawned = true;
+      } else if (waveTimer <= 70) {
+        spawnEnemy(true);
+        isBossSpawned = true;
+      }
     }
     
     // Finalizar oleada si se acaba el tiempo o se eliminan todos los enemigos
     if (waveTimer <= 0 || (enemiesInWave === 0 && isBossSpawned)) {
       isWaveActive = false;
       nextWaveTimer = 30;
+      
+      // Si completamos la oleada 7, regresar al lobby
+      if (currentWave === 7) {
+        window.currentMapType = 'lobby';
+        engine.map.changeMap('lobby');
+        currentWave = 1;
+        return;
+      }
       engine.isPaused = true; // Pausar el juego durante la selección de cartas
       
       // Eliminar todos los enemigos restantes con una animación suave
