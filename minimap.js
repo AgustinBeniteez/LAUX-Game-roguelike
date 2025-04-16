@@ -56,10 +56,12 @@ class Minimap {
             } else if (entity.isBoss) {
                 const x = entity.x * scaleX;
                 const y = entity.y * scaleY;
+                this.ctx.font = '20px Arial';
+                this.ctx.textAlign = 'center';
                 this.ctx.beginPath();
                 this.ctx.fillStyle = '#e8c32c';
                 this.ctx.arc(x, y, 8, 0, Math.PI * 2);
-                this.ctx.fill();
+                this.ctx.fillText("🜲"   , x, y);
             } else if (entity.isEnemy) {
                 const x = entity.x * scaleX;
                 const y = entity.y * scaleY;

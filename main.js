@@ -271,7 +271,7 @@ function spawnEnemy(isBoss = false) {
     enemy.damageRate = currentWave === 7 ? 40 : 30;
     enemy.loadSprite('sprites/plant_enemy_boss_sprite.png', 32, 32, 4);
     enemy.lastSpawnTime = 0;
-    enemy.spawnCooldown = 7.0;
+    enemy.spawnCooldown = 18.0; // Aumentado el tiempo entre spawns de 7 a 15 segundos
     enemy.healthSegments = currentWave === 7 ? 4 : 1; // Segmentos de vida para el jefe final
   } else {
     // Enemigo tipo 3 (desde fase 3)

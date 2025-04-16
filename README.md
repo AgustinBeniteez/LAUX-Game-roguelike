@@ -42,7 +42,7 @@ If you want to contribute to the game's development:
 
 ## Current Version
 
-- Version: v1.0.5.4
+- Version: v1.0.5.5
 
 This version includes gameplay improvements, bug fixes, and performance optimization.
 
