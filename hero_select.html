@@ -12,128 +12,15 @@
   <link rel="shortcut icon" href="sprites/laux_logo.webp" type="image/x-icon">
   <link rel="stylesheet" href="custom_cursor.css">
   <link rel="stylesheet" href="src/fonts.css">
+  <link rel="stylesheet" href="ui/styles/hero_select.css">
   <script src="engine.js"></script>
   <script src="entity.js"></script>
   <script src="mainproyectil.js"></script>
   <script src="floatingNumber.js"></script>
   <script src="experienceOrb.js"></script>
-  <style>
-    body { 
-      margin: 0; 
-      background-image: url('src/background_select_class.png');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      image-rendering: pixelated;
-      overflow: hidden;
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      font-family: 'Mineglyph', sans-serif;
-    }
-    .title {
-      color: white;
-      font-size: 48px;
-      margin-bottom: 40px;
-      text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-    }
-    .hero-selection {
-      display: flex;
-      gap: 20px;
-      margin-bottom: 30px;
-    }
-    .hero-card {
-    border-radius: 10px;
-    padding: 20px;
-    width: 250px;
-    height: 400px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    background: url(sprites/card_sprite.png) no-repeat center;
-    background-size: cover;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: relative;
-    overflow: hidden;
-    image-rendering: pixelated;
-}
-    .hero-card:hover {
-      transform: scale(1.1);
-    }
-    .hero-card.selected {
-      background-image: url('sprites/card_selected_sprite.png');
-    }
-    .hero-icon {
-      width: 128px;
-      height: 128px;
-      margin-bottom: 20px;
-      image-rendering: pixelated;
-    }
-    .hero-name {
-      color: #000000;
-      font-size: 24px;
-      margin-bottom: 10px;
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    }
-    .hero-stats {
-      color: #000000;
-      font-size: 16px;
-      text-align: center;
-      margin-bottom: 15px;
-    }
-    .hero-abilities {
-      display: flex;
-      gap: 10px;
-      margin-top: 10px;
-    }
-    .ability-icon {
-      width: 48px;
-      height: 48px;
-      border: 3px solid #c5a471;
-      border-radius: 8px;
-      padding: 5px;
-      background: rgba(0, 0, 0, 0.3);
-    }
-    .ability-key {
-      color: #000000;
-      font-size: 12px;
-      text-align: center;
-      margin-top: 5px;
-    }
-    .continue-btn {
-      background: #e4b841e7;
-
-      border: none;
-      border-radius: 5px;
-      color: white;
-      padding: 15px 30px;
-      font-size: 20px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      display: block;
-      opacity: 0.5;
-      pointer-events: none;
-      font-family: 'Mineglyph', sans-serif;
-    }
-    .continue-btn.active {
-      opacity: 1;
-      pointer-events: auto;
-      background: #d8af28f6;
-      border: solid 2px #ffffff;
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-    }
-    .continue-btn.active:hover {
-      background: #d8a250ab;
-      transform: scale(1.05);
-    }
-  </style>
 </head>
 <body>
-  <canvas id="gameCanvas" style="position: fixed; top: 0; left: 0; z-index: -1;"></canvas>
+  
   <h1 class="title" data-translate="chooseHero">Elige tus habilidades principales</h1>
 
   <div class="hero-selection">
@@ -195,17 +82,6 @@
   <button id="continue" class="continue-btn" data-translate="continue">Continuar</button>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      // Configurar el canvas
-      const canvas = document.getElementById('gameCanvas');
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-
-      // Inicializar el motor del juego
-      const engine = new Engine('gameCanvas');
-      engine.start();
-    });
-
     let selectedHero = null;
     const cards = document.querySelectorAll('.hero-card');
     const continueBtn = document.getElementById('continue');

@@ -1,0 +1,435 @@
+@media (max-width: 768px) and (orientation: portrait) {
+  #orientation-message {
+    display: flex;
+  }
+  .config-container {
+    display: none;
+  }
+}
+
+body { 
+  margin: 0; 
+  background: url('../../src/background_homegame.png'), linear-gradient(
+    113.65deg,
+    rgba(40, 40, 40, 0.9) 0%,
+    rgba(98, 11, 56, 0.9) 100%
+  );
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  background-size: cover; 
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  font-family: 'Mineglyph', sans-serif;
+}
+
+#orientation-message {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  color: white;
+  font-size: 24px;
+  text-align: center;
+}
+
+#orientation-message img {
+  width: 100px;
+  height: 100px;
+  margin-bottom: 20px;
+  animation: rotate 2s infinite linear;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(90deg); }
+}
+
+.settings-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-right: 20px;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  height: fit-content;
+}
+
+.settings-nav button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.7);
+  width: 150px;
+  height: 40px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Mineglyph', sans-serif;
+  padding: 0 15px;
+}
+
+.settings-nav button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.settings-nav button.active {
+  background: rgba(184, 71, 178, 0.3);
+  color: #fff;
+  border-color: #b847b2;
+}
+
+.config-container {
+  background: rgba(0, 0, 0, 0.7);
+  padding: 30px;
+  border-radius: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  min-width: 300px;
+}
+
+.config-item {
+  margin-bottom: 20px;
+  color: white;
+}
+
+.key-binding {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  flex-direction: row-reverse;
+}
+
+.key-display {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 5px 15px;
+  border-radius: 5px;
+  min-width: 30px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.key-display:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.key-display.listening {
+  background: rgba(184, 71, 178, 0.3);
+  border-color: #b847b2;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.key-label {
+  flex: 1;
+}
+
+.config-label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 18px;
+  color: #b847b2;
+}
+
+select {
+  width: 100%;
+  padding: 10px;
+  background: rgba(34, 34, 34, 0.95);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  font-family: 'Mineglyph', sans-serif !important;
+}
+
+select:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(51, 51, 51, 0.95);
+}
+
+select:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(51, 51, 51, 0.95);
+}
+
+.volume-slider {
+  width: 100%;
+  height: 20px;
+  -webkit-appearance: none;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  outline: none;
+  margin: 10px 0;
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  background: #b847b2;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.volume-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  background: #ce6fce;
+}
+
+.volume-value {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: white;
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.volume-slider-container {
+  position: relative;
+  width: 100%;
+}
+
+.custom-checkbox {
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+  width: 22px;
+  height: 22px;
+}
+
+.custom-checkbox input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  width: 0;
+  height: 0;
+}
+
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 22px;
+  height: 22px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 5px;
+  transition: all 0.3s ease;
+}
+
+.custom-checkbox:hover input ~ .checkmark {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.custom-checkbox input:checked ~ .checkmark {
+  background-color: rgba(184, 71, 178, 0.3);
+  border-color: #b847b2;
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.custom-checkbox input:checked ~ .checkmark:after {
+  display: block;
+}
+
+.custom-checkbox .checkmark:after {
+  left: 7px;
+  top: 3px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.button-container {
+  position: absolute;
+  gap: 20px;
+  bottom: 7%;
+  right: 6.5%;
+}
+
+.config-button {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  font-family: 'Mineglyph', sans-serif !important;
+  padding: 15px 30px;
+  border-radius: 5px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.config-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: scale(1.05);
+}
+
+.save-button {
+  background: rgba(76, 175, 80, 0.3);
+}
+
+.back-button {
+  background: rgba(244, 67, 54, 0.3);
+}
+
+.title {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  color: white;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.section {
+  margin-bottom: 2rem;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #ffeb3b;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.option label {
+  flex: 1;
+  font-size: 1.2rem;
+}
+
+.option select,
+.option input[type="range"] {
+  flex: 1;
+  padding: 0.5rem;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+.option select option {
+  background: #333;
+  color: white;
+}
+
+.volume-value {
+  min-width: 3rem;
+  text-align: center;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.button {
+  padding: 0.8rem 2rem;
+  font-size: 1.2rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+  font-family: 'Mineglyph', sans-serif;
+}
+
+.button:hover {
+  transform: scale(1.05);
+}
+
+.save-button {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.back-button {
+  background-color: #f44336;
+  color: white;
+}
+
+.reset-button {
+  background-color: #ff9800;
+  color: white;
+}
+
+#version-display {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: 'Mineglyph', sans-serif;
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .container {
+    width: 95%;
+    padding: 1rem;
+  }
+
+  .option {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .button-container {
+    flex-direction: column;
+  }
+
+  .button {
+    width: 100%;
+  }
+}
