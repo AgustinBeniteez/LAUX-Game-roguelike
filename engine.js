@@ -242,7 +242,15 @@ class Engine {
 
         if (healthBar && healthText) {
           const healthPercentage = (player.health / player.maxHealth) * 100;
+          const shieldPercentage = (player.shield / player.maxShield) * 100;
+          
+          // Actualizar barra de vida
           healthBar.style.width = `${healthPercentage}%`;
+          
+          // Crear o actualizar barra de escudo
+          // Shield system removed
+          
+          // Actualizar texto de vida y escudo
           healthText.textContent = `${Math.round(player.health)}/${player.maxHealth}`;
         }
         if (speedValue) speedValue.textContent = Math.round(player.speed);

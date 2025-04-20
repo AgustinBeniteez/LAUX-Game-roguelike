@@ -315,15 +315,27 @@ damageNumbersCheckbox.addEventListener('change', function() {
 
     function saveConfig() {
       // Save all configurations
-      localStorage.setItem('soundVolume', document.getElementById('soundVolume').value);
-      localStorage.setItem('musicVolume', document.getElementById('musicVolume').value);
-      localStorage.setItem('damageNumbers', document.getElementById('damageNumbersSelect').checked ? 'on' : 'off');
-      localStorage.setItem('language', document.getElementById('languageSelect').value);
-      localStorage.setItem('gameControls', JSON.stringify(gameControls));
-      localStorage.setItem('terms', document.getElementById('termsSelect').value);
-      localStorage.setItem('performance', document.getElementById('performanceSelect').value);
-      localStorage.setItem('showFPS', document.getElementById('showFPSSelect').value);
-      localStorage.setItem('brightness', document.getElementById('brightnessSlider').value);
+      const config = {
+        soundVolume: document.getElementById('soundVolume').value,
+        musicVolume: document.getElementById('musicVolume').value,
+        damageNumbers: document.getElementById('damageNumbersSelect').checked ? 'on' : 'off',
+        language: document.getElementById('languageSelect').value,
+        gameControls: gameControls,
+        terms: document.getElementById('termsSelect').value,
+        performance: document.getElementById('performanceSelect').value,
+        showFPS: document.getElementById('showFPSSelect').value,
+        brightness: document.getElementById('brightnessSlider').value
+      };
+
+      // Save to localStorage
+      Object.entries(config).forEach(([key, value]) => {
+        localStorage.setItem(key, typeof value === 'object' ? JSON.stringify(value) : value);
+      });
+
+      // Notify parent window about configuration changes
+      if (window.parent !== window) {
+        window.parent.postMessage({ type: 'configUpdated', config }, '*');
+      }
       
       // Crear y mostrar el popup de guardado
       const savePopup = document.createElement('div');

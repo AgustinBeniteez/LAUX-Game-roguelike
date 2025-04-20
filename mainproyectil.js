@@ -76,44 +76,7 @@ window.MainProjectile = window.MainProjectile = class MainProjectile extends Ent
                     this.isHunter = true;
                     return;
                 } else if (config.isShield) {
-                    // Aplicar escudo
-                    if (!player.shield) player.shield = 0;
-                    player.shield += config.shieldAmount;
-
-                    // Actualizar la barra de vida para mostrar el escudo
-                    const healthBar = document.getElementById('health-bar');
-                    if (healthBar) {
-                        // Crear o actualizar la barra de escudo
-                        let shieldBar = document.getElementById('shield-bar');
-                        if (!shieldBar) {
-                            shieldBar = document.createElement('div');
-                            shieldBar.id = 'shield-bar';
-                            shieldBar.style.cssText = `
-                                position: absolute;
-                                top: 0;
-                                right: 0;
-                                height: 100%;
-                                background: rgba(255, 255, 255, 0.7);
-                                border-radius: 0 5px 5px 0;
-                                transition: width 0.3s ease;
-                            `;
-                            healthBar.parentElement.appendChild(shieldBar);
-                        }
-                        // Calcular y actualizar el ancho de la barra de escudo
-                        const maxHealth = player.maxHealth || 100;
-                        const shieldPercentage = (player.shield / maxHealth) * 100;
-                        shieldBar.style.width = `${shieldPercentage}%`;
-                    }
-
-                    // Efecto visual temporal
-                    const shieldEffect = document.createElement('div');
-                    shieldEffect.style.position = 'absolute';
-                    shieldEffect.style.width = '100%';
-                    shieldEffect.style.height = '100%';
-                    shieldEffect.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
-                    shieldEffect.style.borderRadius = '5px';
-                    document.querySelector('.health-bar').appendChild(shieldEffect);
-                    setTimeout(() => shieldEffect.remove(), 300);
+                    // Shield system removed
                 }
                 
                 // Eliminamos la entidad del proyectil inmediatamente
@@ -258,20 +221,7 @@ window.MainProjectile = window.MainProjectile = class MainProjectile extends Ent
         this.x += this.velocityX * dt;
         this.y += this.velocityY * dt;
 
-        // Actualizar la barra de escudo si existe
-        const player = engine.entities.find(e => !e.isEnemy);
-        if (player) {
-            const shieldBar = document.getElementById('shield-bar');
-            if (shieldBar) {
-                if (player.shield <= 0) {
-                    shieldBar.remove(); // Eliminar la barra si no hay escudo
-                } else {
-                    const maxHealth = player.maxHealth || 100;
-                    const shieldPercentage = (player.shield / maxHealth) * 100;
-                    shieldBar.style.width = `${shieldPercentage}%`;
-                }
-            }
-        }
+        // Shield system removed
 
         this.timeAlive += dt;
         if (this.timeAlive >= this.lifetime) {

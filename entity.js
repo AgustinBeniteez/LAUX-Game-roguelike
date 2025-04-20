@@ -126,6 +126,16 @@ class Entity {
       };
     }
   
+    takeDamage(damage) {
+      // El daño afecta directamente a la vida
+      this.health = Math.max(0, this.health - damage);
+      
+      // Verificar si la entidad murió
+      if (this.health <= 0) {
+        this.isDead = true;
+      }
+    }
+
     applyStatusEffect(effectType, duration, params = {}) {
       this.statusEffects[effectType] = {
         duration,

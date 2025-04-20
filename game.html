@@ -414,23 +414,7 @@
       justify-content: center;
       position: relative;
     }
-    .skill-box[data-tooltip]:hover::after {
-      content: attr(data-tooltip);
-      position: absolute;
-      bottom: 120%;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 12px;
-      background: rgba(0, 0, 0, 0.95);
-      color: white;
-      border-radius: 6px;
-      font-size: 14px;
-      white-space: pre;
-      z-index: 99999;
-      border: 1px solid rgba(255, 255, 255, 0.4);
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
-      line-height: 1.4;
-    }
+    
     canvas {
         image-rendering: pixelated;
         image-rendering: crisp-edges;
@@ -502,9 +486,8 @@
       z-index: 900;
     }
     .skill-card:hover {
-      transform: scale(1.1);
-      transition: transform 0.3s ease;
-      cursor: pointer;
+      transform: none;
+      cursor: default;
       image-rendering: pixelated;
     }
     .skill-card.selected {
@@ -530,6 +513,14 @@
       background: rgba(255, 255, 255, 0.2);
       border-color: rgba(255, 255, 255, 0.5);
       transform: scale(1.05);
+    }
+    .skill-box:hover {
+      transform: none;
+      cursor: default;
+    }
+    .skill-card:hover {
+      transform: none;
+      cursor: default;
     }
   </style>
 </head>
@@ -682,6 +673,32 @@
       if (event.data === 'closeSettings') {
         settingsFrame.style.display = 'none';
         pauseMenu.style.display = 'flex';
+      } else if (event.data.type === 'configUpdated') {
+        const config = event.data.config;
+        
+        // Aplicar configuraciones inmediatamente
+        document.body.style.filter = `brightness(${config.brightness}%)`;
+        const fpsContainer = document.getElementById('fps-container');
+        if (fpsContainer) {
+          fpsContainer.style.display = config.showFPS === 'on' ? 'block' : 'none';
+        }
+        window.damageNumbersEnabled = config.damageNumbers !== 'off';
+        
+        // Aplicar configuración de sonido
+        if (window.audioManager) {
+          window.audioManager.setVolume('sound', parseInt(config.soundVolume) / 100);
+          window.audioManager.setVolume('music', parseInt(config.musicVolume) / 100);
+        }
+        
+        // Aplicar configuración de rendimiento
+        if (config.performance === 'on') {
+          document.querySelectorAll('.skill-card').forEach(card => {
+            card.style.transition = 'none';
+          });
+        }
+
+        // Actualizar traducciones
+        loadTranslations();
       }
     });
 
@@ -701,42 +718,8 @@
   <script src="entities/trainingDummy.js"></script>
   <script src="healingOrb.js"></script>
   <script src="main.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      // Actualizar tooltips de habilidades con datos del jugador
-      function updateSkillTooltips() {
-        const playerData = JSON.parse(localStorage.getItem('playerData'));
-        const abilities = playerData?.abilities;
-        if (!abilities) return;
-
-        const skillE = document.querySelector('#active-skills .skill-box:first-child');
-        const skillR = document.querySelector('#active-skills .skill-box:last-child');
-
-        if (skillE && abilities[0]) {
-          skillE.setAttribute('data-tooltip', 
-            `⚔️ Habilidad Principal [E]\n` +
-            `💥 Daño: ${abilities[0].damage}\n` +
-            `⏱️ Cooldown: ${abilities[0].cooldown}s\n` +
-            `🎯 Proyectiles: ${abilities[0].projectiles || 1}\n` +
-            `❄️ Efecto: ${abilities[0].effect || 'Ralentización'}`
-          );
-        }
-
-        if (skillR && abilities[1]) {
-          skillR.setAttribute('data-tooltip', 
-            `⚔️ Habilidad Secundaria [R]\n` +
-            `💥 Daño: ${abilities[1].damage}\n` +
-            `⏱️ Cooldown: ${abilities[1].cooldown}s\n` +
-            `🎯 Proyectiles: ${abilities[1].projectiles || 2}\n` +
-            `🔥 Efecto: ${abilities[1].effect || 'Daño en área'}`
-          );
-        }
-      }
-
-      // Actualizar tooltips inicialmente y cuando cambien los datos del jugador
-      updateSkillTooltips();
-      window.addEventListener('playerDataUpdated', updateSkillTooltips);
-    });
-  </script>
+</body>
+</html>
+<script src="main.js"></script>
 </body>
 </html>
