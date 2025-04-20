@@ -1,0 +1,78 @@
+html { cursor: url('../../src/assets/images/ui/mouse_game.png'), auto; }
+button:hover { cursor: url('../../src/assets/images/ui/mouse_game_hover.png'), pointer; }
+button { cursor: url('../../src/assets/images/ui/mouse_game.png'), auto; }
+a:hover { cursor: url('src/assets/images/ui/mouse_game_hover.png'), pointer; }
+a { cursor: url('../../src/assets/images/ui/mouse_game.png'), auto; }
+div:hover { cursor: url('../../src/assets/images/ui/mouse_game_hover.png'), pointer; }
+upgrade-button:hover { cursor: url('../../src/assets/images/ui/mouse_game_hover.png'), pointer; }
+upgrade-button { cursor: url('../../src/assets/images/ui/mouse_game.png'), auto; }
+.menu-button:hover { cursor: url('../../src/assets/images/ui/mouse_game_hover.png'), pointer; }
+.menu-button { cursor: url('../../src/assets/images/ui/mouse_game.png'), auto; }
+
+.skill-icon:hover { cursor: url('../../src/assets/images/ui/mouse_game_hover.png'), pointer; }
+
+.skill-icon { cursor: url('../../src/assets/images/ui/mouse_game.png'), auto; }
+/*Cuando se hace click en un botón*/
+button:active { cursor: url('../../src/assets/images/ui/mouse_game.png'), auto; }
+/*Cuando se hace click en un enlace*/
+a:active { cursor: url('../../src/assets/images/ui/mouse_game.png'), auto; }
+/*Cuando se hace click en un div*/
+div:active { cursor: url('../../src/assets/images/ui/mouse_game.png'), auto; }
+/*Cuando se hace click en un botón de actualización de habilidad*/
+upgrade-button:active { cursor: url('../../src/assets/images/ui/mouse_game.png'), auto; }
+/*Cuando se hace click en un botón de menú*/
+.menu-button:active { cursor: url('../../src/assets/images/ui/mouse_game.png'), auto; }
+/*Cuando se hace click en una imagen de habilidad*/
+.skill-icon:active { cursor: url('../../src/assets/images/ui/mouse_game.png'), auto; }
+
+select {
+  cursor: url('../../src/assets/images/ui/mouse_game_hover.png'), pointer;
+}
+select:hover {
+  cursor: url('../../src/assets/images/ui/mouse_game_hover.png'), pointer;
+}
+
+select:active {
+  cursor: url('../../src/assets/images/ui/mouse_game.png'), auto;
+}select {
+  cursor: url('../../src/assets/images/ui/mouse_game.png'), auto;
+}
+select:hover {
+  cursor: url('../../src/assets/images/ui/mouse_game_hover.png'), pointer;
+}
+
+select:active {
+  cursor: url('../../src/assets/images/ui/mouse_game.png'), auto;
+}
+
+input[type="checkbox"] {
+  cursor: url('../../src/assets/images/ui/mouse_game.png'), auto;
+}
+
+input[type="checkbox"]:hover {
+  cursor: url('../../src/assets/images/ui/mouse_game_hover.png'), pointer;
+}
+
+input[type="checkbox"]:active {
+  cursor: url('../../src/assets/images/ui/mouse_game.png'), auto;
+}
+
+.custom-checkbox {
+  cursor: url('../../src/assets/images/ui/mouse_game.png'), auto;
+}
+
+.custom-checkbox:hover {
+  cursor: url('../../src/assets/images/ui/mouse_game_hover.png'), pointer;
+}
+
+.custom-checkbox input:checked ~ .checkmark {
+  cursor: url('../../src/assets/images/ui/mouse_game.png'), auto;
+}
+
+/* Regla específica para mapas bloqueados */
+#map-selection-menu div[style*="filter: grayscale(100%)"] {
+  cursor: url('../../src/assets/images/ui/mouse_lock.png'), auto !important;
+}
+#map-selection-menu div[style*="filter: grayscale(100%)"]:hover {
+  cursor: url('../../src/assets/images/ui/mouse_lock.png'), auto !important;
+}
