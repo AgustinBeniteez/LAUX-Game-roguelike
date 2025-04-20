@@ -15,27 +15,27 @@ class Projectile extends Entity {
         const skillConfig = {
             'fire': {
                 damage: damage,
-                sprite: 'sprites/proyectil_sprite_1.png',
+                sprite: 'src/assets/images/projectiles/proyectil_sprite_1.png',
                 effects: { burnDamage: damage * 0.2, burnDuration: 3 }
             },
             'ice': {
                 damage: damage * 1.2,
-                sprite: 'sprites/frezee.png',
+                sprite: 'src/assets/images/projectiles/frezee.png',
                 effects: { slowEffect: true, slowDuration: 3, slowAmount: 0.7 }
             },
             'energy': {
                 damage: damage * 1.4,
-                sprite: 'sprites/proyectil_sprite_3.png',
+                sprite: 'src/assets/images/projectiles/proyectil_sprite_3.png',
                 effects: { areaEffect: true, areaRadius: 80, areaDamageMultiplier: 0.5 }
             },
             'shock': {
                 damage: damage * 1.6,
-                sprite: 'sprites/proyectil_sprite_4.png',
+                sprite: 'src/assets/images/projectiles/proyectil_sprite_4.png',
                 effects: { chainEffect: true, chainRange: 100, chainCount: 3, chainDamageMultiplier: 0.7 }
             },
             'leaves': {
                 damage: damage * 0.05,
-                sprite: 'sprites/proyectil_sprite_leaves.png',
+                sprite: 'src/assets/images/projectiles/proyectil_sprite_leaves.png',
                 effects: { orbitalEffect: true, orbitalRadius: this.equippedSkills && this.equippedSkills[index] ? this.equippedSkills[index].orbitalRadius || 60 : 60, orbitalSpeed: 8, orbitalDamageMultiplier: 0.01 }
             }
         };

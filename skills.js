@@ -11,43 +11,43 @@ class SkillSystem {
         this.skills = [
             {
                 name: 'Proyectil de Fuego',
-                icon: 'sprites/proyectil_sprite_1.png',
+                icon: 'src/assets/images/projectiles/proyectil_sprite_1.png',
                 cooldown: 2.0,
                 damage: 15,
                 projectileType: 'fire',
-                projectileSprite: 'sprites/proyectil_sprite_1.png'
+                projectileSprite: 'src/assets/images/projectiles/proyectil_sprite_1.png'
             },
             {
                 name: 'Rayo de Hielo',
-                icon: 'sprites/proyectil_sprite_2.png',
+                icon: 'src/assets/images/projectiles/proyectil_sprite_2.png',
                 cooldown: 3.0,
                 damage: 35,
                 projectileType: 'ice',
-                projectileSprite: 'sprites/proyectil_sprite_2.png'
+                projectileSprite: 'src/assets/images/projectiles/proyectil_sprite_2.png'
             },
             {
                 name: 'Explosión de Energía',
-                icon: 'sprites/proyectil_sprite_3.png',
+                icon: 'src/assets/images/projectiles/proyectil_sprite_3.png',
                 cooldown: 4.0,
                 damage: 45,
                 projectileType: 'energy',
-                projectileSprite: 'sprites/proyectil_sprite_3.png'
+                projectileSprite: 'src/assets/images/projectiles/proyectil_sprite_3.png'
             },
             {
                 name: 'Onda de Choque',
-                icon: 'sprites/proyectil_sprite_4.png',
+                icon: 'src/assets/images/projectiles/proyectil_sprite_4.png',
                 cooldown: 5.0,
                 damage: 55,
                 projectileType: 'shock',
-                projectileSprite: 'sprites/proyectil_sprite_4.png'
+                projectileSprite: 'src/assets/images/projectiles/proyectil_sprite_4.png'
             },
             {
                 name: 'Vórtice de Hojas',
-                icon: 'sprites/proyectil_sprite_leaves.png',
+                icon: 'src/assets/images/projectiles/proyectil_sprite_leaves.png',
                 cooldown: 5.0,
                 damage: 15,
                 projectileType: 'leaves',
-                projectileSprite: 'sprites/proyectil_sprite_leaves.png'
+                projectileSprite: 'src/assets/images/projectiles/proyectil_sprite_leaves.png'
             }
         ];
 

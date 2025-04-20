@@ -11,8 +11,8 @@ export default class BaseMap {
     }
 
     loadTileImages(config) {
-        this.floorTileImage.src = config.floorTilePath || 'sprites/floor_tile.png';
-        this.wallTileImage.src = config.wallTilePath || 'sprites/wall_tile.png';
+        this.floorTileImage.src = config.floorTilePath || 'src/assets/images/tiles/floor_tile.png';
+        this.wallTileImage.src = config.wallTilePath || 'src/assets/images/tiles/wall_tile.png';
     }
 
     generateMap() {

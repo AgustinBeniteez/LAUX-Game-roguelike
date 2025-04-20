@@ -3,7 +3,7 @@ class ExperienceOrb extends Entity {
         super(x, y);
         this.width = 16;
         this.height = 16;
-        this.loadSprite('sprites/orbe_exp.png', 16, 16, 1);
+        this.loadSprite('src/assets/images/orbs/orbe_exp.png', 16, 16, 1);
         this.expValue = 25;
         this.isCollected = false;
         this.experience = 0;

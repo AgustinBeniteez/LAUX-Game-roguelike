@@ -9,7 +9,7 @@
     import { VERSION } from './version.js';
     document.getElementById('version-display').textContent = VERSION;
   </script>
-  <link rel="shortcut icon" href="sprites/laux_logo.webp" type="image/x-icon">
+  <link rel="shortcut icon" href="src/assets/images/ui/laux_logo.ico" type="image/x-icon">
   <link rel="stylesheet" href="custom_cursor.css">
   <link rel="stylesheet" href="src/fonts.css">
   <link rel="stylesheet" href="ui/styles/hero_select.css">
@@ -25,7 +25,7 @@
 
   <div class="hero-selection">
     <div class="hero-card" data-hero="guardian">
-      <img class="hero-icon" src="src/Guardian_icon_fondo.png">
+      <img class="hero-icon" src="src/assets/images/characters/Guardian_icon_fondo.png">
       <div class="hero-name" data-translate="guardian">Guardian</div>
       <div class="hero-stats">
         <div><span data-translate="health">Vida</span>: 150</div>
@@ -33,17 +33,17 @@
       </div>
       <div class="hero-abilities">
         <div>
-          <img class="ability-icon" src="sprites/main_skills/sprite_main_skill_E_Guardian.png">
+          <img class="ability-icon" src="src/assets/images/skills/sprite_main_skill_E_Guardian.png">
           <div class="ability-key">E</div>
         </div>
         <div>
-          <img class="ability-icon" src="sprites/main_skills/sprite_main_skill_R_Guardian.png">
+          <img class="ability-icon" src="src/assets/images/skills/sprite_main_skill_R_Guardian.png">
           <div class="ability-key">R</div>
         </div>
       </div>
     </div>
     <div class="hero-card" data-hero="sentinel">
-      <img class="hero-icon" src="src/Sentinel_icon_fondo.png">
+      <img class="hero-icon" src="src/assets/images/characters/Sentinel_icon_fondo.png">
       <div class="hero-name" data-translate="sentinel">Centinela</div>
       <div class="hero-stats">
         <div><span data-translate="health">Vida</span>: 100</div>
@@ -51,17 +51,17 @@
       </div>
       <div class="hero-abilities">
         <div>
-          <img class="ability-icon" src="sprites/main_skills/sprite_main_skill_E_Sentinel.png">
+          <img class="ability-icon" src="src/assets/images/skills/sprite_main_skill_E_Sentinel.png">
           <div class="ability-key">E</div>
         </div>
         <div>
-          <img class="ability-icon" src="sprites/main_skills/sprite_main_skill_R_Sentinel.png">
+          <img class="ability-icon" src="src/assets/images/skills/sprite_main_skill_R_Sentinel.png">
           <div class="ability-key">R</div>
         </div>
       </div>
     </div>
     <div class="hero-card" data-hero="arcane">
-      <img class="hero-icon" src="src/Arcane_icon_fondo.png">
+      <img class="hero-icon" src="src/assets/images/characters/Arcane_icon_fondo.png">
       <div class="hero-name" data-translate="arcane">Arcano</div>
       <div class="hero-stats">
         <div><span data-translate="health">Vida</span>: 120</div>
@@ -69,11 +69,11 @@
       </div>
       <div class="hero-abilities">
         <div>
-          <img class="ability-icon" src="sprites/main_skills/sprite_main_skill_E_Arcane.png">
+          <img class="ability-icon" src="src/assets/images/skills/sprite_main_skill_E_Arcane.png">
           <div class="ability-key">E</div>
         </div>
         <div>
-          <img class="ability-icon" src="sprites/main_skills/sprite_main_skill_R_Arcane.png">
+          <img class="ability-icon" src="src/assets/images/skills/sprite_main_skill_R_Arcane.png">
           <div class="ability-key">R</div>
         </div>
       </div>
@@ -89,34 +89,34 @@
     const projectileConfig = {
       mainproyectil_arcane_e: {
         name: 'Bola de Daño',
-        sprite: 'sprites/main_skills/sprite_main_skill_E_Arcane.png',
+        sprite: 'src/assets/images/skills/sprite_main_skill_E_Arcane.png',
         damage: 30 * 1.3,
         areaEffect: true
       },
       mainproyectil_guardian_e: {
         name: 'Bola de Cristal',
-        sprite: 'sprites/main_skills/sprite_main_skill_E_Guardian.png',
+        sprite: 'src/assets/images/skills/sprite_main_skill_E_Guardian.png',
         damage: 40 * 1.4
       },
       mainproyectil_sentinel_e: {
         name: 'Estrella de Daño',
-        sprite: 'sprites/main_skills/sprite_main_skill_E_Sentinel.png',
+        sprite: 'src/assets/images/skills/sprite_main_skill_E_Sentinel.png',
         damage: 50 * 1.5
       },
       mainproyectil_arcane_r: {
         name: 'Teletransporte Arcano',
-        sprite: 'sprites/main_skills/sprite_main_skill_R_Arcane.png',
+        sprite: 'src/assets/images/skills/sprite_main_skill_R_Arcane.png',
         isNotProjectile: true,
         isTeleport: true
       },
       mainproyectil_guardian_r: {
         name: 'Escudo Protector',
-        sprite: 'sprites/main_skills/sprite_main_skill_R_Guardian.png',
+        sprite: 'src/assets/images/skills/sprite_main_skill_R_Guardian.png',
         isNotProjectile: true
       },
       mainproyectil_sentinel_r: {
         name: 'Escudo Protector',
-        sprite: 'sprites/main_skills/sprite_main_skill_R_Sentinel.png',
+        sprite: 'src/assets/images/skills/sprite_main_skill_R_Sentinel.png',
         isNotProjectile: true,
         isShield: true,
         shieldAmount: 50 * 2
@@ -213,10 +213,10 @@
             name: 'Guardián',
             damage: 20,
             speed: 400,
-            icon: 'sprites/main_skills/sprite_main_skill_E_Guardian.png',
+            icon: 'src/assets/images/skills/sprite_main_skill_E_Guardian.png',
             projectileType: 'area',
             cooldown: 2.0,
-            projectileSprite: 'sprites/main_skills/sprite_main_skill_E_Guardian.png',
+            projectileSprite: 'src/assets/images/skills/sprite_main_skill_E_Guardian.png',
             abilities: {
               e: { name: 'Bola de Daño', damage: 40, cooldown: 5, description: 'Lanza una bola que causa daño en área a los enemigos' },
               r: { name: 'Clon Guardián', damage: 0, cooldown: 12, description: 'Crea un clon que distrae a los enemigos y te vuelve invisible temporalmente' }
@@ -226,10 +226,10 @@
             name: 'Centinela',
             damage: 28,
             speed: 400,
-            icon: 'sprites/main_skills/sprite_main_skill_E_Sentinel.png',
+            icon: 'src/assets/images/skills/sprite_main_skill_E_Sentinel.png',
             projectileType: 'crystal',
             cooldown: 4.0,
-            projectileSprite: 'sprites/main_skills/sprite_main_skill_E_Sentinel.png',
+            projectileSprite: 'src/assets/images/skills/sprite_main_skill_E_Sentinel.png',
             abilities: {
               e: { name: 'Bola de Cristal', damage: 50, cooldown: 7, description: 'Lanza una bola de cristal que causa daño a los enemigos' },
               r: { name: 'Escudo de Cristal', damage: 0, cooldown: 14, description: 'Genera un escudo de cristal que aumenta tu vida temporalmente' }
@@ -239,10 +239,10 @@
             name: 'Arcano',
             damage: 24,
             speed: 400,
-            icon: 'sprites/main_skills/sprite_main_skill_E_Arcane.png',
+            icon: 'src/assets/images/skills/sprite_main_skill_E_Arcane.png',
             projectileType: 'star',
             cooldown: 3.0,
-            projectileSprite: 'sprites/main_skills/sprite_main_skill_E_Arcane.png',
+            projectileSprite: 'src/assets/images/skills/sprite_main_skill_E_Arcane.png',
             abilities: {
               e: { name: 'Estrella de Daño', damage: 45, cooldown: 6, description: 'Lanza una estrella mágica que causa daño a los enemigos' },
               r: { name: 'Teletransporte Rúnico', damage: 0, cooldown: 15, description: 'Te teletransporta a una nueva ubicación' }

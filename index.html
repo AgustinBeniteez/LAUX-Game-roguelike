@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LAUX GAME</title>
-  <link rel="shortcut icon" href="sprites/laux_logo.webp" type="image/x-icon">
+  <link rel="shortcut icon" href="src/assets/images/ui/laux_logo.ico" type="image/x-icon">
   <link rel="stylesheet" href="custom_cursor.css">
   <link rel="stylesheet" href="src/fonts.css">
   <link href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css' rel='stylesheet'/>
@@ -56,7 +56,7 @@
 </head>
 <body>
   <div id="orientation-message">
-    <img src="sprites/laux_logo.webp" alt="Rotate device">
+    <img src="src/assets/images/ui/laux_logo.ico" alt="Rotate device">
     <p>Por favor, gira tu dispositivo para jugar</p>
   </div>
   <div id="confirmModal" class="modal" style="display: none;">
@@ -133,7 +133,7 @@
   if (savedData) {
     const playerData = JSON.parse(savedData);
     if (playerData.unlockedMaps?.includes('map2')) {
-      document.body.style.background = "url('src/splashart_map2.gif'), rgb(60, 117, 119)";
+      document.body.style.background = "url('src/assets/images/backgrounds/splashart_map2.gif'), rgb(60, 117, 119)";
       document.body.style.backgroundSize = 'cover';
       document.body.style.backgroundRepeat = 'no-repeat';
       document.body.style.backgroundAttachment = 'fixed';

@@ -9,7 +9,7 @@ class TrainingDummy extends Entity {
         this.isDummy = true;
         this.lastDamageTime = 0;
         this.healingDelay = 2000; // 2 segundos en milisegundos
-        this.loadSprite('sprites/dummy_sprite.png', 32, 32, 1);
+        this.loadSprite('src/assets/images/enemies/dummy_sprite.png', 32, 32, 1);
     }
 
     update(deltaTime) {

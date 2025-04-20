@@ -42,7 +42,7 @@ class Entity {
             this.damageRate = 25;
             this.width = 150;
             this.height = 150;
-            this.spritePath = 'sprites/plant_enemy_boss_sprite.png';
+            this.spritePath = 'src/assets/images/enemies/boss_champi_sprite.png';
             break;
           case 'crystalBoss':
             this.speed = 60;
@@ -51,7 +51,7 @@ class Entity {
             this.damageRate = 35;
             this.width = 180;
             this.height = 180;
-            this.spritePath = 'sprites/plant_enemy_boss_sprite.png';
+            this.spritePath = 'src/assets/images/enemies/plant_enemy_boss_sprite.png';
             break;
           case 'shadowBoss':
             this.speed = 120;
@@ -60,7 +60,7 @@ class Entity {
             this.damageRate = 30;
             this.width = 130;
             this.height = 130;
-            this.spritePath = 'sprites/plant_enemy_4_sprite.png';
+            this.spritePath = 'src/assets/images/enemies/plant_enemy_4_sprite.png';
             break;
           case 'mushroomBoss':
             this.speed = 50;
@@ -69,7 +69,7 @@ class Entity {
             this.damageRate = 40;
             this.width = 300;
             this.height = 300;
-            this.spritePath = 'sprites/boss_champi_sprite.png';
+            this.spritePath = 'src/assets/images/enemies/boss_champi_sprite.png';
             this.lastSpawnTime = 0;
             this.spawnCooldown = 5.0; // Tiempo entre generación de mini champiñones
             break;
@@ -99,7 +99,7 @@ class Entity {
       this.manaCost = 10; // Mana cost per shot
       
       if (spriteSrc) {
-        this.loadSprite(localStorage.getItem('selectedSkin') || 'sprites/player_sprite.png');
+        this.loadSprite(localStorage.getItem('selectedSkin') || 'src/assets/images/characters/player/player_sprite.png');
       }
     }
 
@@ -107,11 +107,11 @@ class Entity {
       this.sprite = new Image();
       this.sprite.src = src;
       this.spriteUp = new Image();
-      this.spriteUp.src = 'sprites/player_sprite_up.png';
+      this.spriteUp.src = 'src/assets/images/characters/player/player_sprite_up.png';
       this.spriteDown = new Image();
-      this.spriteDown.src = 'sprites/player_sprite_down.png';
+      this.spriteDown.src = 'src/assets/images/characters/player/player_sprite_down.png';
       this.spriteHorizontal = new Image();
-      this.spriteHorizontal.src = 'sprites/player_sprite_horizontal.png';
+      this.spriteHorizontal.src = 'src/assets/images/characters/player/player_sprite_horizontal(1).png';
       this.currentDirection = 'right';
       this.isMoving = false;
       this.animationSpeed = 0.15;
@@ -204,7 +204,7 @@ class Entity {
             miniEnemy.damageRate = 10;
             miniEnemy.width = 35;
             miniEnemy.height = 35;
-            miniEnemy.loadSprite('sprites/mini_champi_sprite.png', 16, 16, 4);
+            miniEnemy.loadSprite('src/assets/images/enemies/mini_champi_sprite.png', 16, 16, 4);
             miniEnemy.target = this.target;
             engine.addEntity(miniEnemy);
           }
@@ -299,7 +299,7 @@ class Entity {
         this.isDead = true;
         this.deathSprite = new Image();
         const selectedSkin = localStorage.getItem('selectedSkin') || 'default';
-        const deathSpritePath = `sprites/${selectedSkin}_dead.png`;
+        const deathSpritePath = `src/assets/images/characters/player/player_sprite_dead.png`;
         
         
         setTimeout(() => {

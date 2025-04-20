@@ -6,8 +6,8 @@ export default class DungeonMap extends BaseMap {
             width: 1000,
             height: 800,
             tileSize: 32,
-            floorTilePath: 'sprites/tiles_cesped.png',
-            wallTilePath: 'sprites/wall_tile.png'
+            floorTilePath: 'src/assets/images/tiles/floor_tile.png',
+            wallTilePath: 'src/assets/images/tiles/wall_tile.png'
         };
         super(engine, config);
     }

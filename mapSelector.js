@@ -41,9 +41,9 @@ class MapSelector {
         `;
 
         const maps = [
-            { name: 'Bosque Maldito', type: 'forest', level: 1, image: 'src/background_homegame.gif' },
-            { name: 'Sakura', type: 'crypt', level: 2, image: 'src/splashart_map2.gif' },
-            { name: 'Pantano Venenoso', type: 'swamp', level: 3, image: 'src/splashart_map3.png' }
+            { name: 'Forest', type: 'forest', level: 1, image: 'src/assets/images/backgrounds/background_homegame.gif' },
+            { name: 'Sakura', type: 'crypt', level: 2, image: 'src/assets/images/backgrounds/splashart_map2.gif' },
+            { name: 'Por definir', type: 'swamp', level: 3, image: 'src/assets/images/backgrounds/splashart_map3.png' }
         ];
 
         maps.forEach((map, index) => {
@@ -120,10 +120,12 @@ class MapSelector {
                     transform: translate(-50%, -50%);
                     width: 40px;
                     height: 40px;
-                    background: url('sprites/mouse_lock.png') no-repeat center;
-                    background-size: contain;
-                    z-index: 2;
+                    background: url('src/assets/images/ui/mouse_lock.png') no-repeat center;
+                    background-size: 80% auto;
+                    z-index: 3;
                     pointer-events: none;
+                    opacity: 0.9;
+                    transition: transform 0.3s ease, opacity 0.3s ease;
                 `;
                 imageContainer.appendChild(lock);
             }
@@ -164,7 +166,7 @@ class MapSelector {
                 mapContainer.style.cursor = 'pointer';
                 mapContainer.onclick = () => this.selectMap(map.type);
             } else {
-                mapContainer.style.cursor = 'url(sprites/mouse_lock.png), auto';
+                mapContainer.style.cursor = 'url(src/assets/images/ui/mouse_lock.png), auto';
             }
 
             mapMenu.appendChild(mapContainer);

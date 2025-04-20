@@ -9,17 +9,10 @@
 
 body { 
   margin: 0; 
-  background: url('../../src/background_homegame.png'), linear-gradient(
-    113.65deg,
-    rgba(40, 40, 40, 0.9) 0%,
-    rgba(98, 11, 56, 0.9) 100%
-  );
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-  background-size: cover; 
+  background: url('../../src/assets/images/backgrounds/background_homegame.gif'), url('../../src/assets/images/backgrounds/background_homegame.png'), rgb(60, 117, 119);
+  background-size: cover, cover;
+  background-repeat: no-repeat, no-repeat;
+  background-attachment: fixed, fixed;
   overflow: hidden;
   width: 100vw;
   height: 100vh;
@@ -29,6 +22,8 @@ body {
   flex-direction: column;
   font-family: 'Mineglyph', sans-serif;
 }
+
+
 
 #orientation-message {
   display: none;

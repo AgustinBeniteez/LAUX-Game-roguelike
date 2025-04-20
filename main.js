@@ -62,10 +62,10 @@ function showSkillSelection() {
 const player = new Entity(100, 100);
 const selectedSkin = localStorage.getItem('selectedSkin') || 'default';
 const skinSprites = {
-  default: 'sprites/player_sprite.png',
-  magenta: 'sprites/player_sprite_skin1.png',
-  azul: 'sprites/player_sprite_skin2.png',
-  amarillo: 'sprites/player_sprite_skin3.png'
+  default: 'src/assets/images/characters/player/player_sprite.png',
+  magenta: 'src/assets/images/characters/player/player_sprite_skin1.png',
+  azul: 'src/assets/images/characters/player/player_sprite_skin2.png',
+  amarillo: 'src/assets/images/characters/player/player_sprite_skin3.png'
 };
 player.loadSprite(skinSprites[selectedSkin], 32, 32, 4);
 player.health = playerData.health;
@@ -202,10 +202,10 @@ if (gameState.entities && gameState.entities.length > 0) {
       enemy.maxHealth = 800;
       enemy.speed = 70;
       enemy.damageRate = 35;
-      enemy.loadSprite('sprites/plant_enemy_boss_sprite.png', 32, 32, 4);
+      enemy.loadSprite('src/assets/images/enemies/plant_enemy_boss_sprite.png', 32, 32, 4);
     } else {
       enemy.health = entityData.health;
-      enemy.loadSprite('sprites/plant_enemy_sprite.png', 32, 32, 4);
+      enemy.loadSprite('src/assets/images/enemies/plant_enemy_sprite.png', 32, 32, 4);
     }
     enemy.target = player;
     engine.addEntity(enemy);
@@ -269,7 +269,7 @@ function spawnEnemy(isBoss = false) {
     enemy.maxHealth = currentWave === 7 ? 2000 : 1000;
     enemy.speed = currentWave === 7 ? 50 : 60; // Velocidad ajustada para el jefe final
     enemy.damageRate = currentWave === 7 ? 40 : 30;
-    enemy.loadSprite('sprites/plant_enemy_boss_sprite.png', 32, 32, 4);
+    enemy.loadSprite('src/assets/images/enemies/plant_enemy_boss_sprite.png', 32, 32, 4);
     enemy.lastSpawnTime = 0;
     enemy.spawnCooldown = 18.0; // Aumentado el tiempo entre spawns de 7 a 15 segundos
     enemy.healthSegments = currentWave === 7 ? 4 : 1; // Segmentos de vida para el jefe final
@@ -280,7 +280,7 @@ function spawnEnemy(isBoss = false) {
       enemy.maxHealth = 200;
       enemy.speed = 90;
       enemy.damageRate = 25;
-      enemy.loadSprite('sprites/plant_enemy_3_sprite.png', 32, 32, 4);
+      enemy.loadSprite('src/assets/images/enemies/plant_enemy_3_sprite.png', 32, 32, 4);
     }
     // Enemigo tipo 2 (desde fase 2)
     else if (currentWave >= 2 && Math.random() < 0.4) {
@@ -288,7 +288,7 @@ function spawnEnemy(isBoss = false) {
       enemy.maxHealth = 150;
       enemy.speed = 100;
       enemy.damageRate = 20;
-      enemy.loadSprite('sprites/plant_enemy_2_sprite.png', 32, 32, 4);
+      enemy.loadSprite('src/assets/images/enemies/plant_enemy_2_sprite.png', 32, 32, 4);
     }
     // Enemigo básico
     else {
@@ -296,7 +296,7 @@ function spawnEnemy(isBoss = false) {
       enemy.maxHealth = 100;
       enemy.speed = 85; // Velocidad reducida del enemigo básico
       enemy.damageRate = 15;
-      enemy.loadSprite('sprites/plant_enemy_sprite.png', 32, 32, 4);
+      enemy.loadSprite('src/assets/images/enemies/plant_enemy_sprite.png', 32, 32, 4);
     }
   }
   enemy.target = player;
@@ -492,13 +492,13 @@ function waveManager(dt) {
         if (randomSkill) {
           const card = document.createElement('div');
           card.className = 'skill-card';
-          card.style.cssText = 'width: 200px; background: url(sprites/card_sprite.png) no-repeat center; background-size: contain; padding: 15px; cursor: pointer; color: black; text-align: center; position: relative; font-family: "Mineglyph", sans-serif;';
+          card.style.cssText = 'width: 200px; background: url(src/assets/images/ui/card_sprite.png) no-repeat center; background-size: contain; padding: 15px; cursor: pointer; color: black; text-align: center; position: relative; font-family: "Mineglyph", sans-serif;';
           card.addEventListener('mouseover', () => {
-            card.style.backgroundImage = 'url(sprites/card_selected_sprite.png)';
+            card.style.backgroundImage = 'url(src/assets/images/ui/card_selected_sprite.png)';
           });
           card.addEventListener('mouseout', () => {
             if (!card.classList.contains('selected')) {
-              card.style.backgroundImage = 'url(sprites/card_sprite.png)';
+              card.style.backgroundImage = 'url(src/assets/images/ui/card_sprite.png)';
             }
           });
           card.innerHTML = `

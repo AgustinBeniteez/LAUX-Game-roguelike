@@ -3,7 +3,7 @@ class AudioManager {
         this.soundVolume = parseInt(localStorage.getItem('soundVolume')) || 70;
         this.musicVolume = parseInt(localStorage.getItem('musicVolume')) || 70;
         this.testSound = new Audio();
-        this.testSound.src = 'sprites/test_sound.mp3';
+        this.testSound.src = 'src/assets/audio/test_sound.mp3';
         this.testSound.volume = this.soundVolume / 100;
         this.testSound.loop = false;
     }

@@ -6,8 +6,8 @@ export default class LobbyMap extends BaseMap {
             width: 800,
             height: 600,
             tileSize: 32,
-            floorTilePath: 'sprites/floor_tile.png',
-            wallTilePath: 'sprites/wall_tile.png'
+            floorTilePath: 'src/assets/images/tiles/floor_tile.png',
+            wallTilePath: 'src/assets/images/tiles/wall_tile.png'
         };
         super(engine, config);
     }

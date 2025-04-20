@@ -1,6 +1,6 @@
 body { 
   margin: 0; 
-  background-image: url('../../src/background_select_class.png');
+  background-image: url('../../src/assets/images/backgrounds/background_select_class.png');
   background-color: #222222;
   background-size: cover;
   background-position: center;
@@ -36,7 +36,7 @@ body {
   height: 400px;
   cursor: pointer;
   transition: all 0.3s ease;
-  background: url(../../sprites/card_sprite.png) no-repeat center;
+  background: url(../../src/assets/images/card_sprite.png) no-repeat center;
   background-size: cover;
   display: flex;
   flex-direction: column;
@@ -51,7 +51,7 @@ body {
 }
 
 .hero-card.selected {
-  background-image: url('../../sprites/card_selected_sprite.png');
+  background-image: url('../../src/assets/images/card_selected_sprite.png');
 }
 
 .hero-icon {

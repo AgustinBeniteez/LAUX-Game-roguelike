@@ -32,7 +32,7 @@ class Map1 {
 
     loadTileSprites() {
         const tilesetImage = new Image();
-        tilesetImage.src = 'sprites/tiles_cesped.png';
+        tilesetImage.src = 'src/assets/images/tiles/tiles_cesped.png';
 
         tilesetImage.onload = () => {
             const tileSize = 64;

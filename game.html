@@ -8,7 +8,7 @@
     import { VERSION } from './version.js';
     document.getElementById('version-display').textContent = VERSION;
   </script>
-  <link rel="shortcut icon" href="sprites/laux_logo.webp" type="image/x-icon">
+  <link rel="shortcut icon" href="src/assets/images/ui/laux_logo.ico" type="image/x-icon">
   <link href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css' rel='stylesheet'/>
   <link rel="stylesheet" href="custom_cursor.css">
   <link rel="stylesheet" href="src/fonts.css">
@@ -500,7 +500,6 @@
       border: none;
       border-radius: 10px;
       z-index: 900;
-      background: #222;
     }
     .skill-card:hover {
       transform: scale(1.1);
@@ -509,7 +508,7 @@
       image-rendering: pixelated;
     }
     .skill-card.selected {
-      background: url('sprites/card_selected_sprite.png') no-repeat center !important;
+      background: url('src/assets/images/ui/card_selected_sprite.png') no-repeat center !important;
       background-size: contain !important;
       transform: scale(1.1);
       image-rendering: pixelated;

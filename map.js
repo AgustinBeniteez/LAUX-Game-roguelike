@@ -93,11 +93,11 @@ class Map {
 
     loadTileSprites() {
         const tilesetImage = new Image();
-        tilesetImage.src = this.mapType === 'lobby' ? 'sprites/lobby_tiles.png' :
-                          this.mapType === 'forest' ? 'sprites/tiles_cesped.png' :
-                          this.mapType === 'crypt' ? 'sprites/tiles_sakura.png' :
-                          this.mapType === 'swamp' ? 'sprites/floor_tile.png' :
-                          'sprites/lobby_tiles.png';
+        tilesetImage.src = this.mapType === 'lobby' ? 'src/assets/images/tiles/lobby_tiles.png' :
+                          this.mapType === 'forest' ? 'src/assets/images/tiles/tiles_cesped.png' :
+                          this.mapType === 'crypt' ? 'src/assets/images/tiles/tiles_sakura.png' :
+                          this.mapType === 'swamp' ? 'src/assets/images/tiles/floor_tile.png' :
+                          'src/assets/images/tiles/tiles_cesped.png';
 
         tilesetImage.onload = () => {
             const tileSize = 64;

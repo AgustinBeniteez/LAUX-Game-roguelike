@@ -37,7 +37,7 @@
 
 body {
   margin: 0;
-  background: url('../../src/background_homegame.gif'), url('../../src/background_homegame.png'), rgb(60, 117, 119);
+  background: url('../../src/assets/images/backgrounds/background_homegame.gif'), url('../../src/assets/images/backgrounds/background_homegame.png'), rgb(60, 117, 119);
   background-size: cover, cover;
   background-repeat: no-repeat, no-repeat;
   background-attachment: fixed, fixed;

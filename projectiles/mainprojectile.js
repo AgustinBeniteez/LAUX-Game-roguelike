@@ -9,34 +9,34 @@ class MainProjectile extends Projectile {
         const projectileConfig = {
             mainproyectil_arcane_e: {
                 name: 'Bola de Daño',
-                sprite: 'sprites/main_skills/sprite_main_skill_E_Arcane.png',
+                sprite: 'src/assets/images/skills/sprite_main_skill_E_Arcane.png',
                 damage: damage * 1.3,
                 areaEffect: true
             },
             mainproyectil_guardian_e: {
                 name: 'Bola de Cristal',
-                sprite: 'sprites/main_skills/sprite_main_skill_E_Guardian.png',
+                sprite: 'src/assets/images/skills/sprite_main_skill_E_Guardian.png',
                 damage: damage * 1.4
             },
             mainproyectil_sentinel_e: {
                 name: 'Estrella de Daño',
-                sprite: 'sprites/main_skills/sprite_main_skill_E_Sentinel.png',
+                sprite: 'src/assets/images/skills/sprite_main_skill_E_Sentinel.png',
                 damage: damage * 1.5
             },
             mainproyectil_arcane_r: {
                 name: 'Teletransporte Arcano',
-                sprite: 'sprites/main_skills/sprite_main_skill_R_Arcane.png',
+                sprite: 'src/assets/images/skills/sprite_main_skill_R_Arcane.png',
                 isNotProjectile: true,
                 isTeleport: true
             },
             mainproyectil_guardian_r: {
                 name: 'Escudo Protector',
-                sprite: 'sprites/main_skills/sprite_main_skill_R_Guardian.png',
+                sprite: 'src/assets/images/skills/sprite_main_skill_R_Guardian.png',
                 isNotProjectile: true
             },
             mainproyectil_sentinel_r: {
                 name: 'Escudo Protector',
-                sprite: 'sprites/main_skills/sprite_main_skill_R_Sentinel.png',
+                sprite: 'src/assets/images/skills/sprite_main_skill_R_Sentinel.png',
                 isNotProjectile: true,
                 isShield: true,
                 shieldAmount: damage * 2
