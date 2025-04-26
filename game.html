@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LAUX GAME</title>
   <div id="version-display" style="position: fixed; bottom: 10px; left: 10px; color: rgba(255, 255, 255, 0.7); font-family: 'Mineglyph', sans-serif; font-size: 14px;"></div>
   <script type="module">
@@ -12,6 +13,32 @@
   <link href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css' rel='stylesheet'/>
   <link rel="stylesheet" href="ui/styles/custom_cursor.css">
   <link rel="stylesheet" href="src/fonts.css">
+  <style>
+    #joystick-container {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      width: 120px;
+      height: 120px;
+      background: rgba(126, 124, 124, 0.39);
+      border-radius: 50%;
+      touch-action: none;
+      z-index: 1000;
+    }
+
+    #joystick-knob {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      background: rgba(61, 61, 61, 0.5);
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+  </style>
   <script>
     // Variables para controlar estados del juego
     let isCounterPaused = false;
@@ -527,7 +554,84 @@
 <body>
   <div id="fps-container"></div>
   <div id="dev-panel"></div>
+  <div id="mobile-pause-button" style="display: none; position: fixed; top: 20px; left: 20px; z-index: 1000; background: rgba(0, 0, 0, 0.5); padding: 10px; border-radius: 50%; cursor: pointer;">
+    <i class="fa-solid fa-pause" style="color: white; font-size: 24px;"></i>
+  </div>
   <canvas id="gameCanvas"></canvas>
+  <div id="joystick-container">
+    <div id="joystick-knob"></div>
+  </div>
+  <script>
+    // Detección de dispositivo móvil
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+      const joystickContainer = document.getElementById('joystick-container');
+      const joystickKnob = document.getElementById('joystick-knob');
+      const mobilePauseButton = document.getElementById('mobile-pause-button');
+      joystickContainer.style.display = 'block';
+      mobilePauseButton.style.display = 'block';
+      
+      mobilePauseButton.addEventListener('click', () => {
+        const pauseMenu = document.getElementById('pauseMenu');
+        pauseMenu.style.display = pauseMenu.style.display === 'flex' ? 'none' : 'flex';
+      });
+      
+      let isDragging = false;
+      let centerX, centerY;
+      let currentX = 0;
+      let currentY = 0;
+      
+      joystickContainer.addEventListener('touchstart', handleStart);
+      joystickContainer.addEventListener('touchmove', handleMove);
+      joystickContainer.addEventListener('touchend', handleEnd);
+      
+      function handleStart(e) {
+        isDragging = true;
+        const rect = joystickContainer.getBoundingClientRect();
+        centerX = rect.left + rect.width / 2;
+        centerY = rect.top + rect.height / 2;
+      }
+      
+      function handleMove(e) {
+        if (!isDragging) return;
+        e.preventDefault();
+        
+        const touch = e.touches[0];
+        const maxDistance = 35;
+        
+        let dx = touch.clientX - centerX;
+        let dy = touch.clientY - centerY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance > maxDistance) {
+          dx = (dx / distance) * maxDistance;
+          dy = (dy / distance) * maxDistance;
+        }
+        
+        currentX = dx / maxDistance;
+        currentY = dy / maxDistance;
+        
+        joystickKnob.style.transform = `translate(${dx}px, ${dy}px)`;
+        
+        // Simular teclas WASD basado en la dirección del joystick
+        window.joystickInput = {
+          up: currentY < -0.5,
+          down: currentY > 0.5,
+          left: currentX < -0.5,
+          right: currentX > 0.5
+        };
+      }
+      
+      function handleEnd() {
+        isDragging = false;
+        currentX = 0;
+        currentY = 0;
+        joystickKnob.style.transform = 'translate(-50%, -50%)';
+        window.joystickInput = { up: false, down: false, left: false, right: false };
+      }
+    }
+  </script>
   <div id="hud">
     <div id="skills-container" style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px; align-items: center;">
       <!-- Habilidades activables -->

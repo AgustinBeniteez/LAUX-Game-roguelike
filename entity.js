@@ -187,6 +187,55 @@ class Entity {
       // Actualizar efectos de estado
       this.updateStatusEffects();
 
+      // Integrar controles de joystick para móviles
+      if (window.joystickInput && !this.isEnemy && !engine.isPaused) {
+        const moveSpeed = this.speed * dt * 2; // Multiplicamos por 2 para igualar la velocidad del WASD
+        let isMoving = false;
+        
+        if (window.joystickInput.up) {
+          this.y -= moveSpeed;
+          this.currentDirection = 'up';
+          isMoving = true;
+        } else if (window.joystickInput.down) {
+          this.y += moveSpeed;
+          this.currentDirection = 'down';
+          isMoving = true;
+        }
+        
+        if (window.joystickInput.left) {
+          this.x -= moveSpeed;
+          this.currentDirection = 'left';
+          isMoving = true;
+        } else if (window.joystickInput.right) {
+          this.x += moveSpeed;
+          this.currentDirection = 'right';
+          isMoving = true;
+        }
+
+        // Actualizar sprite según la dirección
+        if (isMoving) {
+          this.isMoving = true;
+          switch(this.currentDirection) {
+            case 'up':
+              this.sprite = this.spriteUp;
+              break;
+            case 'down':
+              this.sprite = this.spriteDown;
+              break;
+            case 'left':
+              this.sprite = this.spriteHorizontal;
+              this.lastDirection = 'left';
+              break;
+            case 'right':
+              this.sprite = this.spriteHorizontal;
+              this.lastDirection = 'right';
+              break;
+          }
+        } else {
+          this.isMoving = false;
+        }
+      }
+
       // Actualizar barra de vida del jefe si es un jefe
       if (this.isBoss) {
         const bossHealthBar = document.getElementById('boss-health-bar');
